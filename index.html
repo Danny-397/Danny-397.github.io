@@ -509,6 +509,10 @@
     <div>
       <h2 class="eyebrow">Also</h2>
       <p class="rail-note" style="border-top:0;padding-top:var(--s2)">
+        <a href="reports.html">Technical reports &rarr;</a><br>
+        <span style="color:var(--faint)">Eight documents, ~57 pages, one per project</span>
+      </p>
+      <p class="rail-note" style="border-top:0;padding-top:var(--s3)">
         <a href="writing.html">Writing &rarr;</a><br>
         <span style="color:var(--faint)">Arguments from results I produced myself</span>
       </p>
@@ -722,8 +726,8 @@
       </div>
 
       <dl class="figs">
-        <div><dt>Probability of backtest overfitting</dt><dd>63% <small>CPCV, 42-variant grid</small></dd></div>
-        <div><dt>In-sample Sharpe surviving OOS</dt><dd>~38% <small>median</small></dd></div>
+        <div><dt>Probability of backtest overfitting</dt><dd>72% <small>CPCV, 42-variant grid</small></dd></div>
+        <div><dt>In-sample Sharpe surviving OOS</dt><dd>~52% <small>median</small></dd></div>
         <div><dt>Tests in CI</dt><dd>169</dd></div>
       </dl>
 
@@ -740,9 +744,12 @@
         <p class="eyebrow">Reported finding</p>
         <p>
           Run over a 42-variant trend and mean-reversion grid on SPY using Combinatorial Purged
-          Cross-Validation, the platform reports a <strong>63% probability of backtest overfitting</strong>
+          Cross-Validation, the platform reports a <strong>72% probability of backtest overfitting</strong>
           &mdash; the in-sample winner lands in the bottom half out-of-sample more often than not &mdash;
-          and a median of only ~38% of in-sample Sharpe surviving out of sample. The ML forecaster's test
+          and a median of only ~52% of in-sample Sharpe surviving out of sample. An earlier run of the
+          identical procedure returned 63% and ~38%: same code, same grid, same ticker, different window.
+          That instability is itself the finding, and the report says so rather than quoting whichever
+          number flatters the system. The ML forecaster's test
           AUC of &asymp;0.51 on next-week direction is, correctly and publicly, a coin flip. The one clean
           positive: a dip-buying strategy on AAPL/MSFT in ranging markets, 2021&ndash;2024, returning
           +21.8% against SPY's +5.6%.
@@ -788,7 +795,7 @@
       </div>
 
       <dl class="figs">
-        <div><dt>Symbols streamed live</dt><dd>11 <small>over WebSocket</small></dd></div>
+        <div><dt>Symbols tracked live</dt><dd>11 <small>ticker + correlation matrix</small></dd></div>
         <div><dt>Fed series, hourly refresh</dt><dd>7 <small>via FRED API</small></dd></div>
         <div><dt>Tests in CI</dt><dd>71 <small>across 10 files</small></dd></div>
       </dl>
@@ -810,7 +817,7 @@
             <li><strong>Sentiment.</strong> VADER extended with roughly 30 finance-specific terms &mdash; <code>beats &rarr; +2.0</code>, <code>bankruptcy &rarr; &minus;3.0</code> &mdash; because general-purpose sentiment models misread earnings language.</li>
             <li><strong>Assistant.</strong> Grounded in the user's live macro, portfolio and news context before the model is called, so answers are about their actual holdings.</li>
             <li><strong>Security.</strong> PBKDF2 password hashing, signed bearer tokens, and per-user row scoping isolating portfolios, alerts and watchlists.</li>
-            <li><strong>Screener.</strong> 28 curated stocks across five sectors, fetched concurrently through an 8-worker thread pool.</li>
+            <li><strong>Screener.</strong> A 29-symbol universe &mdash; 27 stocks across five sectors plus SPY and QQQ &mdash; fetched concurrently through an 8-worker thread pool.</li>
           </ul>
         </div>
       </details>
@@ -820,6 +827,7 @@
       </div>
       <div class="links">
         <a href="https://www.tradeski.dev/">Open the dashboard &rarr;</a>
+        <a class="secondary" href="reports/Tradeski-Technical-Report.pdf">Technical report</a>
         <a class="secondary" href="https://github.com/Danny-397/Tradeski">Source</a>
       </div>
     </article>
@@ -871,6 +879,7 @@
       </div>
       <div class="links">
         <a href="https://danny-397.github.io/neural-canvas/">Paint with your hands &rarr;</a>
+        <a class="secondary" href="reports/Neural-Canvas-Technical-Report.pdf">Technical report</a>
         <a class="secondary" href="https://github.com/Danny-397/neural-canvas">Source</a>
       </div>
     </article>

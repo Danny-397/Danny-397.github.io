@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technical Reports — Dan Lichtenberger</title>
+<link rel="stylesheet" href="site.css">
+<style>
+  .head { padding: var(--s5) 0 var(--s4); border-bottom: 1px solid var(--rule); }
+  h1 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(2rem, 4.6vw, 2.9rem); line-height: 1.08;
+    letter-spacing: -.012em; margin: var(--s2) 0 var(--s3); text-wrap: balance;
+  }
+  .standfirst {
+    font-family: var(--serif); font-size: clamp(1.08rem, 2vw, 1.25rem);
+    line-height: 1.55; max-width: var(--measure); margin: 0 0 var(--s3); color: var(--text);
+  }
+  .standfirst em { font-style: italic; color: var(--accent-ink); }
+  .note { color: var(--muted); font-size: .95rem; max-width: 42em; margin: 0; }
+
+  .list { padding: var(--s4) 0 0; display: grid; gap: 0; }
+  .doc {
+    border-top: 1px solid var(--rule);
+    padding: var(--s4) 0;
+    display: grid;
+    grid-template-columns: 132px 1fr;
+    gap: var(--s4);
+    align-items: start;
+  }
+  .doc:first-child { border-top: 0; padding-top: var(--s2); }
+  @media (max-width: 760px) { .doc { grid-template-columns: 1fr; gap: var(--s2); } }
+
+  .meta { display: grid; gap: .3rem; }
+  .meta .k {
+    font-family: var(--mono); font-size: .67rem; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--faint);
+  }
+  .meta .v {
+    font-family: var(--mono); font-size: .78rem; letter-spacing: .04em;
+    color: var(--accent-ink); font-variant-numeric: tabular-nums;
+  }
+  .meta .proj { color: var(--muted); font-size: .74rem; line-height: 1.45; }
+
+  .doc h2 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(1.3rem, 2.5vw, 1.62rem); line-height: 1.18;
+    margin: 0 0 var(--s2); text-wrap: balance;
+  }
+  .doc h2 a { text-decoration: none; border-bottom: 1px solid var(--rule); padding-bottom: .1rem; }
+  .doc h2 a:hover { border-bottom-color: var(--accent); color: var(--accent-ink); }
+  .doc p { margin: 0 0 var(--s2); max-width: 42em; color: var(--muted); font-size: .95rem; }
+  .doc .pull {
+    font-family: var(--serif); font-size: 1.02rem; color: var(--text);
+    border-left: 2px solid var(--accent); padding-left: var(--s3);
+    margin: 0 0 var(--s3); max-width: 40em;
+  }
+  .links { display: flex; flex-wrap: wrap; gap: var(--s3); align-items: center; }
+  .links a {
+    font-family: var(--mono); font-size: .75rem; letter-spacing: .06em;
+    text-decoration: none; color: var(--accent-ink);
+    border-bottom: 1px solid var(--accent); padding-bottom: .1rem;
+  }
+  .links a:hover { background: var(--accent-wash); }
+  .links a.secondary { color: var(--muted); border-bottom-color: var(--rule); }
+  .links a.secondary:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="name" href="index.html">Dan Lichtenberger</a>
+    <nav>
+      <a href="index.html">Work</a>
+      <a href="reports.html" aria-current="page">Reports</a>
+      <a href="writing.html">Writing</a>
+      <a href="https://github.com/Danny-397">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="head">
+    <p class="eyebrow">Technical Reports</p>
+    <h1>Eight documents, and<br>what each one admits.</h1>
+    <p class="standfirst">
+      Every project here is written up properly &mdash; architecture, method, results, and a
+      section on <em>what it does not do</em>. That last section is the one I'd read first.
+    </p>
+    <p class="note">
+      Roughly 57 pages in total. Each report is generated from the markdown source committed
+      in its own repository, so the document and the code cannot drift apart. Every figure is
+      reproduced from that project's test suite, experiment log, or results file.
+    </p>
+  </div>
+
+  <div class="list">
+
+    <!-- ============ RL TRADER PAPER ============ -->
+    <article class="doc">
+      <div class="meta">
+        <span class="k">Format</span>
+        <span class="v">Paper &middot; 3 pp</span>
+        <span class="k" style="margin-top:.6rem">Project</span>
+        <span class="proj">RL for Crypto &amp; Stocks</span>
+      </div>
+      <div>
+        <h2><a href="reports/RL-Trader-Paper.pdf">Generalization and Evaluation Rigor in Deep Reinforcement Learning</a></h2>
+        <p class="pull">
+          The headline result is negative, and that is the point: on real markets the agent has
+          no seed-robust edge over buy-and-hold, and the significance tooling catches a
+          single-seed &ldquo;+275%&rdquo; run as a false positive.
+        </p>
+        <p>
+          PPO with Generalized Advantage Estimation implemented from first principles, two
+          custom Gymnasium environments, and four research questions on generalization,
+          domain randomization, seed robustness and cross-sectional allocation. Written in
+          LaTeX, two-column, figure-free so it compiles from the <code>.tex</code> alone.
+        </p>
+        <div class="links">
+          <a href="reports/RL-Trader-Paper.pdf">Read the paper &rarr;</a>
+          <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-/blob/main/RESULTS.md">Full results</a>
+          <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-">Source</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- ============ RL CHESS ============ -->
+    <article class="doc">
+      <div class="meta">
+        <span class="k">Format</span>
+        <span class="v">Report &middot; 13 pp</span>
+        <span class="k" style="margin-top:.6rem">Project</span>
+        <span class="proj">AlphaZero Chess Engine</span>
+      </div>
+      <div>
+        <h2><a href="reports/RL-Chess-Technical-Report.pdf">An AlphaZero-Style Chess Engine, Built From Scratch</a></h2>
+        <p class="pull">
+          Scaling self-play 10&times; bought 14 Elo. The diagnosis is that this is a self-play
+          <em>signal</em> problem, not a compute ceiling &mdash; draw-heavy self-play starves the
+          value head of gradient.
+        </p>
+        <p>
+          The longest document here. Network, PUCT search and training loop from first
+          principles; a controlled study of the training plateau; and a classical alpha-beta
+          engine built as a control to confirm the evaluation harness itself was sound.
+        </p>
+        <div class="links">
+          <a href="reports/RL-Chess-Technical-Report.pdf">Read the report &rarr;</a>
+          <a class="secondary" href="reports/RL-Chess-Experiment-Results.pdf">Experiment log (7 pp)</a>
+          <a class="secondary" href="https://rlchess.xyz">Play it</a>
+          <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine">Source</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- ============ ALPHAGLYPH ============ -->
+    <article class="doc">
+      <div class="meta">
+        <span class="k">Format</span>
+        <span class="v">Report &middot; 8 pp</span>
+        <span class="k" style="margin-top:.6rem">Project</span>
+        <span class="proj">AlphaGlyph</span>
+      </div>
+      <div>
+        <h2><a href="reports/AlphaGlyph-Technical-Report.pdf">A Backtesting Laboratory That Measures Its Own Credibility</a></h2>
+        <p class="pull">
+          72% probability of backtest overfitting on its own strategy grid. An earlier run of
+          identical code on a different window said 63% &mdash; and the instability is itself
+          the finding.
+        </p>
+        <p>
+          Walk-forward simulation with rolling Kelly sizing and transaction costs, then
+          Probabilistic and Deflated Sharpe ratios, Fama-French attribution, and combinatorial
+          purged cross-validation to quantify how much of the result is selection bias.
+        </p>
+        <div class="links">
+          <a href="reports/AlphaGlyph-Technical-Report.pdf">Read the report &rarr;</a>
+          <a class="secondary" href="https://alphaglyph.org">Run a backtest</a>
+          <a class="secondary" href="https://github.com/Danny-397/Alphaglyph">Source</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- ============ QUANTUMSAFE ============ -->
+    <article class="doc">
+      <div class="meta">
+        <span class="k">Format</span>
+        <span class="v">Report &middot; 6 pp</span>
+        <span class="k" style="margin-top:.6rem">Project</span>
+        <span class="proj">QuantumSafe Scan</span>
+      </div>
+      <div>
+        <h2><a href="reports/QuantumSafe-Technical-Report.pdf">Detecting Quantum-Vulnerable Cryptography</a></h2>
+        <p class="pull">
+          The interesting problem isn't matching the string <code>RSA</code> &mdash; it's not
+          matching it inside a comment, a docstring, or a code path nothing ever calls.
+        </p>
+        <p>
+          A hybrid AST-and-regex engine with usage awareness and reachability ranking, measured
+          against a labeled nine-language benchmark: 100% precision where naive pattern matching
+          scores 49.1%, with 100% recall under mutation testing. The companion whitepaper covers
+          the full threat model, the mathematics of Shor and Grover, and a lattice-based KEM
+          written from scratch.
+        </p>
+        <div class="links">
+          <a href="reports/QuantumSafe-Technical-Report.pdf">Read the report &rarr;</a>
+          <a class="secondary" href="reports/QuantumSafe-Whitepaper.pdf">Whitepaper (8 pp)</a>
+          <a class="secondary" href="https://quantumsafescan.com">Open the scanner</a>
+          <a class="secondary" href="https://github.com/Danny-397/Quantum-Safe-Scan">Source</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- ============ TRADESKI ============ -->
+    <article class="doc">
+      <div class="meta">
+        <span class="k">Format</span>
+        <span class="v">Report &middot; 6 pp</span>
+        <span class="k" style="margin-top:.6rem">Project</span>
+        <span class="proj">Tradeski</span>
+      </div>
+      <div>
+        <h2><a href="reports/Tradeski-Technical-Report.pdf">A Real-Time Market Dashboard</a></h2>
+        <p class="pull">
+          A market dashboard looks like a data-visualization problem and is actually an
+          API-quota problem. The design question is not how to draw it &mdash; it's how stale
+          each number is allowed to be.
+        </p>
+        <p>
+          Per-source cache TTLs chosen from how fast each quantity actually moves, ten
+          indicators hand-implemented on NumPy arrays with their boundary conditions handled
+          explicitly, and a language-model assistant grounded in the user's real holdings
+          before it is called. The limitations section is unusually long on purpose.
+        </p>
+        <div class="links">
+          <a href="reports/Tradeski-Technical-Report.pdf">Read the report &rarr;</a>
+          <a class="secondary" href="https://www.tradeski.dev/">Open the dashboard</a>
+          <a class="secondary" href="https://github.com/Danny-397/Tradeski">Source</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- ============ NEURAL CANVAS ============ -->
+    <article class="doc">
+      <div class="meta">
+        <span class="k">Format</span>
+        <span class="v">Report &middot; 6 pp</span>
+        <span class="k" style="margin-top:.6rem">Project</span>
+        <span class="proj">Neural Canvas</span>
+      </div>
+      <div>
+        <h2><a href="reports/Neural-Canvas-Technical-Report.pdf">Painting With Bare Hands</a></h2>
+        <p class="pull">
+          Getting hand landmarks is a solved problem you can import. Then you draw a line with
+          it, and the line is unusable &mdash; the jitter and the signal are the same size.
+        </p>
+        <p>
+          Why a fixed low-pass filter cannot work for drawing, and what the one-euro filter
+          does instead: a cutoff frequency derived from the smoothed velocity, so the pen
+          smooths hard at rest and passes through untouched at speed. Plus dropout grace
+          periods, gesture debouncing, and kaleidoscopic symmetry as a stroke-path transform.
+        </p>
+        <div class="links">
+          <a href="reports/Neural-Canvas-Technical-Report.pdf">Read the report &rarr;</a>
+          <a class="secondary" href="https://danny-397.github.io/neural-canvas/">Paint with your hands</a>
+          <a class="secondary" href="https://github.com/Danny-397/neural-canvas">Source</a>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <p class="eyebrow">On these documents</p>
+    <p>
+      Each PDF is rendered from the markdown committed in its project's own repository, so
+      the report and the code stay in step. Where a project failed to beat its baseline, the
+      report says so and reports the confidence interval.
+      <a href="index.html">Back to the work &rarr;</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

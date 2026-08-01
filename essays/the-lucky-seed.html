@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Lucky Seed — Dan Lichtenberger</title>
+<link rel="stylesheet" href="../site.css">
+<style>
+  .article { padding: var(--s5) 0 var(--s4); }
+  .article > * { max-width: var(--measure); }
+  .article > .full { max-width: none; }
+
+  h1 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(2.1rem, 5vw, 3.1rem); line-height: 1.06;
+    letter-spacing: -.014em; margin: var(--s2) 0 var(--s3); text-wrap: balance;
+  }
+  .standfirst {
+    font-family: var(--serif); font-size: clamp(1.1rem, 2.1vw, 1.3rem);
+    line-height: 1.55; margin: 0 0 var(--s4); color: var(--text);
+  }
+  .byline {
+    display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3);
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--faint);
+    border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft);
+    padding: var(--s2) 0; margin-bottom: var(--s4);
+  }
+  .byline a { color: var(--accent-ink); }
+
+  h2 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(1.3rem, 2.5vw, 1.6rem); line-height: 1.2;
+    margin: var(--s5) 0 var(--s3); text-wrap: balance;
+  }
+  h2 .num {
+    font-family: var(--mono); font-size: .68rem; letter-spacing: .16em;
+    color: var(--accent); display: block; margin-bottom: .5rem;
+  }
+  .article p { margin: 0 0 var(--s3); }
+
+  /* ---------- figure ---------- */
+  figure.chart {
+    margin: var(--s5) 0;
+    padding: var(--s4) 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    max-width: 46rem;
+  }
+  figure.chart .scroller { overflow-x: auto; }
+  figure.chart svg { display: block; min-width: 560px; width: 100%; height: auto; }
+  figcaption {
+    font-size: .85rem; color: var(--muted); line-height: 1.55;
+    margin-top: var(--s3); max-width: 40em;
+  }
+  figcaption b { color: var(--text); font-weight: 600; }
+  .chart-title {
+    font-family: var(--sans); font-size: 1rem; font-weight: 600;
+    color: var(--text); margin: 0 0 .2rem;
+  }
+  .chart-sub {
+    font-family: var(--mono); font-size: .7rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--faint); margin: 0 0 var(--s3);
+  }
+
+  /* svg text + marks driven by tokens so both themes work */
+  .ax        { stroke: var(--rule); stroke-width: 1; }
+  .grid      { stroke: var(--rule-soft); stroke-width: 1; }
+  .zero      { stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 3 4; }
+  .tick      { fill: var(--faint); font-family: var(--mono); font-size: 11px; }
+  .rowlab    { fill: var(--text); font-family: var(--sans); font-size: 13px; font-weight: 600; }
+  .rowsub    { fill: var(--muted); font-family: var(--mono); font-size: 10.5px; }
+  .vallab    { fill: var(--text); font-family: var(--mono); font-size: 12px; font-weight: 600; }
+  .zerolab   { fill: var(--muted); font-family: var(--mono); font-size: 10.5px; }
+  .whisk     { stroke-width: 2; fill: none; }
+  .ring      { stroke: var(--bg); stroke-width: 2; }
+  .m-incon   { stroke: var(--accent); fill: var(--accent); }
+  .m-worse   { stroke: var(--flag);   fill: var(--flag); }
+
+  blockquote {
+    font-family: var(--serif); font-size: 1.25rem; line-height: 1.45;
+    border-left: 2px solid var(--accent); padding-left: var(--s3);
+    margin: var(--s4) 0; color: var(--text);
+  }
+
+  .fn { border-top: 1px solid var(--rule); margin-top: var(--s5); padding-top: var(--s3); }
+  .fn ol { padding-left: 1.2rem; margin: var(--s2) 0 0; display: grid; gap: .5rem; }
+  .fn li { font-size: .85rem; color: var(--muted); line-height: 1.5; }
+  .fn li::marker { font-family: var(--mono); color: var(--accent); }
+  sup a { font-family: var(--mono); font-size: .7em; color: var(--accent-ink); text-decoration: none; padding: 0 .1em; }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="name" href="../index.html">Dan Lichtenberger</a>
+    <nav>
+      <a href="../index.html">Work</a>
+      <a href="../writing.html" aria-current="page">Writing</a>
+      <a href="https://github.com/Danny-397">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap article">
+
+  <p class="eyebrow">Essay &middot; Reinforcement learning</p>
+  <h1>The Lucky Seed</h1>
+  <p class="standfirst">
+    I trained the same trading agent five times, changing nothing but the random seed.
+    One of those runs returned 275%. That run is the reason I no longer believe results
+    like it &mdash; including, for a while, my own.
+  </p>
+
+  <div class="byline">
+    <span>Draft</span>
+    <span>Evidence: <a href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-">RL-Trader</a></span>
+    <span>Code &amp; data public</span>
+  </div>
+
+  <div class="draft">
+    <p class="eyebrow">How to use this page</p>
+    <p>
+      The structure, the figure and every number are in place &mdash; all of it comes from
+      your own runs. What's missing is the argument, which has to be yours: an admissions
+      reader can tell the difference between someone reporting a result and someone
+      thinking about one, and the whole point of this page is to show the second thing.
+    </p>
+    <p>
+      Each section below has a note saying what that section must accomplish and the trap
+      to avoid. <strong>Write the prose, then delete the note.</strong> When every dashed
+      box is gone, the essay is done.
+    </p>
+  </div>
+
+  <!-- ================= 1 ================= -->
+  <h2><span class="num">01</span>The claim you see everywhere</h2>
+
+  <div class="draft">
+    <p class="eyebrow">What this section must do</p>
+    <ul>
+      <li>Open with the specific belief you're going to attack &mdash; that machine learning can find durable edge in markets, stated the way its advocates state it.</li>
+      <li>Be fair to it. Steelman it. If you strawman here, everything after is worthless.</li>
+      <li><strong>Trap:</strong> don't open with &ldquo;AI is everywhere these days.&rdquo; Open with a specific claim a specific kind of person makes.</li>
+      <li><strong>Your unfair advantage:</strong> you believed this. Say so, and say what made you believe it.</li>
+    </ul>
+  </div>
+
+  <!-- ================= 2 ================= -->
+  <h2><span class="num">02</span>What I built to test it</h2>
+
+  <div class="draft">
+    <p class="eyebrow">What this section must do</p>
+    <ul>
+      <li>Establish that the test was honest <em>before</em> you knew the answer &mdash; chronological splits, scalers fit on training data only, transaction costs, a real benchmark. Pre-committing to the method is what separates this from data mining.</li>
+      <li>Keep it short. Two paragraphs. The method is in the repo; this is an essay.</li>
+      <li><strong>Trap:</strong> don't list every hyperparameter. Nobody is grading your implementation here.</li>
+      <li>Worth one line: you wrote PPO from scratch rather than importing it, which is why you could see what it was doing.</li>
+    </ul>
+  </div>
+
+  <!-- ================= 3 ================= -->
+  <h2><span class="num">03</span>The run that would have fooled me</h2>
+
+  <div class="draft">
+    <p class="eyebrow">What this section must do</p>
+    <ul>
+      <li>Tell it honestly as the moment it happened: <b>+275%</b> against a <b>+19%</b> benchmark. Describe what you felt, briefly &mdash; this is the one place emotion belongs.</li>
+      <li>Then the pivot: what made you run it again instead of writing it up.</li>
+      <li><strong>This is the hinge of the essay.</strong> The interesting person isn't the one who got 275%. It's the one who distrusted it.</li>
+    </ul>
+  </div>
+
+  <!-- ================= 4 ================= -->
+  <h2><span class="num">04</span>What five runs showed</h2>
+
+  <figure class="chart full">
+    <p class="chart-title">Five seeds, same agent, same data</p>
+    <p class="chart-sub">Return with 95% bootstrap confidence interval</p>
+
+    <div class="scroller">
+      <svg viewBox="0 0 720 236" role="img"
+           aria-label="Forest plot. Crypto agent: mean return negative 2.7 percent, confidence interval negative 31 to positive 27 percent, crossing zero. Stock agent: mean return negative 19 percent, confidence interval negative 29 to negative 7 percent, entirely below zero.">
+
+        <!-- gridlines -->
+        <g class="grid">
+          <line x1="130" y1="42" x2="130" y2="182"></line>
+          <line x1="200.7" y1="42" x2="200.7" y2="182"></line>
+          <line x1="271.3" y1="42" x2="271.3" y2="182"></line>
+          <line x1="342" y1="42" x2="342" y2="182"></line>
+          <line x1="483.3" y1="42" x2="483.3" y2="182"></line>
+          <line x1="554" y1="42" x2="554" y2="182"></line>
+          <line x1="624.7" y1="42" x2="624.7" y2="182"></line>
+        </g>
+
+        <!-- zero reference -->
+        <line class="zero" x1="412.7" y1="34" x2="412.7" y2="188"></line>
+        <text class="zerolab" x="412.7" y="26" text-anchor="middle">BREAK EVEN</text>
+
+        <!-- axis -->
+        <line class="ax" x1="130" y1="182" x2="660" y2="182"></line>
+        <g class="tick" text-anchor="middle">
+          <text x="130" y="200">&minus;40%</text>
+          <text x="200.7" y="200">&minus;30%</text>
+          <text x="271.3" y="200">&minus;20%</text>
+          <text x="342" y="200">&minus;10%</text>
+          <text x="412.7" y="200">0</text>
+          <text x="483.3" y="200">+10%</text>
+          <text x="554" y="200">+20%</text>
+          <text x="624.7" y="200">+30%</text>
+        </g>
+
+        <!-- row 1: crypto (inconclusive, crosses zero) -->
+        <text class="rowlab" x="118" y="76" text-anchor="end">Crypto agent</text>
+        <text class="rowsub" x="118" y="92" text-anchor="end">p &asymp; 0.97</text>
+        <g class="m-incon">
+          <line class="whisk" x1="193.6" y1="82" x2="603.5" y2="82"></line>
+          <line class="whisk" x1="193.6" y1="74" x2="193.6" y2="90"></line>
+          <line class="whisk" x1="603.5" y1="74" x2="603.5" y2="90"></line>
+          <circle class="ring" cx="393.6" cy="82" r="5.5"></circle>
+        </g>
+        <text class="vallab" x="393.6" y="60" text-anchor="middle">&minus;2.7%</text>
+        <text class="rowsub" x="393.6" y="112" text-anchor="middle">interval crosses zero &mdash; inconclusive</text>
+
+        <!-- row 2: stocks (significantly worse) -->
+        <text class="rowlab" x="118" y="146" text-anchor="end">Stock agent</text>
+        <text class="rowsub" x="118" y="162" text-anchor="end">p &asymp; 0.002</text>
+        <g class="m-worse">
+          <line class="whisk" x1="207.7" y1="152" x2="363.2" y2="152"></line>
+          <line class="whisk" x1="207.7" y1="144" x2="207.7" y2="160"></line>
+          <line class="whisk" x1="363.2" y1="144" x2="363.2" y2="160"></line>
+          <circle class="ring" cx="278.4" cy="152" r="5.5"></circle>
+        </g>
+        <text class="vallab" x="278.4" y="132" text-anchor="middle">&minus;19%</text>
+        <text class="rowsub" x="278.4" y="174" text-anchor="middle">entirely below zero</text>
+
+        <!-- annotation: the single run, off scale -->
+        <text class="rowsub" x="660" y="222" text-anchor="end">the +275% single run is off this scale &rarr;</text>
+      </svg>
+    </div>
+
+    <figcaption>
+      Both agents, evaluated across five random seeds. The crypto agent's interval
+      <b>[&minus;31%, +27%]</b> straddles zero: the result is indistinguishable from noise.
+      The stock agent's interval <b>[&minus;29%, &minus;7%]</b> sits entirely below it.
+      <i>p</i>-values are against a buy-and-hold benchmark, which returned <b>+260%</b>
+      over the stock test period &mdash; far off the right of this axis, and the reason the
+      stock agent's <i>p</i> &asymp; 0.002 means <em>significantly worse</em>, not
+      significantly better.
+    </figcaption>
+  </figure>
+
+  <div class="draft">
+    <p class="eyebrow">What this section must do</p>
+    <ul>
+      <li>Walk the reader through the figure in plain English. Assume they don't know what a confidence interval is and teach it in one sentence without condescending.</li>
+      <li>Land the asymmetry: crypto is <em>inconclusive</em>, stocks is <em>significantly worse than doing nothing</em>. Those are different failures and you should say why.</li>
+      <li><strong>Trap:</strong> don't say &ldquo;the model failed.&rdquo; The model did exactly what it was optimized to do. The <em>evaluation</em> was what had been failing.</li>
+    </ul>
+  </div>
+
+  <!-- ================= 5 ================= -->
+  <h2><span class="num">05</span>Why one run looks so much better than five</h2>
+
+  <div class="draft">
+    <p class="eyebrow">What this section must do</p>
+    <ul>
+      <li>Explain the mechanism, not just the observation. Why is deep RL specifically this high-variance? Initialization, exploration noise, the feedback loop where an early lucky trajectory shapes everything the agent sees next.</li>
+      <li>Connect to your domain-randomization result: an agent trained on a single price path memorizes it; training on a fresh synthetic path per episode closed the gap by <b>two to three orders of magnitude</b>. That's your own evidence for what's actually going wrong.</li>
+      <li>Cite Henderson et al.<sup><a href="#fn1">1</a></sup> here &mdash; you independently reproduced their finding in a domain they didn't test.</li>
+      <li><strong>Trap:</strong> this is the section most likely to turn into a textbook. Keep your own voice.</li>
+    </ul>
+  </div>
+
+  <!-- ================= 6 ================= -->
+  <h2><span class="num">06</span>The counterargument I have to beat</h2>
+
+  <div class="draft">
+    <p class="eyebrow">What this section must do</p>
+    <ul>
+      <li>State the strongest objection to your own essay and answer it. Candidates: <em>&ldquo;you're a student with limited compute &mdash; real firms have more data and better features, so your null result says nothing about theirs.&rdquo;</em> That objection is partly correct. Say which part.</li>
+      <li>Your honest answer is probably about what a null result <em>can</em> and <em>cannot</em> establish. That distinction is the most sophisticated thing in the essay &mdash; don't skip it to look more certain than you are.</li>
+      <li><strong>Including this section is most of its value.</strong> Almost nobody argues against themselves; readers notice.</li>
+    </ul>
+  </div>
+
+  <!-- ================= 7 ================= -->
+  <h2><span class="num">07</span>What I do differently now</h2>
+
+  <div class="draft">
+    <p class="eyebrow">What this section must do</p>
+    <ul>
+      <li>Concrete changes to your own practice, not a moral. You built AlphaGlyph's overfitting tests <em>after</em> this &mdash; and it reports 63% probability of backtest overfitting on your own strategy grid. That's the strongest possible ending: you built the instrument that convicts you.</li>
+      <li>End on the standard you now hold yourself to, in one sentence, without grandeur.</li>
+      <li><strong>Trap:</strong> no &ldquo;and that's what I learned about perseverance.&rdquo; Let the work carry it.</li>
+    </ul>
+  </div>
+
+  <div class="fn" id="notes">
+    <p class="eyebrow">Notes</p>
+    <ol>
+      <li id="fn1">
+        Henderson, P., Islam, R., Bachman, P., Pineau, J., Precup, D., &amp; Meger, D.
+        &ldquo;Deep Reinforcement Learning That Matters.&rdquo; <i>AAAI</i>, 2018 &mdash; the
+        paper establishing that single-run reinforcement learning evaluations are unreliable.
+        Verify the citation against the published version before you post this.
+      </li>
+      <li>
+        All figures are reproducible from the
+        <a href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-">RL-Trader repository</a>;
+        seeds, splits and cost assumptions are recorded there.
+      </li>
+    </ol>
+  </div>
+
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <p><a href="../writing.html">&larr; All writing</a> &nbsp;&middot;&nbsp; <a href="../index.html">Projects</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

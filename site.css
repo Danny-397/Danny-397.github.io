@@ -1,0 +1,152 @@
+/* ------------------------------------------------------------------
+   Shared tokens + base for the writing pages.
+   Same design system as index.html: plotter-pen palette, Iowan Old
+   Style display, Cascadia Mono for data. No build step.
+   ------------------------------------------------------------------ */
+
+:root {
+  --bg:        #E8E6DE;
+  --surface:   #F1EFE9;
+  --text:      #171A20;
+  --muted:     #5B6069;
+  --faint:     #8A8E92;
+  --rule:      #C9C5BA;
+  --rule-soft: #D8D5CB;
+  --accent:    #1F4B99;
+  --accent-ink:#173A78;
+  --accent-wash: rgba(31,75,153,.09);
+  --flag:      #A8402F;
+  --ok:        #3F6B4F;
+  --draft-bg:  rgba(168,64,47,.055);
+
+  --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","Hoefler Text",Georgia,serif;
+  --sans: "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --mono: ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SF Mono",Menlo,"DejaVu Sans Mono",monospace;
+
+  --s1: .375rem; --s2: .75rem; --s3: 1.25rem; --s4: 2rem; --s5: 3.25rem; --s6: 5rem;
+  --measure: 34em;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#0F1319; --surface:#151A21; --text:#DEE2E7; --muted:#8B939E; --faint:#69717C;
+    --rule:#262D36; --rule-soft:#1E242C; --accent:#7FA6E8; --accent-ink:#A6C2F0;
+    --accent-wash: rgba(127,166,232,.10); --flag:#D9705C; --ok:#6FA982;
+    --draft-bg: rgba(217,112,92,.07);
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#0F1319; --surface:#151A21; --text:#DEE2E7; --muted:#8B939E; --faint:#69717C;
+  --rule:#262D36; --rule-soft:#1E242C; --accent:#7FA6E8; --accent-ink:#A6C2F0;
+  --accent-wash: rgba(127,166,232,.10); --flag:#D9705C; --ok:#6FA982;
+  --draft-bg: rgba(217,112,92,.07);
+}
+:root[data-theme="light"] {
+  --bg:#E8E6DE; --surface:#F1EFE9; --text:#171A20; --muted:#5B6069; --faint:#8A8E92;
+  --rule:#C9C5BA; --rule-soft:#D8D5CB; --accent:#1F4B99; --accent-ink:#173A78;
+  --accent-wash: rgba(31,75,153,.09); --flag:#A8402F; --ok:#3F6B4F;
+  --draft-bg: rgba(168,64,47,.055);
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.62;
+  margin: 0;
+  overflow-x: hidden;
+}
+::selection { background: var(--accent-wash); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 1px; }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--s3); }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0;
+}
+
+/* ---------- site bar ---------- */
+.bar {
+  border-bottom: 1px solid var(--rule);
+  padding: var(--s3) 0;
+}
+.bar .wrap { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); align-items: baseline; justify-content: space-between; }
+.bar .name {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  text-decoration: none;
+}
+.bar nav { display: flex; gap: var(--s3); }
+.bar nav a {
+  font-family: var(--mono);
+  font-size: .72rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--muted);
+  padding-bottom: .15rem;
+  border-bottom: 1px solid transparent;
+}
+.bar nav a:hover { color: var(--text); }
+.bar nav a[aria-current="page"] { color: var(--accent-ink); border-bottom-color: var(--accent); }
+
+/* ---------- shared blocks ---------- */
+code {
+  font-family: var(--mono);
+  font-size: .87em;
+  background: var(--accent-wash);
+  padding: .08em .35em;
+  border-radius: 2px;
+}
+
+.figs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: var(--s3);
+  margin: 0;
+  padding: var(--s3) 0;
+  border-top: 1px solid var(--rule-soft);
+  border-bottom: 1px solid var(--rule-soft);
+}
+.figs > div { display: grid; gap: .15rem; }
+.figs dt {
+  font-family: var(--mono); font-size: .67rem; letter-spacing: .11em;
+  text-transform: uppercase; color: var(--faint); order: 2;
+}
+.figs dd {
+  margin: 0; order: 1; font-family: var(--mono);
+  font-variant-numeric: tabular-nums; font-size: 1.18rem; font-weight: 600;
+  letter-spacing: -.015em; color: var(--text); line-height: 1.25;
+}
+.figs dd small { font-size: .8rem; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+
+/* draft scaffolding — delete these as you write */
+.draft {
+  border: 1px dashed var(--flag);
+  background: var(--draft-bg);
+  border-radius: 2px;
+  padding: var(--s3);
+  margin: var(--s3) 0;
+  display: grid;
+  gap: var(--s2);
+  max-width: var(--measure);
+}
+.draft > p.eyebrow { color: var(--flag); }
+.draft p, .draft li { font-size: .9rem; color: var(--muted); margin: 0; }
+.draft ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .35rem; }
+.draft li::marker { color: var(--flag); }
+.draft strong { color: var(--text); }
+
+footer.colophon { border-top: 1px solid var(--rule); padding: var(--s4) 0 var(--s5); margin-top: var(--s5); }
+footer.colophon p { margin: .5rem 0 0; color: var(--muted); font-size: .92rem; max-width: 30em; }
+footer.colophon a { color: var(--accent-ink); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

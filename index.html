@@ -1,0 +1,1058 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dan Lichtenberger — Selected Work</title>
+<style>
+  :root {
+    --bg:        #E8E6DE;
+    --surface:   #F1EFE9;
+    --text:      #171A20;
+    --muted:     #5B6069;
+    --faint:     #8A8E92;
+    --rule:      #C9C5BA;
+    --rule-soft: #D8D5CB;
+    --accent:    #1F4B99;
+    --accent-ink:#173A78;
+    --accent-wash: rgba(31,75,153,.09);
+    --flag:      #A8402F;
+    --ok:        #3F6B4F;
+
+    --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","Hoefler Text",Georgia,serif;
+    --sans: "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    --mono: ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SF Mono",Menlo,"DejaVu Sans Mono",monospace;
+
+    --s1: .375rem; --s2: .75rem; --s3: 1.25rem; --s4: 2rem; --s5: 3.25rem; --s6: 5rem;
+    --maxw: 1180px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:        #0F1319;
+      --surface:   #151A21;
+      --text:      #DEE2E7;
+      --muted:     #8B939E;
+      --faint:     #69717C;
+      --rule:      #262D36;
+      --rule-soft: #1E242C;
+      --accent:    #7FA6E8;
+      --accent-ink:#A6C2F0;
+      --accent-wash: rgba(127,166,232,.10);
+      --flag:      #D9705C;
+      --ok:        #6FA982;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#0F1319; --surface:#151A21; --text:#DEE2E7; --muted:#8B939E; --faint:#69717C;
+    --rule:#262D36; --rule-soft:#1E242C; --accent:#7FA6E8; --accent-ink:#A6C2F0;
+    --accent-wash: rgba(127,166,232,.10); --flag:#D9705C; --ok:#6FA982;
+  }
+  :root[data-theme="light"] {
+    --bg:#E8E6DE; --surface:#F1EFE9; --text:#171A20; --muted:#5B6069; --faint:#8A8E92;
+    --rule:#C9C5BA; --rule-soft:#D8D5CB; --accent:#1F4B99; --accent-ink:#173A78;
+    --accent-wash: rgba(31,75,153,.09); --flag:#A8402F; --ok:#3F6B4F;
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.62;
+    margin: 0;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--accent-wash); }
+
+  a { color: inherit; }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 var(--s3);
+  }
+
+  /* ---------- eyebrow / labels ---------- */
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: .68rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin: 0;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    overflow: hidden;
+  }
+  #plot {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: .55;
+    pointer-events: none;
+  }
+  @media (prefers-color-scheme: dark) { #plot { opacity: .72; } }
+  :root[data-theme="dark"] #plot { opacity: .72; }
+  :root[data-theme="light"] #plot { opacity: .55; }
+
+  .masthead-inner {
+    position: relative;
+    padding: var(--s5) 0 var(--s4);
+    display: grid;
+    gap: var(--s3);
+  }
+  .id-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2) var(--s3);
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(2.15rem, 5.4vw, 3.4rem);
+    line-height: 1.06;
+    letter-spacing: -.012em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h1 .sub {
+    display: block;
+    font-family: var(--mono);
+    font-size: clamp(.72rem, 1.5vw, .8rem);
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: .9rem;
+    line-height: 1.4;
+  }
+  .thesis {
+    font-family: var(--serif);
+    font-size: clamp(1.12rem, 2.1vw, 1.3rem);
+    line-height: 1.55;
+    max-width: 34em;
+    margin: 0;
+    color: var(--text);
+  }
+  .thesis em { font-style: italic; color: var(--accent-ink); }
+  .whoami {
+    max-width: 44em;
+    margin: 0;
+    color: var(--muted);
+    font-size: .95rem;
+  }
+
+  /* ---------- ledger strip ---------- */
+  .ledger {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    border-top: 1px solid var(--rule);
+    margin-top: var(--s3);
+  }
+  .ledger div {
+    padding: var(--s3) var(--s3) var(--s3) 0;
+    border-right: 1px solid var(--rule-soft);
+  }
+  .ledger div:last-child { border-right: 0; }
+  .ledger b {
+    display: block;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.45rem;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    color: var(--accent-ink);
+  }
+  .ledger span {
+    display: block;
+    font-size: .82rem;
+    color: var(--muted);
+    line-height: 1.45;
+    margin-top: .2rem;
+    max-width: 20em;
+  }
+
+  /* ---------- body grid ---------- */
+  .layout {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: var(--s6);
+    padding: var(--s5) 0 var(--s6);
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: var(--s4); padding-top: var(--s4); }
+  }
+
+  /* ---------- index rail ---------- */
+  .rail { position: sticky; top: var(--s3); display: grid; gap: var(--s4); }
+  @media (max-width: 900px) { .rail { position: static; } }
+
+  .rail h2 { margin: 0 0 var(--s2); }
+  .filters {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    border-top: 1px solid var(--rule-soft);
+    padding-top: var(--s2);
+  }
+  @media (max-width: 900px) {
+    .filters { flex-direction: row; flex-wrap: wrap; gap: var(--s1) var(--s2); }
+  }
+  .filters button {
+    appearance: none;
+    background: none;
+    border: 0;
+    border-left: 2px solid transparent;
+    padding: .3rem 0 .3rem .6rem;
+    margin: 0;
+    font: inherit;
+    font-size: .9rem;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: left;
+    transition: color .15s, border-color .15s;
+  }
+  .filters button:hover { color: var(--text); }
+  .filters button[aria-pressed="true"] {
+    color: var(--accent-ink);
+    border-left-color: var(--accent);
+    font-weight: 600;
+  }
+  .filters .n {
+    font-family: var(--mono);
+    font-size: .72rem;
+    color: var(--faint);
+    font-weight: 400;
+    margin-left: .35rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .rail-note {
+    font-size: .82rem;
+    color: var(--muted);
+    line-height: 1.5;
+    border-top: 1px solid var(--rule-soft);
+    padding-top: var(--s2);
+    margin: 0;
+  }
+  .rail-note a { color: var(--accent-ink); }
+
+  /* ---------- records ---------- */
+  .records { display: grid; gap: 0; }
+  .rec {
+    border-top: 1px solid var(--rule);
+    padding: var(--s4) 0;
+    display: grid;
+    gap: var(--s3);
+  }
+  .rec[hidden] { display: none; }
+  .rec:first-child { border-top: 0; padding-top: 0; }
+
+  .rec-head { display: grid; gap: var(--s2); }
+  .tags { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+  .tag {
+    font-family: var(--mono);
+    font-size: .67rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .tag.type { color: var(--accent-ink); }
+  .tag.live::before {
+    content: "";
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--ok);
+    margin-right: .45rem;
+    vertical-align: .08em;
+  }
+  .tag.live { color: var(--ok); }
+
+  .rec h3 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(1.5rem, 3vw, 1.95rem);
+    line-height: 1.15;
+    letter-spacing: -.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .lede {
+    font-family: var(--serif);
+    font-size: 1.08rem;
+    line-height: 1.55;
+    color: var(--text);
+    max-width: 40em;
+    margin: 0;
+  }
+  .rec p { margin: 0; max-width: 42em; }
+  .prose { color: var(--muted); font-size: .95rem; }
+
+  /* figures */
+  .figs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: var(--s3);
+    margin: 0;
+    padding: var(--s3) 0;
+    border-top: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .figs > div { display: grid; gap: .15rem; }
+  .figs dt {
+    font-family: var(--mono);
+    font-size: .67rem;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--faint);
+    order: 2;
+  }
+  .figs dd {
+    margin: 0;
+    order: 1;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.18rem;
+    font-weight: 600;
+    letter-spacing: -.015em;
+    color: var(--text);
+    line-height: 1.25;
+  }
+  .figs dd small {
+    font-size: .8rem;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 0;
+  }
+
+  /* reported finding */
+  .finding {
+    border-left: 2px solid var(--flag);
+    padding: .1rem 0 .1rem var(--s3);
+    display: grid;
+    gap: .3rem;
+    max-width: 44em;
+  }
+  .finding .eyebrow { color: var(--flag); }
+  .finding p { font-size: .95rem; color: var(--text); }
+
+  /* method disclosure */
+  details.method {
+    border-top: 1px solid var(--rule-soft);
+    padding-top: var(--s2);
+  }
+  details.method > summary {
+    list-style: none;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: .72rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .15rem 0;
+  }
+  details.method > summary::-webkit-details-marker { display: none; }
+  details.method > summary::before {
+    content: "+";
+    font-size: .95rem;
+    line-height: 1;
+    width: .8em;
+    color: var(--accent);
+  }
+  details.method[open] > summary::before { content: "\2212"; }
+  details.method .inner {
+    padding-top: var(--s2);
+    display: grid;
+    gap: var(--s2);
+  }
+  details.method ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--muted);
+    font-size: .93rem;
+    display: grid;
+    gap: .4rem;
+    max-width: 44em;
+  }
+  details.method li::marker { color: var(--accent); }
+  code {
+    font-family: var(--mono);
+    font-size: .87em;
+    background: var(--accent-wash);
+    padding: .08em .35em;
+    border-radius: 2px;
+  }
+
+  /* stack + links */
+  .stack { display: flex; flex-wrap: wrap; gap: var(--s1); }
+  .stack span {
+    font-family: var(--mono);
+    font-size: .71rem;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: .16rem .45rem;
+    white-space: nowrap;
+  }
+  .links { display: flex; flex-wrap: wrap; gap: var(--s3); align-items: center; }
+  .links a {
+    font-family: var(--mono);
+    font-size: .78rem;
+    letter-spacing: .06em;
+    text-decoration: none;
+    color: var(--accent-ink);
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: .12rem;
+    transition: background .15s;
+  }
+  .links a:hover { background: var(--accent-wash); }
+  .links a.secondary { color: var(--muted); border-bottom-color: var(--rule); }
+  .links a.secondary:hover { color: var(--text); }
+
+  /* ---------- colophon ---------- */
+  .colophon {
+    border-top: 1px solid var(--rule);
+    padding: var(--s4) 0 var(--s5);
+  }
+  .colophon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: var(--s4);
+    align-items: start;
+  }
+  .colophon p { margin: .5rem 0 0; color: var(--muted); font-size: .92rem; max-width: 30em; }
+  .colophon a { color: var(--accent-ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <canvas id="plot" aria-hidden="true"></canvas>
+  <div class="wrap masthead-inner">
+    <div class="id-line">
+      <h1>
+        <span class="sub">Dan Lichtenberger · New York</span>
+        Six systems, and what<br>each one actually proved.
+      </h1>
+    </div>
+
+    <p class="thesis">
+      I build things that make a measurable claim — and then I try to break the claim.
+      Three of the projects below <em>failed to beat their baseline</em>, and they say so,
+      with the confidence intervals that show it.
+    </p>
+
+    <p class="whoami">
+      Everything here was written between May and August 2026: reinforcement learning,
+      post-quantum cryptography, quantitative finance, and one piece of interactive art.
+      Every project is deployed to a live URL you can open right now — start there, then
+      expand <span style="font-family:var(--mono);font-size:.85em">Method</span> on
+      anything you want the details of.
+    </p>
+
+    <dl class="ledger">
+      <div>
+        <b>6 / 6</b>
+        <span>projects deployed to a live, working URL — not just a repository</span>
+      </div>
+      <div>
+        <b>345</b>
+        <span>automated tests running in CI across four of the codebases</span>
+      </div>
+      <div>
+        <b>12 weeks</b>
+        <span>from the first commit of the oldest project to the newest</span>
+      </div>
+      <div>
+        <b>3</b>
+        <span>report null or negative results — the finding is that it didn't work</span>
+      </div>
+    </dl>
+  </div>
+</header>
+
+<main class="wrap layout">
+
+  <nav class="rail" aria-label="Project index">
+    <div>
+      <h2 class="eyebrow">Filter by field</h2>
+      <div class="filters" id="filters">
+        <button type="button" data-f="all" aria-pressed="true">Everything <span class="n">6</span></button>
+        <button type="button" data-f="ml" aria-pressed="false">Machine learning <span class="n">2</span></button>
+        <button type="button" data-f="sec" aria-pressed="false">Security <span class="n">1</span></button>
+        <button type="button" data-f="quant" aria-pressed="false">Quantitative finance <span class="n">2</span></button>
+        <button type="button" data-f="art" aria-pressed="false">Interactive art <span class="n">1</span></button>
+      </div>
+    </div>
+    <div>
+      <h2 class="eyebrow">Also</h2>
+      <p class="rail-note" style="border-top:0;padding-top:var(--s2)">
+        <a href="writing.html">Writing &rarr;</a><br>
+        <span style="color:var(--faint)">Arguments from results I produced myself</span>
+      </p>
+    </div>
+
+    <p class="rail-note">
+      Source for all six:<br>
+      <a href="https://github.com/Danny-397">github.com/Danny-397</a>
+    </p>
+  </nav>
+
+  <div class="records" id="records">
+
+    <!-- ============ QUANTUM SAFE SCAN ============ -->
+    <article class="rec" data-field="sec">
+      <div class="rec-head">
+        <div class="tags">
+          <span class="tag type">Developer tool</span>
+          <span class="tag">Post-quantum cryptography</span>
+          <span class="tag live">quantumsafescan.com</span>
+        </div>
+        <h3>QuantumSafe Scan</h3>
+        <p class="lede">
+          Finds the encryption inside a codebase that quantum computers are expected to break,
+          scores how exposed the project is from 0&ndash;100, and names the specific NIST-standard
+          replacement for every finding.
+        </p>
+      </div>
+
+      <dl class="figs">
+        <div><dt>Precision on labeled benchmark</dt><dd>100% <small>vs. 49.1% naive baseline</small></dd></div>
+        <div><dt>Languages parsed</dt><dd>11</dd></div>
+        <div><dt>Real-world audit</dt><dd>5,512 <small>findings, 10,938 files</small></dd></div>
+      </dl>
+
+      <p class="prose">
+        The interesting problem isn't matching the string <code>RSA</code> &mdash; it's not matching it
+        inside a comment, a docstring, or a code path nothing ever calls. A hybrid AST-and-regex engine
+        with usage awareness and reachability ranking eliminated 27 false positives the naive
+        pattern-matching baseline produced, taking precision from 49.1% to 100% on an 18-file,
+        9-language benchmark, with 100% recall on 50 seeded cases under mutation testing.
+      </p>
+
+      <details class="method">
+        <summary>Method</summary>
+        <div class="inner">
+          <ul>
+            <li><strong>Attack.</strong> Shor's and Grover's algorithms implemented on the Qiskit simulator, so the HIGH risk rating on RSA, ECC and Diffie-Hellman is demonstrated rather than asserted.</li>
+            <li><strong>Detect.</strong> Cross-language AST + regex scanning with dependency analysis; results export to JSON, HTML, SARIF, CycloneDX CBOM and SVG badges so it drops into an existing CI pipeline.</li>
+            <li><strong>Fix.</strong> A lattice-based (LWE) key-encapsulation mechanism written from scratch &mdash; the underlying math of CRYSTALS-Kyber / ML-KEM &mdash; rather than a library call.</li>
+            <li><strong>Field results.</strong> Paramiko, the standard Python SSH library, scores 100/100 Critical with 110 findings. Across 37 PyPI packages, 32 (86%) contained at least one finding. In a study of 8 widely-used projects, 88% contained HIGH-risk usage, mean score 61.4/100.</li>
+            <li><strong>Assurance.</strong> 80 automated tests in continuous integration.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="stack">
+        <span>Python</span><span>Qiskit</span><span>Flask</span><span>SQLite / Postgres</span><span>JWT</span><span>Docker Compose</span><span>PyPI</span>
+      </div>
+      <div class="links">
+        <a href="https://quantumsafescan.com">Open the scanner &rarr;</a>
+        <a class="secondary" href="https://github.com/Danny-397/Quantum-Safe-Scan">Source</a>
+      </div>
+    </article>
+
+    <!-- ============ RL CHESS ============ -->
+    <article class="rec" data-field="ml">
+      <div class="rec-head">
+        <div class="tags">
+          <span class="tag type">Research study</span>
+          <span class="tag">Reinforcement learning</span>
+          <span class="tag live">rlchess.xyz</span>
+        </div>
+        <h3>AlphaZero-style Chess Engine</h3>
+        <p class="lede">
+          An engine given the rules of chess and nothing else &mdash; no openings, no human games, no
+          evaluation function &mdash; that learns entirely from playing itself. You can play the
+          trained network in your browser.
+        </p>
+      </div>
+
+      <dl class="figs">
+        <div><dt>Self-play games trained</dt><dd>1,000 <small>~9.8h on 2&times;T4</small></dd></div>
+        <div><dt>Elo vs. random baseline</dt><dd>&minus;21 &rarr; +28</dd></div>
+        <div><dt>Policy head</dt><dd>4,672 <small>move logits</small></dd></div>
+      </dl>
+
+      <p class="prose">
+        A dual-headed ResNet reads an <code>18&times;8&times;8</code> position tensor and emits both a move
+        policy and a position value in <code>[&minus;1, 1]</code>; PUCT Monte-Carlo tree search balances the
+        running value estimate against the network's priors; self-play generates the
+        (position, search policy, outcome) tuples it then trains on. The browser opponent runs the
+        exported network client-side through ONNX Runtime Web.
+      </p>
+
+      <div class="finding">
+        <p class="eyebrow">Reported finding</p>
+        <p>
+          Scaling self-play 10&times; barely moved the needle: 92% of games were still non-decisive and
+          Elo went from &minus;21 to only &minus;7. Adding a material signal reached +28. The diagnosis in
+          the writeup is that this is <em>&ldquo;a self-play signal problem, not a compute ceiling&rdquo;</em>
+          &mdash; draw-heavy self-play starves the value head of gradient. The classical alpha-beta
+          engine built as a control beat the random baseline 10&ndash;0, confirming the harness itself was sound.
+        </p>
+      </div>
+
+      <details class="method">
+        <summary>Method</summary>
+        <div class="inner">
+          <ul>
+            <li>Modular by component so each piece is testable in isolation: <code>chess_game.py</code> (rules and encoding), <code>model.py</code> (network), <code>mcts.py</code> (search), <code>self_play.py</code> / <code>training.py</code> (the learning loop), <code>evaluation.py</code> (strength measurement).</li>
+            <li>Trained with cross-entropy loss against the MCTS visit distribution and mean-squared error against the final game outcome.</li>
+            <li>Three ways in: a browser UI, a console client, and a FastAPI HTTP API.</li>
+            <li>25-test pytest suite on GitHub Actions.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="stack">
+        <span>PyTorch</span><span>Python 3.10+</span><span>FastAPI</span><span>ONNX Runtime Web</span><span>chessboard.js</span><span>Vercel</span>
+      </div>
+      <div class="links">
+        <a href="https://rlchess.xyz">Play the engine &rarr;</a>
+        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/technical-report.md">Technical report</a>
+        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md">Experiment results</a>
+        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine">Source</a>
+      </div>
+    </article>
+
+    <!-- ============ RL TRADER ============ -->
+    <article class="rec" data-field="ml">
+      <div class="rec-head">
+        <div class="tags">
+          <span class="tag type">Research study</span>
+          <span class="tag">Reinforcement learning</span>
+          <span class="tag live">Live dashboard + LaTeX paper</span>
+        </div>
+        <h3>How Reinforcement Learning Agents Fool You</h3>
+        <p class="lede">
+          PPO implemented from scratch, then pointed at a deliberately brutal testbed &mdash; financial
+          markets &mdash; to ask one question: does an agent that looks brilliant in a single run survive
+          being run five times?
+        </p>
+      </div>
+
+      <dl class="figs">
+        <div><dt>The single lucky run</dt><dd>+275% <small>vs. +19% benchmark</small></dd></div>
+        <div><dt>Same agent, 5 seeds</dt><dd>&minus;2.7% <small>[&minus;31%, +27%]</small></dd></div>
+        <div><dt>Generalization gap closed</dt><dd>10<sup>2</sup>&ndash;10<sup>3</sup>&times;</dd></div>
+      </dl>
+
+      <p class="prose">
+        This is the project I'd point at first. It is designed to produce a negative result honestly,
+        and it does. The framework implements Proximal Policy Optimization with Generalized Advantage
+        Estimation from first principles in PyTorch &mdash; gradient clipping, entropy bonus, orthogonal
+        initialization, running observation normalization via Welford's method &mdash; over two custom
+        Gymnasium environments sharing identical accounting and cost mechanics.
+      </p>
+
+      <div class="finding">
+        <p class="eyebrow">Reported finding</p>
+        <p>
+          <strong>No seed-robust edge over buy-and-hold.</strong> One favorable run returned +275% against a
+          +19% benchmark. Across five seeds the crypto agent returned &minus;2.7% with a confidence interval
+          of [&minus;31%, +27%] straddling zero (p &asymp; 0.97), and the stock agent returned &minus;19%
+          [&minus;29%, &minus;7%] against buy-and-hold's +260% &mdash; significantly <em>worse</em>, at p &asymp; 0.002.
+          Separately, an agent trained on a single price path memorizes it catastrophically; training on a
+          freshly generated synthetic path each episode closes that generalization gap by two to three
+          orders of magnitude. The result reproduces Henderson et al. (2018) on the unreliability of
+          single-run RL evaluation, in a domain where the incentive to publish the lucky seed is strongest.
+        </p>
+      </div>
+
+      <details class="method">
+        <summary>Method</summary>
+        <div class="inner">
+          <ul>
+            <li><strong>Observation space.</strong> 28 engineered features spanning momentum horizons, trend indicators, oscillators, volatility-regime signals, volume microstructure and cross-asset context. Continuous action targeting a position fraction (long / short / flat).</li>
+            <li><strong>Leakage control.</strong> Chronological train/validation/test splits with feature scalers fit on training data only.</li>
+            <li><strong>Statistics.</strong> Bootstrap confidence intervals across seeds, paired permutation tests against buy-and-hold, rolling multi-fold walk-forward evaluation. Results are reported as distributions, never single runs.</li>
+            <li><strong>Replication.</strong> The harder cross-sectional problem &mdash; allocating portfolio weights rather than timing one asset &mdash; reaches identical conclusions.</li>
+            <li><strong>Deployment.</strong> The trained policy is exported to NumPy archives so the inference API runs with no PyTorch dependency.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="stack">
+        <span>PyTorch 2.x</span><span>Gymnasium</span><span>NumPy</span><span>Matplotlib</span><span>LaTeX</span><span>Vercel</span><span>Render</span>
+      </div>
+      <div class="links">
+        <a href="https://rl-for-crypto-and-stocks.vercel.app">Open the results dashboard &rarr;</a>
+        <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-/blob/main/RESULTS.md">Full results</a>
+        <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-/tree/main/paper">Paper</a>
+        <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-">Source</a>
+      </div>
+    </article>
+
+    <!-- ============ ALPHAGLYPH ============ -->
+    <article class="rec" data-field="quant">
+      <div class="rec-head">
+        <div class="tags">
+          <span class="tag type">Live system</span>
+          <span class="tag">Statistical validation</span>
+          <span class="tag live">alphaglyph.org</span>
+        </div>
+        <h3>AlphaGlyph</h3>
+        <p class="lede">
+          A backtesting laboratory built on the assumption that its own results are wrong until they
+          survive the statistical tests institutional quant funds use to separate skill from luck.
+        </p>
+      </div>
+
+      <dl class="figs">
+        <div><dt>Probability of backtest overfitting</dt><dd>63% <small>CPCV, 42-variant grid</small></dd></div>
+        <div><dt>In-sample Sharpe surviving OOS</dt><dd>~38% <small>median</small></dd></div>
+        <div><dt>Tests in CI</dt><dd>169</dd></div>
+      </dl>
+
+      <p class="prose">
+        Anyone can produce a backtest with a good-looking equity curve. This one runs day-by-day
+        simulations with walk-forward cross-validation, rolling Kelly position sizing with no look-ahead,
+        transaction costs, regime tagging and an SPY benchmark &mdash; then subjects the output to
+        Probabilistic and Deflated Sharpe ratios, Fama-French factor decomposition, cost-sensitivity
+        sweeps, and an append-only forward ledger that grades live predictions after the fact so past
+        calls can't be quietly revised.
+      </p>
+
+      <div class="finding">
+        <p class="eyebrow">Reported finding</p>
+        <p>
+          Run over a 42-variant trend and mean-reversion grid on SPY using Combinatorial Purged
+          Cross-Validation, the platform reports a <strong>63% probability of backtest overfitting</strong>
+          &mdash; the in-sample winner lands in the bottom half out-of-sample more often than not &mdash;
+          and a median of only ~38% of in-sample Sharpe surviving out of sample. The ML forecaster's test
+          AUC of &asymp;0.51 on next-week direction is, correctly and publicly, a coin flip. The one clean
+          positive: a dip-buying strategy on AAPL/MSFT in ranging markets, 2021&ndash;2024, returning
+          +21.8% against SPY's +5.6%.
+        </p>
+      </div>
+
+      <details class="method">
+        <summary>Method</summary>
+        <div class="inner">
+          <ul>
+            <li><strong>The Data-Mining Lab.</strong> Generates hundreds of random long/flat strategies that have no edge <em>by construction</em>, keeps the luckiest, and shows the naive statistics calling it significant while the Deflated Sharpe correctly calls it noise. The gap between those two numbers is the argument the whole system is built on.</li>
+            <li><strong>Architecture.</strong> The browser holds all UI state and the backend is a pure compute layer; the ML model is trained offline and shipped as a portable ONNX artifact. 15 API endpoints.</li>
+            <li><strong>Indicators from first principles.</strong> SMA, EMA, RSI, MACD, ADX and Bollinger Bands implemented directly rather than pulled from a TA library.</li>
+            <li><strong>Data resilience.</strong> A three-stage cascade &mdash; Tiingo, then yfinance, then Stooq &mdash; so a single upstream outage doesn't take the system down.</li>
+            <li><strong>Pipeline.</strong> GitHub Actions running 169 pytest cases, flake8 linting and smoke tests on every push.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="stack">
+        <span>Python 3.11</span><span>Flask 3</span><span>pandas</span><span>SciPy (SLSQP)</span><span>ONNX Runtime</span><span>Chart.js</span><span>Postgres</span>
+      </div>
+      <div class="links">
+        <a href="https://alphaglyph.org">Run a backtest &rarr;</a>
+        <a class="secondary" href="https://github.com/Danny-397/Alphaglyph/blob/main/docs/technical-report.md">Technical report</a>
+        <a class="secondary" href="https://github.com/Danny-397/Alphaglyph">Source</a>
+      </div>
+    </article>
+
+    <!-- ============ TRADESKI ============ -->
+    <article class="rec" data-field="quant">
+      <div class="rec-head">
+        <div class="tags">
+          <span class="tag type">Live system</span>
+          <span class="tag">Real-time infrastructure</span>
+          <span class="tag live">tradeski.dev</span>
+        </div>
+        <h3>Tradeski</h3>
+        <p class="lede">
+          A real-time market dashboard &mdash; streaming prices, Federal Reserve data, news sentiment and
+          an assistant that answers questions about <em>your</em> portfolio rather than the market in general.
+        </p>
+      </div>
+
+      <dl class="figs">
+        <div><dt>Symbols streamed live</dt><dd>11 <small>over WebSocket</small></dd></div>
+        <div><dt>Fed series, hourly refresh</dt><dd>7 <small>via FRED API</small></dd></div>
+        <div><dt>Tests in CI</dt><dd>71 <small>across 10 files</small></dd></div>
+      </dl>
+
+      <p class="prose">
+        The engineering interest here is everything around the charts. Every quantitative indicator
+        &mdash; SMA, EMA, RSI with Wilder smoothing, MACD, Bollinger Bands, ATR, stochastic, Z-score,
+        volatility, linear regression &mdash; is hand-coded on raw NumPy arrays: no TA-Lib, no pandas.
+        A persistent WebSocket backend feeds a fully static frontend, with a caching layer tuned per
+        data source (prices 5 minutes, news 30, FRED and correlations an hour) and per-route rate
+        limiting to keep third-party API budgets intact.
+      </p>
+
+      <details class="method">
+        <summary>Method</summary>
+        <div class="inner">
+          <ul>
+            <li><strong>Risk metrics.</strong> Sharpe ratio, beta against the S&amp;P 500 and annualized volatility computed from a year of daily returns weighted by current market value, plus a 90-day pairwise return-correlation heatmap across all tracked symbols.</li>
+            <li><strong>Sentiment.</strong> VADER extended with roughly 30 finance-specific terms &mdash; <code>beats &rarr; +2.0</code>, <code>bankruptcy &rarr; &minus;3.0</code> &mdash; because general-purpose sentiment models misread earnings language.</li>
+            <li><strong>Assistant.</strong> Grounded in the user's live macro, portfolio and news context before the model is called, so answers are about their actual holdings.</li>
+            <li><strong>Security.</strong> PBKDF2 password hashing, signed bearer tokens, and per-user row scoping isolating portfolios, alerts and watchlists.</li>
+            <li><strong>Screener.</strong> 28 curated stocks across five sectors, fetched concurrently through an 8-worker thread pool.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="stack">
+        <span>Python 3.12</span><span>Flask-SocketIO</span><span>gevent</span><span>Plotly.js</span><span>FRED API</span><span>NewsAPI</span><span>Claude Haiku 4.5</span><span>Postgres</span>
+      </div>
+      <div class="links">
+        <a href="https://www.tradeski.dev/">Open the dashboard &rarr;</a>
+        <a class="secondary" href="https://github.com/Danny-397/Tradeski">Source</a>
+      </div>
+    </article>
+
+    <!-- ============ NEURAL CANVAS ============ -->
+    <article class="rec" data-field="art">
+      <div class="rec-head">
+        <div class="tags">
+          <span class="tag type">Artwork</span>
+          <span class="tag">Hack the Arts 2026</span>
+          <span class="tag live">Runs in your browser</span>
+        </div>
+        <h3>Neural Canvas</h3>
+        <p class="lede">
+          Paint glowing light in mid-air with your bare hands. No controller, no mouse, no stylus &mdash;
+          a webcam, a neural network, and a pinch of your fingers.
+        </p>
+      </div>
+
+      <dl class="figs">
+        <div><dt>Hand landmarks tracked</dt><dd>21 <small>per hand, in 3D</small></dd></div>
+        <div><dt>Inference rate</dt><dd>~60/s <small>fully on-device</small></dd></div>
+        <div><dt>Build step</dt><dd>None <small>one HTML file, no server</small></dd></div>
+      </dl>
+
+      <p class="prose">
+        Built for Hack the Arts 2026, whose theme was art that wouldn't exist without technology &mdash;
+        so the hand tracking isn't a control scheme bolted onto a paint program, it's the medium.
+        MediaPipe Tasks Vision locates 21 3D points per hand about sixty times a second entirely in the
+        browser; a one-euro filter smooths the jitter out of raw landmark data so strokes stay clean;
+        Canvas 2D renders them with additive blending and shadow-blur glow. Nothing leaves the device.
+      </p>
+
+      <details class="method">
+        <summary>Method</summary>
+        <div class="inner">
+          <ul>
+            <li><strong>Gesture vocabulary.</strong> Pinch to paint; other hand positions erase, change color and clear the canvas &mdash; no UI chrome between the person and the drawing.</li>
+            <li><strong>Brushes.</strong> Neon glow, ribbon, spray, comet and embers, each a different stroke-accumulation model.</li>
+            <li><strong>Symmetry.</strong> Kaleidoscope mirroring at 2, 4, 6 and 8 folds, applied as a transform on the stroke path.</li>
+            <li><strong>Extras.</strong> Full-body pose painting, an attract mode for unattended displays, and save/record output.</li>
+            <li><strong>Constraint.</strong> Pure HTML, CSS and JavaScript in a single file &mdash; no framework, no build, no backend. MediaPipe runs via WebAssembly and GPU.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="stack">
+        <span>JavaScript</span><span>MediaPipe Tasks Vision</span><span>WebAssembly</span><span>Canvas 2D</span><span>One-euro filter</span>
+      </div>
+      <div class="links">
+        <a href="https://danny-397.github.io/neural-canvas/">Paint with your hands &rarr;</a>
+        <a class="secondary" href="https://github.com/Danny-397/neural-canvas">Source</a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="colophon">
+  <div class="wrap colophon-grid">
+    <div>
+      <p class="eyebrow">Contact</p>
+      <p>
+        <a href="mailto:dlichtenberger91@gmail.com">dlichtenberger91@gmail.com</a><br>
+        <a href="https://github.com/Danny-397">github.com/Danny-397</a>
+      </p>
+    </div>
+    <div>
+      <p class="eyebrow">On the numbers</p>
+      <p>
+        Every figure on this page is taken from the corresponding repository's own
+        documentation and test suite. Where a project failed to beat its baseline, that
+        is what's printed. <a href="writing.html">I write about why &rarr;</a>
+      </p>
+    </div>
+    <div>
+      <p class="eyebrow">Colophon</p>
+      <p>
+        Set in Iowan Old Style and Cascadia Mono. Drawn in a single HTML file with no
+        framework and no build step &mdash; same constraint as the artwork.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  /* ---------- field filter ---------- */
+  var bar = document.getElementById('filters');
+  var recs = Array.prototype.slice.call(document.querySelectorAll('.rec'));
+
+  bar.addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-f]');
+    if (!btn) return;
+    var f = btn.getAttribute('data-f');
+
+    Array.prototype.forEach.call(bar.querySelectorAll('button'), function (b) {
+      b.setAttribute('aria-pressed', String(b === btn));
+    });
+    recs.forEach(function (r) {
+      r.hidden = !(f === 'all' || r.getAttribute('data-field') === f);
+    });
+
+    /* keep the first visible record flush with the top of the stack */
+    var first = true;
+    recs.forEach(function (r) {
+      r.style.borderTop = '';
+      r.style.paddingTop = '';
+      if (!r.hidden && first) {
+        r.style.borderTop = '0';
+        r.style.paddingTop = '0';
+        first = false;
+      }
+    });
+  });
+
+  /* ---------- masthead: five seeds, one median ---------- */
+  var cv = document.getElementById('plot');
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var N = 260, SEEDS = 5;
+  var paths = [], median = [];
+
+  function rng(seed) {
+    return function () {
+      seed = (seed * 1664525 + 1013904223) % 4294967296;
+      return seed / 4294967296;
+    };
+  }
+
+  function build() {
+    paths = []; median = [];
+    for (var s = 0; s < SEEDS; s++) {
+      var r = rng(97 + s * 7919), v = 0, pts = [];
+      for (var i = 0; i < N; i++) {
+        v += (r() - 0.5) * 0.62 + (r() - 0.5) * 0.28;
+        v *= 0.985;                       /* mean reversion, so paths fan then settle */
+        pts.push(v);
+      }
+      paths.push(pts);
+    }
+    for (var i2 = 0; i2 < N; i2++) {
+      var col = paths.map(function (p) { return p[i2]; }).sort(function (a, b) { return a - b; });
+      median.push(col[2]);
+    }
+  }
+
+  var W = 0, H = 0;
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = Math.max(1, Math.round(W * dpr));
+    cv.height = Math.max(1, Math.round(H * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function ink() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#1F4B99';
+  }
+
+  function draw(progress) {
+    ctx.clearRect(0, 0, W, H);
+    if (!W || !H) return;
+    var mid = H * 0.60, amp = Math.min(H * 0.22, 96), c = ink();
+    var upto = Math.max(2, Math.floor(N * progress));
+
+    function xy(i, v) { return [ (i / (N - 1)) * W, mid - v * amp ]; }
+
+    /* the five individual runs, faint */
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.30;
+    ctx.strokeStyle = c;
+    paths.forEach(function (p) {
+      ctx.beginPath();
+      for (var i = 0; i < upto; i++) {
+        var q = xy(i, p[i]);
+        i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]);
+      }
+      ctx.stroke();
+    });
+
+    /* the honest summary, drawn over them */
+    ctx.globalAlpha = 0.85;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    for (var j = 0; j < upto; j++) {
+      var m = xy(j, median[j]);
+      j ? ctx.lineTo(m[0], m[1]) : ctx.moveTo(m[0], m[1]);
+    }
+    ctx.stroke();
+
+    /* zero line */
+    ctx.globalAlpha = 0.18;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 5]);
+    ctx.beginPath();
+    ctx.moveTo(0, mid);
+    ctx.lineTo(W * progress, mid);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+  }
+
+  var start = null;
+  function frame(t) {
+    if (start === null) start = t;
+    var p = Math.min(1, (t - start) / 1500);
+    draw(p * p * (3 - 2 * p));
+    if (p < 1) requestAnimationFrame(frame);
+  }
+
+  function run() {
+    resize();
+    build();
+    if (reduce) { draw(1); return; }
+    start = null;
+    requestAnimationFrame(frame);
+  }
+
+  run();
+
+  var t0;
+  window.addEventListener('resize', function () {
+    clearTimeout(t0);
+    t0 = setTimeout(function () { resize(); draw(1); }, 160);
+  });
+
+  /* redraw when the viewer flips theme, so the pen colour follows */
+  new MutationObserver(function () { draw(1); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>
+
+</body>
+</html>

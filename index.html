@@ -661,7 +661,7 @@
       <dl class="figs">
         <div><dt>The single lucky run</dt><dd>+275% <small>vs. +19% benchmark</small></dd></div>
         <div><dt>Same agent, 5 seeds</dt><dd>&minus;2.7% <small>[&minus;31%, +27%]</small></dd></div>
-        <div><dt>Generalization gap closed</dt><dd>10<sup>2</sup>&ndash;10<sup>3</sup>&times;</dd></div>
+        <div><dt>Domain randomization, held-out</dt><dd>&minus;26% &rarr; +36% <small>stocks, 5 seeds</small></dd></div>
       </dl>
 
       <p class="prose">
@@ -680,8 +680,11 @@
           of [&minus;31%, +27%] straddling zero (p &asymp; 0.97), and the stock agent returned &minus;19%
           [&minus;29%, &minus;7%] against buy-and-hold's +260% &mdash; significantly <em>worse</em>, at p &asymp; 0.002.
           Separately, an agent trained on a single price path memorizes it catastrophically; training on a
-          freshly generated synthetic path each episode closes that generalization gap by two to three
-          orders of magnitude. The result reproduces Henderson et al. (2018) on the unreliability of
+          freshly generated synthetic path each episode flips held-out return from &minus;26% to +36% on
+          equities and from &minus;51% to +132% on crypto &mdash; across five seeds, with all four confidence
+          intervals excluding zero. Reported as a distribution rather than a single run, because the
+          in-sample figure that version quoted swings by an order of magnitude between seeds.
+          The result reproduces Henderson et al. (2018) on the unreliability of
           single-run RL evaluation, in a domain where the incentive to publish the lucky seed is strongest.
         </p>
       </div>
@@ -797,7 +800,7 @@
       <dl class="figs">
         <div><dt>Symbols tracked live</dt><dd>11 <small>ticker + correlation matrix</small></dd></div>
         <div><dt>Fed series, hourly refresh</dt><dd>7 <small>via FRED API</small></dd></div>
-        <div><dt>Tests in CI</dt><dd>71 <small>across 10 files</small></dd></div>
+        <div><dt>Tests in CI</dt><dd>75 <small>across 11 files</small></dd></div>
       </dl>
 
       <p class="prose">

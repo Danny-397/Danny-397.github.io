@@ -30,7 +30,7 @@
     --surface:   #F1EFE9;
     --text:      #171A20;
     --muted:     #5B6069;
-    --faint:     #8A8E92;
+    --faint:     #64686B;
     --rule:      #C9C5BA;
     --rule-soft: #D8D5CB;
     --accent:    #1F4B99;
@@ -53,7 +53,7 @@
       --surface:   #151A21;
       --text:      #DEE2E7;
       --muted:     #8B939E;
-      --faint:     #69717C;
+      --faint:     #757E8A;
       --rule:      #262D36;
       --rule-soft: #1E242C;
       --accent:    #7FA6E8;
@@ -64,12 +64,12 @@
     }
   }
   :root[data-theme="dark"] {
-    --bg:#0F1319; --surface:#151A21; --text:#DEE2E7; --muted:#8B939E; --faint:#69717C;
+    --bg:#0F1319; --surface:#151A21; --text:#DEE2E7; --muted:#8B939E; --faint:#757E8A;
     --rule:#262D36; --rule-soft:#1E242C; --accent:#7FA6E8; --accent-ink:#A6C2F0;
     --accent-wash: rgba(127,166,232,.10); --flag:#D9705C; --ok:#6FA982;
   }
   :root[data-theme="light"] {
-    --bg:#E8E6DE; --surface:#F1EFE9; --text:#171A20; --muted:#5B6069; --faint:#8A8E92;
+    --bg:#E8E6DE; --surface:#F1EFE9; --text:#171A20; --muted:#5B6069; --faint:#64686B;
     --rule:#C9C5BA; --rule-soft:#D8D5CB; --accent:#1F4B99; --accent-ink:#173A78;
     --accent-wash: rgba(31,75,153,.09); --flag:#A8402F; --ok:#3F6B4F;
   }
@@ -187,7 +187,7 @@
     border-right: 1px solid var(--rule-soft);
   }
   .ledger div:last-child { border-right: 0; }
-  .ledger b {
+  .ledger dt {
     display: block;
     font-family: var(--mono);
     font-variant-numeric: tabular-nums;
@@ -196,12 +196,12 @@
     letter-spacing: -.01em;
     color: var(--accent-ink);
   }
-  .ledger span {
+  .ledger dd {
     display: block;
     font-size: .82rem;
     color: var(--muted);
     line-height: 1.45;
-    margin-top: .2rem;
+    margin: .2rem 0 0;   /* dd carries a default left margin - clear it */
     max-width: 20em;
   }
 
@@ -494,20 +494,20 @@
 
     <dl class="ledger">
       <div>
-        <b>6 / 6</b>
-        <span>projects deployed to a live, working URL — not just a repository</span>
+        <dt>6 / 6</dt>
+        <dd>projects deployed to a live, working URL — not just a repository</dd>
       </div>
       <div>
-        <b>345</b>
-        <span>automated tests running in CI across four of the codebases</span>
+        <dt>345</dt>
+        <dd>automated tests running in CI across four of the codebases</dd>
       </div>
       <div>
-        <b>12 weeks</b>
-        <span>from the first commit of the oldest project to the newest</span>
+        <dt>12 weeks</dt>
+        <dd>from the first commit of the oldest project to the newest</dd>
       </div>
       <div>
-        <b>3</b>
-        <span>report null or negative results — the finding is that it didn't work</span>
+        <dt>3</dt>
+        <dd>report null or negative results — the finding is that it didn't work</dd>
       </div>
     </dl>
   </div>

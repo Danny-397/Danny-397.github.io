@@ -8,7 +8,7 @@
   --bg:        #E8E6DE;
   --surface:   #F1EFE9;
   --text:      #171A20;
-  --muted:     #5B6069;
+  --muted:     #585D66;
   --faint:     #64686B;
   --rule:      #C9C5BA;
   --rule-soft: #D8D5CB;
@@ -42,7 +42,7 @@
   --draft-bg: rgba(217,112,92,.07);
 }
 :root[data-theme="light"] {
-  --bg:#E8E6DE; --surface:#F1EFE9; --text:#171A20; --muted:#5B6069; --faint:#64686B;
+  --bg:#E8E6DE; --surface:#F1EFE9; --text:#171A20; --muted:#585D66; --faint:#64686B;
   --rule:#C9C5BA; --rule-soft:#D8D5CB; --accent:#1F4B99; --accent-ink:#173A78;
   --accent-wash: rgba(31,75,153,.09); --flag:#A8402F; --ok:#3F6B4F;
   --draft-bg: rgba(168,64,47,.055);

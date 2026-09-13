@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dan Lichtenberger — Selected Work</title>
-<meta name="description" content="Six systems built May–August 2026 — reinforcement learning, post-quantum cryptography, quantitative finance, and interactive art. Every one deployed to a live URL; three report null or negative results, with the confidence intervals that show it.">
+<meta name="description" content="Six systems built May–August 2026 — reinforcement learning, post-quantum cryptography, quantitative finance, and interactive art. Every one deployed to a public URL; three report null or negative results, with the confidence intervals that show it.">
 <meta name="author" content="Dan Lichtenberger">
 <link rel="canonical" href="https://danny-397.github.io/">
 
@@ -38,6 +38,7 @@
     --accent-wash: rgba(31,75,153,.09);
     --flag:      #A8402F;
     --ok:        #3F6B4F;
+    --plate:     #0E1218;
 
     --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","Hoefler Text",Georgia,serif;
     --sans: "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
@@ -61,20 +62,22 @@
       --accent-wash: rgba(127,166,232,.10);
       --flag:      #D9705C;
       --ok:        #6FA982;
+      --plate:     #0A0D12;
     }
   }
   :root[data-theme="dark"] {
     --bg:#0F1319; --surface:#151A21; --text:#DEE2E7; --muted:#8B939E; --faint:#757E8A;
     --rule:#262D36; --rule-soft:#1E242C; --accent:#7FA6E8; --accent-ink:#A6C2F0;
-    --accent-wash: rgba(127,166,232,.10); --flag:#D9705C; --ok:#6FA982;
+    --accent-wash: rgba(127,166,232,.10); --flag:#D9705C; --ok:#6FA982; --plate:#0A0D12;
   }
   :root[data-theme="light"] {
     --bg:#E8E6DE; --surface:#F1EFE9; --text:#171A20; --muted:#585D66; --faint:#64686B;
     --rule:#C9C5BA; --rule-soft:#D8D5CB; --accent:#1F4B99; --accent-ink:#173A78;
-    --accent-wash: rgba(31,75,153,.09); --flag:#A8402F; --ok:#3F6B4F;
+    --accent-wash: rgba(31,75,153,.09); --flag:#A8402F; --ok:#3F6B4F; --plate:#0E1218;
   }
 
-  html { -webkit-text-size-adjust: 100%; }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   body {
     background: var(--bg);
     color: var(--text);
@@ -99,6 +102,13 @@
     padding: 0 var(--s3);
   }
 
+  .skip {
+    position: absolute; left: -9999px; top: 0; z-index: 100;
+    background: var(--surface); color: var(--text);
+    padding: .6rem 1rem; border: 1px solid var(--rule);
+  }
+  .skip:focus { left: var(--s3); top: var(--s2); }
+
   /* ---------- eyebrow / labels ---------- */
   .eyebrow {
     font-family: var(--mono);
@@ -109,6 +119,28 @@
     margin: 0;
   }
 
+  /* ---------- sticky utility bar ---------- */
+  .util {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+    background: var(--bg);
+    border-bottom: 1px solid var(--rule);
+    transform: translateY(-101%);
+    transition: transform .26s ease;
+  }
+  .util.on { transform: none; }
+  .util-in {
+    max-width: var(--maxw); margin: 0 auto; padding: .5rem var(--s3);
+    display: flex; align-items: center; justify-content: space-between; gap: var(--s3);
+  }
+  .util-name { font-family: var(--serif); font-size: 1rem; letter-spacing: -.01em; white-space: nowrap; }
+  .util-links { display: flex; gap: var(--s3); flex-wrap: wrap; }
+  .util-links a {
+    font-family: var(--mono); font-size: .71rem; letter-spacing: .08em;
+    text-transform: uppercase; text-decoration: none; color: var(--muted);
+  }
+  .util-links a:hover { color: var(--accent-ink); }
+  @media (max-width: 640px) { .util-links a.opt { display: none; } }
+
   /* ---------- masthead ---------- */
   .masthead {
     border-bottom: 1px solid var(--rule);
@@ -116,29 +148,36 @@
     overflow: hidden;
   }
   #plot {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: .55;
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    opacity: .40;
     pointer-events: none;
   }
-  @media (prefers-color-scheme: dark) { #plot { opacity: .72; } }
-  :root[data-theme="dark"] #plot { opacity: .72; }
-  :root[data-theme="light"] #plot { opacity: .55; }
+  @media (prefers-color-scheme: dark) { #plot { opacity: .52; } }
+  :root[data-theme="dark"] #plot { opacity: .52; }
+  :root[data-theme="light"] #plot { opacity: .40; }
+
+  /* keep the plot behind the words: a scrim that clears the reading column */
+  .masthead::after {
+    content: "";
+    position: absolute; inset: 0; z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(to right, var(--bg) 0%, var(--bg) 30%, rgba(0,0,0,0) 84%),
+      linear-gradient(to bottom, rgba(0,0,0,0) 58%, var(--bg) 100%);
+  }
 
   .masthead-inner {
     position: relative;
+    z-index: 2;
     padding: var(--s5) 0 var(--s4);
     display: grid;
     gap: var(--s3);
   }
   .id-line {
-    display: flex;
-    flex-wrap: wrap;
+    display: flex; flex-wrap: wrap;
     gap: var(--s2) var(--s3);
-    align-items: baseline;
-    justify-content: space-between;
+    align-items: baseline; justify-content: space-between;
   }
   h1 {
     font-family: var(--serif);
@@ -168,11 +207,10 @@
     color: var(--text);
   }
   .thesis em { font-style: italic; color: var(--accent-ink); }
-  .whoami {
-    max-width: 44em;
-    margin: 0;
-    color: var(--muted);
-    font-size: .95rem;
+  .whoami { max-width: 44em; margin: 0; color: var(--muted); font-size: .95rem; }
+  .kbd {
+    font-family: var(--mono); font-size: .85em;
+    background: var(--accent-wash); padding: .06em .34em; border-radius: 2px;
   }
 
   /* ---------- ledger strip ---------- */
@@ -201,50 +239,61 @@
     font-size: .82rem;
     color: var(--muted);
     line-height: 1.45;
-    margin: .2rem 0 0;   /* dd carries a default left margin - clear it */
+    margin: .2rem 0 0;
     max-width: 20em;
   }
 
   /* ---------- body grid ---------- */
   .layout {
     display: grid;
-    grid-template-columns: 210px 1fr;
+    grid-template-columns: 236px 1fr;
     gap: var(--s6);
     padding: var(--s5) 0 var(--s6);
     align-items: start;
   }
-  @media (max-width: 900px) {
+  @media (max-width: 980px) {
     .layout { grid-template-columns: 1fr; gap: var(--s4); padding-top: var(--s4); }
   }
 
   /* ---------- index rail ---------- */
-  .rail { position: sticky; top: var(--s3); display: grid; gap: var(--s4); }
-  @media (max-width: 900px) { .rail { position: static; } }
-
+  .rail { position: sticky; top: var(--s4); display: grid; gap: var(--s4); }
+  @media (max-width: 980px) { .rail { position: static; } }
   .rail h2 { margin: 0 0 var(--s2); }
+
+  .toc { display: grid; border-top: 1px solid var(--rule-soft); }
+  .toc a {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    align-items: baseline;
+    padding: .5rem 0;
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule-soft);
+    color: var(--muted);
+    transition: color .15s;
+  }
+  .toc a:hover, .toc a.here { color: var(--accent-ink); }
+  .toc a.here .tnum { color: var(--accent); }
+  .tnum {
+    font-family: var(--mono); font-size: .7rem; color: var(--faint);
+    font-variant-numeric: tabular-nums; letter-spacing: .04em;
+  }
+  .tname { font-size: .88rem; line-height: 1.35; }
+  .toc a.here .tname { font-weight: 600; }
+
   .filters {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
     border-top: 1px solid var(--rule-soft);
     padding-top: var(--s2);
   }
-  @media (max-width: 900px) {
+  @media (max-width: 980px) {
     .filters { flex-direction: row; flex-wrap: wrap; gap: var(--s1) var(--s2); }
   }
   .filters button {
-    appearance: none;
-    background: none;
-    border: 0;
+    appearance: none; background: none; border: 0;
     border-left: 2px solid transparent;
     padding: .3rem 0 .3rem .6rem;
-    margin: 0;
-    font: inherit;
-    font-size: .9rem;
-    color: var(--muted);
-    cursor: pointer;
-    text-align: left;
+    margin: 0; font: inherit; font-size: .9rem;
+    color: var(--muted); cursor: pointer; text-align: left;
     transition: color .15s, border-color .15s;
   }
   .filters button:hover { color: var(--text); }
@@ -254,20 +303,13 @@
     font-weight: 600;
   }
   .filters .n {
-    font-family: var(--mono);
-    font-size: .72rem;
-    color: var(--faint);
-    font-weight: 400;
-    margin-left: .35rem;
-    font-variant-numeric: tabular-nums;
+    font-family: var(--mono); font-size: .72rem; color: var(--faint);
+    font-weight: 400; margin-left: .35rem; font-variant-numeric: tabular-nums;
   }
   .rail-note {
-    font-size: .82rem;
-    color: var(--muted);
-    line-height: 1.5;
+    font-size: .82rem; color: var(--muted); line-height: 1.5;
     border-top: 1px solid var(--rule-soft);
-    padding-top: var(--s2);
-    margin: 0;
+    padding-top: var(--s2); margin: 0;
   }
   .rail-note a { color: var(--accent-ink); }
 
@@ -275,53 +317,142 @@
   .records { display: grid; gap: 0; }
   .rec {
     border-top: 1px solid var(--rule);
-    padding: var(--s4) 0;
+    padding: var(--s5) 0;
     display: grid;
     gap: var(--s3);
+    scroll-margin-top: 4.5rem;
   }
   .rec[hidden] { display: none; }
   .rec:first-child { border-top: 0; padding-top: 0; }
 
   .rec-head { display: grid; gap: var(--s2); }
+
+  .rank {
+    display: flex; align-items: baseline; gap: var(--s2);
+    font-family: var(--mono);
+  }
+  .rank .num {
+    font-size: 1.5rem; font-weight: 600; letter-spacing: -.02em;
+    color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .rank .lede-note {
+    font-size: .67rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--faint);
+  }
+
   .tags { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
   .tag {
-    font-family: var(--mono);
-    font-size: .67rem;
-    letter-spacing: .13em;
-    text-transform: uppercase;
-    color: var(--muted);
+    font-family: var(--mono); font-size: .67rem; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--muted);
   }
   .tag.type { color: var(--accent-ink); }
-  .tag.live::before {
-    content: "";
-    display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--ok);
-    margin-right: .45rem;
-    vertical-align: .08em;
+  .tag.live::before,
+  .tag.warn::before {
+    content: ""; display: inline-block;
+    width: 6px; height: 6px; border-radius: 50%;
+    margin-right: .45rem; vertical-align: .08em;
   }
+  .tag.live::before { background: var(--ok); }
   .tag.live { color: var(--ok); }
+  .tag.warn::before { background: none; border: 1px solid var(--flag); }
+  .tag.warn { color: var(--flag); }
 
   .rec h3 {
-    font-family: var(--serif);
-    font-weight: 400;
+    font-family: var(--serif); font-weight: 400;
     font-size: clamp(1.5rem, 3vw, 1.95rem);
-    line-height: 1.15;
-    letter-spacing: -.01em;
-    margin: 0;
-    text-wrap: balance;
+    line-height: 1.15; letter-spacing: -.01em;
+    margin: 0; text-wrap: balance;
   }
   .lede {
-    font-family: var(--serif);
-    font-size: 1.08rem;
-    line-height: 1.55;
-    color: var(--text);
-    max-width: 40em;
-    margin: 0;
+    font-family: var(--serif); font-size: 1.08rem; line-height: 1.55;
+    color: var(--text); max-width: 40em; margin: 0;
   }
   .rec p { margin: 0; max-width: 42em; }
   .prose { color: var(--muted); font-size: .95rem; }
+
+  /* ---------- media plates ---------- */
+  .plate {
+    margin: var(--s1) 0 0;
+    display: grid;
+    gap: var(--s2);
+  }
+  .plate-frame {
+    position: relative;
+    background: var(--plate);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    line-height: 0;
+  }
+  .plate-frame img,
+  .plate-frame video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .plate-cover {
+    position: absolute; inset: 0;
+    display: flex; align-items: flex-end; justify-content: flex-start;
+    padding: var(--s3);
+    text-decoration: none;
+    background: linear-gradient(to top, rgba(6,9,13,.78) 0%, rgba(6,9,13,0) 42%);
+    opacity: 0;
+    transition: opacity .18s ease;
+  }
+  .plate-frame:hover .plate-cover,
+  .plate-cover:focus-visible { opacity: 1; }
+  .plate-cta {
+    font-family: var(--mono); font-size: .76rem; letter-spacing: .06em;
+    color: #F2F5F9;
+    border-bottom: 1px solid rgba(242,245,249,.65);
+    padding-bottom: .1rem;
+    line-height: 1.4;
+  }
+  .chip {
+    display: inline-block;
+    font-family: var(--mono); font-size: .6rem; letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--faint);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: .1rem .4rem;
+    margin-right: .5rem;
+    line-height: 1.6;
+    vertical-align: .08em;
+    white-space: nowrap;
+  }
+  .plate-toggle {
+    position: absolute; top: var(--s2); right: var(--s2);
+    appearance: none; cursor: pointer;
+    font-family: var(--mono); font-size: .6rem; letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #CBD4E0;
+    background: rgba(8,11,16,.82);
+    border: 1px solid rgba(203,212,224,.22);
+    border-radius: 2px;
+    padding: .2rem .5rem;
+    line-height: 1.5;
+  }
+  .plate-toggle:hover { color: #fff; border-color: rgba(203,212,224,.5); }
+
+  /* dense screenshots stay legible on a phone: let them pan instead of shrinking */
+  @media (max-width: 760px) {
+    .plate-scroll { overflow-x: auto; overscroll-behavior-x: contain; }
+    .plate-scroll img { min-width: 660px; }
+    .plate-scroll::-webkit-scrollbar { height: 6px; }
+    .plate-scroll::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+    .plate-hint { display: inline; }
+  }
+  .plate-hint { display: none; color: var(--faint); font-style: italic; }
+
+  .plate figcaption {
+    font-size: .84rem;
+    color: var(--muted);
+    line-height: 1.5;
+    max-width: 46em;
+    margin: 0;
+  }
+  .plate figcaption b { color: var(--text); font-weight: 600; }
 
   /* figures */
   .figs {
@@ -335,38 +466,22 @@
   }
   .figs > div { display: grid; gap: .15rem; }
   .figs dt {
-    font-family: var(--mono);
-    font-size: .67rem;
-    letter-spacing: .11em;
-    text-transform: uppercase;
-    color: var(--faint);
-    order: 2;
+    font-family: var(--mono); font-size: .67rem; letter-spacing: .11em;
+    text-transform: uppercase; color: var(--faint); order: 2;
   }
   .figs dd {
-    margin: 0;
-    order: 1;
-    font-family: var(--mono);
-    font-variant-numeric: tabular-nums;
-    font-size: 1.18rem;
-    font-weight: 600;
-    letter-spacing: -.015em;
-    color: var(--text);
-    line-height: 1.25;
+    margin: 0; order: 1;
+    font-family: var(--mono); font-variant-numeric: tabular-nums;
+    font-size: 1.18rem; font-weight: 600; letter-spacing: -.015em;
+    color: var(--text); line-height: 1.25;
   }
-  .figs dd small {
-    font-size: .8rem;
-    font-weight: 400;
-    color: var(--muted);
-    letter-spacing: 0;
-  }
+  .figs dd small { font-size: .8rem; font-weight: 400; color: var(--muted); letter-spacing: 0; }
 
   /* reported finding */
   .finding {
     border-left: 2px solid var(--flag);
     padding: .1rem 0 .1rem var(--s3);
-    display: grid;
-    gap: .3rem;
-    max-width: 44em;
+    display: grid; gap: .3rem; max-width: 44em;
   }
   .finding .eyebrow { color: var(--flag); }
   .finding p { font-size: .95rem; color: var(--text); }
@@ -377,75 +492,63 @@
     padding-top: var(--s2);
   }
   details.method > summary {
-    list-style: none;
-    cursor: pointer;
-    font-family: var(--mono);
-    font-size: .72rem;
-    letter-spacing: .13em;
-    text-transform: uppercase;
-    color: var(--accent-ink);
-    display: flex;
-    align-items: center;
-    gap: .55rem;
-    padding: .15rem 0;
+    list-style: none; cursor: pointer;
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--accent-ink);
+    display: flex; align-items: center; gap: .55rem; padding: .15rem 0;
   }
   details.method > summary::-webkit-details-marker { display: none; }
   details.method > summary::before {
-    content: "+";
-    font-size: .95rem;
-    line-height: 1;
-    width: .8em;
-    color: var(--accent);
+    content: "+"; font-size: .95rem; line-height: 1; width: .8em; color: var(--accent);
   }
   details.method[open] > summary::before { content: "\2212"; }
-  details.method .inner {
-    padding-top: var(--s2);
-    display: grid;
-    gap: var(--s2);
-  }
+  details.method .inner { padding-top: var(--s2); display: grid; gap: var(--s2); }
   details.method ul {
-    margin: 0;
-    padding-left: 1.1rem;
-    color: var(--muted);
-    font-size: .93rem;
-    display: grid;
-    gap: .4rem;
-    max-width: 44em;
+    margin: 0; padding-left: 1.1rem;
+    color: var(--muted); font-size: .93rem;
+    display: grid; gap: .4rem; max-width: 44em;
   }
   details.method li::marker { color: var(--accent); }
   code {
-    font-family: var(--mono);
-    font-size: .87em;
+    font-family: var(--mono); font-size: .87em;
     background: var(--accent-wash);
-    padding: .08em .35em;
-    border-radius: 2px;
+    padding: .08em .35em; border-radius: 2px;
   }
 
   /* stack + links */
   .stack { display: flex; flex-wrap: wrap; gap: var(--s1); }
   .stack span {
-    font-family: var(--mono);
-    font-size: .71rem;
-    color: var(--muted);
-    border: 1px solid var(--rule);
-    border-radius: 2px;
-    padding: .16rem .45rem;
-    white-space: nowrap;
+    font-family: var(--mono); font-size: .71rem; color: var(--muted);
+    border: 1px solid var(--rule); border-radius: 2px;
+    padding: .16rem .45rem; white-space: nowrap;
   }
-  .links { display: flex; flex-wrap: wrap; gap: var(--s3); align-items: center; }
+  .links { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); align-items: center; }
   .links a {
-    font-family: var(--mono);
-    font-size: .78rem;
-    letter-spacing: .06em;
-    text-decoration: none;
-    color: var(--accent-ink);
+    font-family: var(--mono); font-size: .78rem; letter-spacing: .06em;
+    text-decoration: none; color: var(--accent-ink);
     border-bottom: 1px solid var(--accent);
     padding-bottom: .12rem;
-    transition: background .15s;
+    transition: background .15s, color .15s;
   }
   .links a:hover { background: var(--accent-wash); }
+  .links a.primary {
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    padding: .42rem .8rem;
+    background: var(--accent-wash);
+  }
+  .links a.primary:hover { background: var(--accent); color: var(--surface); }
   .links a.secondary { color: var(--muted); border-bottom-color: var(--rule); }
   .links a.secondary:hover { color: var(--text); }
+
+  .caveat {
+    font-size: .88rem;
+    color: var(--muted);
+    border-left: 2px solid var(--rule);
+    padding-left: var(--s3);
+    max-width: 44em;
+  }
+  .caveat b { color: var(--text); font-weight: 600; }
 
   /* ---------- colophon ---------- */
   .colophon {
@@ -462,11 +565,26 @@
   .colophon a { color: var(--accent-ink); }
 
   @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
     * { transition: none !important; animation: none !important; }
   }
 </style>
 </head>
 <body>
+
+<a class="skip" href="#records">Skip to the projects</a>
+
+<div class="util" id="util" aria-hidden="true">
+  <div class="util-in">
+    <span class="util-name">Dan Lichtenberger</span>
+    <nav class="util-links">
+      <a href="#rl-trader">Projects</a>
+      <a class="opt" href="reports.html">Reports</a>
+      <a class="opt" href="https://github.com/Danny-397">GitHub</a>
+      <a href="mailto:dlichtenberger91@gmail.com">Email</a>
+    </nav>
+  </div>
+</div>
 
 <header class="masthead">
   <canvas id="plot" aria-hidden="true"></canvas>
@@ -487,18 +605,19 @@
     <p class="whoami">
       Everything here was written between May and August 2026: reinforcement learning,
       post-quantum cryptography, quantitative finance, and one piece of interactive art.
-      Every project is deployed to a live URL you can open right now — start there, then
-      expand <span style="font-family:var(--mono);font-size:.85em">Method</span> on
-      anything you want the details of.
+      Every project is deployed to a public URL you can open right now, and every screen
+      below is a recording or screenshot of that deployment — not a mockup. They are ordered
+      with the strongest first. Expand <span class="kbd">Method</span> on anything you want
+      the details of.
     </p>
 
     <dl class="ledger">
       <div>
         <dt>6 / 6</dt>
-        <dd>projects deployed to a live, working URL — not just a repository</dd>
+        <dd>projects deployed to a public URL — not just a repository</dd>
       </div>
       <div>
-        <dt>420</dt>
+        <dt>431</dt>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
@@ -517,15 +636,28 @@
 
   <nav class="rail" aria-label="Project index">
     <div>
+      <h2 class="eyebrow">The work, in order</h2>
+      <div class="toc" id="toc">
+        <a href="#rl-trader"><span class="tnum">01</span><span class="tname">How RL Agents Fool You</span></a>
+        <a href="#quantumsafe"><span class="tnum">02</span><span class="tname">QuantumSafe Scan</span></a>
+        <a href="#alphaglyph"><span class="tnum">03</span><span class="tname">AlphaGlyph</span></a>
+        <a href="#rl-chess"><span class="tnum">04</span><span class="tname">AlphaZero Chess Engine</span></a>
+        <a href="#tradeski"><span class="tnum">05</span><span class="tname">Tradeski</span></a>
+        <a href="#neural-canvas"><span class="tnum">06</span><span class="tname">Neural Canvas</span></a>
+      </div>
+    </div>
+
+    <div>
       <h2 class="eyebrow">Filter by field</h2>
       <div class="filters" id="filters">
         <button type="button" data-f="all" aria-pressed="true">Everything <span class="n">6</span></button>
         <button type="button" data-f="ml" aria-pressed="false">Machine learning <span class="n">2</span></button>
-        <button type="button" data-f="sec" aria-pressed="false">Security <span class="n">1</span></button>
         <button type="button" data-f="quant" aria-pressed="false">Quantitative finance <span class="n">2</span></button>
+        <button type="button" data-f="sec" aria-pressed="false">Security <span class="n">1</span></button>
         <button type="button" data-f="art" aria-pressed="false">Interactive art <span class="n">1</span></button>
       </div>
     </div>
+
     <div>
       <h2 class="eyebrow">Also</h2>
       <p class="rail-note" style="border-top:0;padding-top:var(--s2)">
@@ -542,125 +674,10 @@
 
   <div class="records" id="records">
 
-    <!-- ============ QUANTUM SAFE SCAN ============ -->
-    <article class="rec" data-field="sec">
+    <!-- ============ 01 · RL TRADER ============ -->
+    <article class="rec" data-field="ml" id="rl-trader">
       <div class="rec-head">
-        <div class="tags">
-          <span class="tag type">Developer tool</span>
-          <span class="tag">Post-quantum cryptography</span>
-          <span class="tag live">quantumsafescan.com</span>
-        </div>
-        <h3>QuantumSafe Scan</h3>
-        <p class="lede">
-          Finds the encryption inside a codebase that quantum computers are expected to break,
-          scores how exposed the project is from 0&ndash;100, and names the specific NIST-standard
-          replacement for every finding.
-        </p>
-      </div>
-
-      <dl class="figs">
-        <div><dt>Precision on labeled benchmark</dt><dd>100% <small>vs. 49.1% naive baseline</small></dd></div>
-        <div><dt>Languages parsed</dt><dd>11</dd></div>
-        <div><dt>Real-world audit</dt><dd>5,512 <small>findings, 10,938 files</small></dd></div>
-      </dl>
-
-      <p class="prose">
-        The interesting problem isn't matching the string <code>RSA</code> &mdash; it's not matching it
-        inside a comment, a docstring, or a code path nothing ever calls. A hybrid AST-and-regex engine
-        with usage awareness and reachability ranking eliminated 27 false positives the naive
-        pattern-matching baseline produced, taking precision from 49.1% to 100% on an 18-file,
-        9-language benchmark, with 100% recall on 50 seeded cases under mutation testing.
-      </p>
-
-      <details class="method">
-        <summary>Method</summary>
-        <div class="inner">
-          <ul>
-            <li><strong>Attack.</strong> Shor's and Grover's algorithms implemented on the Qiskit simulator, so the HIGH risk rating on RSA, ECC and Diffie-Hellman is demonstrated rather than asserted.</li>
-            <li><strong>Detect.</strong> Cross-language AST + regex scanning with dependency analysis; results export to JSON, HTML, SARIF, CycloneDX CBOM and SVG badges so it drops into an existing CI pipeline.</li>
-            <li><strong>Fix.</strong> A lattice-based (LWE) key-encapsulation mechanism written from scratch &mdash; the underlying math of CRYSTALS-Kyber / ML-KEM &mdash; rather than a library call.</li>
-            <li><strong>Field results.</strong> Paramiko, the standard Python SSH library, scores 100/100 Critical with 110 findings. Across 37 PyPI packages, 32 (86%) contained at least one finding. In a study of 8 widely-used projects, 88% contained HIGH-risk usage, mean score 61.4/100.</li>
-            <li><strong>Assurance.</strong> 80 automated tests in continuous integration.</li>
-          </ul>
-        </div>
-      </details>
-
-      <div class="stack">
-        <span>Python</span><span>Qiskit</span><span>Flask</span><span>SQLite / Postgres</span><span>JWT</span><span>Docker Compose</span><span>PyPI</span>
-      </div>
-      <div class="links">
-        <a href="https://quantumsafescan.com">Open the scanner &rarr;</a>
-        <a class="secondary" href="https://github.com/Danny-397/Quantum-Safe-Scan">Source</a>
-      </div>
-    </article>
-
-    <!-- ============ RL CHESS ============ -->
-    <article class="rec" data-field="ml">
-      <div class="rec-head">
-        <div class="tags">
-          <span class="tag type">Research study</span>
-          <span class="tag">Reinforcement learning</span>
-          <span class="tag live">rlchess.xyz</span>
-        </div>
-        <h3>AlphaZero-style Chess Engine</h3>
-        <p class="lede">
-          An engine given the rules of chess and nothing else &mdash; no openings, no human games, no
-          evaluation function &mdash; that learns entirely from playing itself. You can play the
-          trained network in your browser.
-        </p>
-      </div>
-
-      <dl class="figs">
-        <div><dt>Self-play games trained</dt><dd>1,000 <small>~9.8h on 2&times;T4</small></dd></div>
-        <div><dt>Elo vs. random baseline</dt><dd>&minus;21 &rarr; +28</dd></div>
-        <div><dt>Policy head</dt><dd>4,672 <small>move logits</small></dd></div>
-      </dl>
-
-      <p class="prose">
-        A dual-headed ResNet reads an <code>18&times;8&times;8</code> position tensor and emits both a move
-        policy and a position value in <code>[&minus;1, 1]</code>; PUCT Monte-Carlo tree search balances the
-        running value estimate against the network's priors; self-play generates the
-        (position, search policy, outcome) tuples it then trains on. The browser opponent runs the
-        exported network client-side through ONNX Runtime Web.
-      </p>
-
-      <div class="finding">
-        <p class="eyebrow">Reported finding</p>
-        <p>
-          Scaling self-play 10&times; barely moved the needle: 92% of games were still non-decisive and
-          Elo went from &minus;21 to only &minus;7. Adding a material signal reached +28. The diagnosis in
-          the writeup is that this is <em>&ldquo;a self-play signal problem, not a compute ceiling&rdquo;</em>
-          &mdash; draw-heavy self-play starves the value head of gradient. The classical alpha-beta
-          engine built as a control beat the random baseline 10&ndash;0, confirming the harness itself was sound.
-        </p>
-      </div>
-
-      <details class="method">
-        <summary>Method</summary>
-        <div class="inner">
-          <ul>
-            <li>Modular by component so each piece is testable in isolation: <code>chess_game.py</code> (rules and encoding), <code>model.py</code> (network), <code>mcts.py</code> (search), <code>self_play.py</code> / <code>training.py</code> (the learning loop), <code>evaluation.py</code> (strength measurement).</li>
-            <li>Trained with cross-entropy loss against the MCTS visit distribution and mean-squared error against the final game outcome.</li>
-            <li>Three ways in: a browser UI, a console client, and a FastAPI HTTP API.</li>
-            <li>25-test pytest suite on GitHub Actions.</li>
-          </ul>
-        </div>
-      </details>
-
-      <div class="stack">
-        <span>PyTorch</span><span>Python 3.10+</span><span>FastAPI</span><span>ONNX Runtime Web</span><span>chessboard.js</span><span>Vercel</span>
-      </div>
-      <div class="links">
-        <a href="https://rlchess.xyz">Play the engine &rarr;</a>
-        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/technical-report.md">Technical report</a>
-        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md">Experiment results</a>
-        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine">Source</a>
-      </div>
-    </article>
-
-    <!-- ============ RL TRADER ============ -->
-    <article class="rec" data-field="ml">
-      <div class="rec-head">
+        <div class="rank"><span class="num">01</span><span class="lede-note">Start here</span></div>
         <div class="tags">
           <span class="tag type">Research study</span>
           <span class="tag">Reinforcement learning</span>
@@ -674,6 +691,28 @@
         </p>
       </div>
 
+      <figure class="plate">
+        <div class="plate-frame">
+          <video
+            muted loop playsinline preload="none"
+            width="980" height="614"
+            poster="media/rltrader-lab.webp"
+            data-src="media/rltrader-lab.mp4"
+            aria-label="The Agent Playground running a full episode on real BTC-USD data: the equity curve, target exposure, per-bar reward and drawdown all stream in as the episode steps forward."></video>
+          <button type="button" class="plate-toggle" data-play>Pause</button>
+          <a class="plate-cover" href="https://rl-for-crypto-and-stocks.vercel.app/#lab">
+            <span class="plate-cta">Run your own episode &nearr;</span>
+          </a>
+        </div>
+        <figcaption>
+          <span class="chip">Screen recording &middot; the live lab</span>
+          <b>The Agent Playground, running in the browser.</b> A trained policy steps through real
+          BTC-USD bars while equity, target exposure, per-bar reward and drawdown stream in together
+          &mdash; with transaction cost and slippage as live inputs. Every run ends with a reproducibility
+          receipt naming the experiment, the data source and the settings.
+        </figcaption>
+      </figure>
+
       <dl class="figs">
         <div><dt>The single lucky run</dt><dd>+275% <small>vs. +19% benchmark</small></dd></div>
         <div><dt>Same agent, 5 seeds</dt><dd>&minus;2.7% <small>[&minus;31%, +27%]</small></dd></div>
@@ -681,12 +720,31 @@
       </dl>
 
       <p class="prose">
-        This is the project I'd point at first. It is designed to produce a negative result honestly,
-        and it does. The framework implements Proximal Policy Optimization with Generalized Advantage
-        Estimation from first principles in PyTorch &mdash; gradient clipping, entropy bonus, orthogonal
-        initialization, running observation normalization via Welford's method &mdash; over two custom
-        Gymnasium environments sharing identical accounting and cost mechanics.
+        This is the project I'd point at first, and it is first for that reason. It is designed to
+        produce a negative result honestly, and it does. The framework implements Proximal Policy
+        Optimization with Generalized Advantage Estimation from first principles in PyTorch &mdash;
+        gradient clipping, entropy bonus, orthogonal initialization, running observation normalization
+        via Welford's method &mdash; over two custom Gymnasium environments sharing identical accounting
+        and cost mechanics.
       </p>
+
+      <figure class="plate">
+        <div class="plate-frame plate-scroll">
+          <img src="media/rltrader-arms.webp" width="1400" height="516" loading="lazy" decoding="async"
+               alt="Two panels compared. Trained on one asset, tagged MEMORISED: training return +322k% to +4.0M% across 5 seeds, held-out return minus 51% with a 95% confidence interval of minus 62% to minus 39%. Trained across the basket, tagged GENERALISED: training return +5% to +154%, held-out return +129% with a 95% confidence interval of +82% to +185%.">
+          <a class="plate-cover" href="https://rl-for-crypto-and-stocks.vercel.app/#result">
+            <span class="plate-cta">See the full result &nearr;</span>
+          </a>
+        </div>
+        <figcaption>
+          <span class="chip">Screenshot &middot; the finding</span>
+          <b>The whole argument in one figure.</b> Both arms were trained identically and scored on the
+          same held-out paths; the only difference is how many assets they saw. The overfit arm's
+          in-sample return of <code>+4.0M%</code> becomes <code>&minus;51%</code> the moment it meets
+          data it has never seen. Each dot is one seed.
+         <span class="plate-hint">Scroll it sideways to read the detail.</span>
+        </figcaption>
+      </figure>
 
       <div class="finding">
         <p class="eyebrow">Reported finding</p>
@@ -722,16 +780,90 @@
         <span>PyTorch 2.x</span><span>Gymnasium</span><span>NumPy</span><span>Matplotlib</span><span>LaTeX</span><span>Vercel</span><span>Render</span>
       </div>
       <div class="links">
-        <a href="https://rl-for-crypto-and-stocks.vercel.app">Open the results dashboard &rarr;</a>
+        <a class="primary" href="https://rl-for-crypto-and-stocks.vercel.app">Open the results dashboard &rarr;</a>
+        <a class="secondary" href="https://rl-for-crypto-and-stocks.vercel.app/#lab">Interactive lab</a>
         <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-/blob/main/RESULTS.md">Full results</a>
         <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-/tree/main/paper">Paper</a>
         <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-">Source</a>
       </div>
     </article>
 
-    <!-- ============ ALPHAGLYPH ============ -->
-    <article class="rec" data-field="quant">
+    <!-- ============ 02 · QUANTUM SAFE SCAN ============ -->
+    <article class="rec" data-field="sec" id="quantumsafe">
       <div class="rec-head">
+        <div class="rank"><span class="num">02</span><span class="lede-note">Shipped product</span></div>
+        <div class="tags">
+          <span class="tag type">Developer tool</span>
+          <span class="tag">Post-quantum cryptography</span>
+          <span class="tag live">quantumsafescan.com</span>
+        </div>
+        <h3>QuantumSafe Scan</h3>
+        <p class="lede">
+          Finds the encryption inside a codebase that quantum computers are expected to break,
+          scores how exposed the project is from 0&ndash;100, and names the specific NIST-standard
+          replacement for every finding.
+        </p>
+      </div>
+
+      <figure class="plate">
+        <div class="plate-frame plate-scroll">
+          <img src="media/quantumsafe-scan.webp" width="1400" height="961" loading="lazy" decoding="async"
+               alt="The scanner mid-use. Left: a Python snippet using RSA key generation, ECDSA, MD5 and TLS 1.0. Right: a quantum risk score of 66 out of 100 marked High risk, a severity breakdown of 4 high, 1 medium, 1 low, and a findings list mapping each line to its replacement — RSA to CRYSTALS-Kyber/Dilithium, ECC/ECDSA to Kyber/Dilithium, MD5 to SHA-3/SHA-256, TLS 1.0/1.1 to TLS 1.3.">
+          <a class="plate-cover" href="https://quantumsafescan.com/#scan">
+            <span class="plate-cta">Scan your own code &nearr;</span>
+          </a>
+        </div>
+        <figcaption>
+          <span class="chip">Screenshot &middot; a real scan</span>
+          <b>A live scan, no account needed.</b> Paste a snippet and the engine scores it, flags each
+          at-risk primitive with its line number, and names the FIPS 203/204 replacement. The same
+          engine runs against a whole repository or an uploaded <code>.zip</code>.
+         <span class="plate-hint">Scroll it sideways to read the detail.</span>
+        </figcaption>
+      </figure>
+
+      <dl class="figs">
+        <div><dt>Precision on labeled benchmark</dt><dd>100% <small>vs. 49.1% naive baseline</small></dd></div>
+        <div><dt>Languages parsed</dt><dd>11</dd></div>
+        <div><dt>Real-world audit</dt><dd>5,512 <small>findings, 10,938 files</small></dd></div>
+      </dl>
+
+      <p class="prose">
+        The interesting problem isn't matching the string <code>RSA</code> &mdash; it's not matching it
+        inside a comment, a docstring, or a code path nothing ever calls. A hybrid AST-and-regex engine
+        with usage awareness and reachability ranking eliminated 27 false positives the naive
+        pattern-matching baseline produced, taking precision from 49.1% to 100% on an 18-file,
+        9-language benchmark, with 100% recall on 50 seeded cases under mutation testing.
+      </p>
+
+      <details class="method">
+        <summary>Method</summary>
+        <div class="inner">
+          <ul>
+            <li><strong>Attack.</strong> Shor's and Grover's algorithms implemented on the Qiskit simulator, so the HIGH risk rating on RSA, ECC and Diffie-Hellman is demonstrated rather than asserted.</li>
+            <li><strong>Detect.</strong> Cross-language AST + regex scanning with dependency analysis; results export to JSON, HTML, SARIF, CycloneDX CBOM and SVG badges so it drops into an existing CI pipeline.</li>
+            <li><strong>Fix.</strong> A lattice-based (LWE) key-encapsulation mechanism written from scratch &mdash; the underlying math of CRYSTALS-Kyber / ML-KEM &mdash; rather than a library call.</li>
+            <li><strong>Field results.</strong> Paramiko, the standard Python SSH library, scores 100/100 Critical with 110 findings. Across 37 PyPI packages, 32 (86%) contained at least one finding. In a study of 8 widely-used projects, 88% contained HIGH-risk usage, mean score 61.4/100.</li>
+            <li><strong>Assurance.</strong> 102 automated tests in continuous integration.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="stack">
+        <span>Python</span><span>Qiskit</span><span>Flask</span><span>SQLite / Postgres</span><span>JWT</span><span>Docker Compose</span><span>PyPI</span>
+      </div>
+      <div class="links">
+        <a class="primary" href="https://quantumsafescan.com">Open the scanner &rarr;</a>
+        <a class="secondary" href="reports/QuantumSafe-Technical-Report.pdf">Technical report</a>
+        <a class="secondary" href="reports/QuantumSafe-Whitepaper.pdf">Whitepaper</a>
+        <a class="secondary" href="https://github.com/Danny-397/Quantum-Safe-Scan">Source</a>
+      </div>
+    </article>
+
+    <!-- ============ 03 · ALPHAGLYPH ============ -->
+    <article class="rec" data-field="quant" id="alphaglyph">
+      <div class="rec-head">
+        <div class="rank"><span class="num">03</span><span class="lede-note">Statistical rigor</span></div>
         <div class="tags">
           <span class="tag type">Live system</span>
           <span class="tag">Statistical validation</span>
@@ -743,6 +875,28 @@
           survive the statistical tests institutional quant funds use to separate skill from luck.
         </p>
       </div>
+
+      <figure class="plate">
+        <div class="plate-frame">
+          <video
+            muted loop playsinline preload="none"
+            width="920" height="516"
+            poster="media/alphaglyph-replay.webp"
+            data-src="media/alphaglyph-replay.mp4"
+            aria-label="The Watch It Trade replay: the strategy equity curve grows day by day against the SPY benchmark while each executed trade streams into a log beneath it with a plain-English reason and its realised profit or loss."></video>
+          <button type="button" class="plate-toggle" data-play>Pause</button>
+          <a class="plate-cover" href="https://alphaglyph.org/backtest.html">
+            <span class="plate-cta">Run your own backtest &nearr;</span>
+          </a>
+        </div>
+        <figcaption>
+          <span class="chip">Screen recording &middot; a real backtest</span>
+          <b>&ldquo;Watch it trade&rdquo; &mdash; the backtest replayed day by day.</b> The equity curve grows
+          against the SPY benchmark while each trade streams in with a plain-English reason
+          (&ldquo;bought because the stock was trading near its 52-week low&rdquo;) and its realised P&amp;L.
+          Nothing about the run is hidden behind a single summary number.
+        </figcaption>
+      </figure>
 
       <dl class="figs">
         <div><dt>Probability of backtest overfitting</dt><dd>72% <small>CPCV, 42-variant grid</small></dd></div>
@@ -792,19 +946,107 @@
         <span>Python 3.11</span><span>Flask 3</span><span>pandas</span><span>SciPy (SLSQP)</span><span>ONNX Runtime</span><span>Chart.js</span><span>Postgres</span>
       </div>
       <div class="links">
-        <a href="https://alphaglyph.org">Run a backtest &rarr;</a>
+        <a class="primary" href="https://alphaglyph.org/backtest.html">Run a backtest &rarr;</a>
+        <a class="secondary" href="https://alphaglyph.org">Project site</a>
         <a class="secondary" href="https://github.com/Danny-397/Alphaglyph/blob/main/docs/technical-report.md">Technical report</a>
         <a class="secondary" href="https://github.com/Danny-397/Alphaglyph">Source</a>
       </div>
     </article>
 
-    <!-- ============ TRADESKI ============ -->
-    <article class="rec" data-field="quant">
+    <!-- ============ 04 · RL CHESS ============ -->
+    <article class="rec" data-field="ml" id="rl-chess">
       <div class="rec-head">
+        <div class="rank"><span class="num">04</span><span class="lede-note">Play it yourself</span></div>
+        <div class="tags">
+          <span class="tag type">Research study</span>
+          <span class="tag">Reinforcement learning</span>
+          <span class="tag live">rlchess.xyz</span>
+        </div>
+        <h3>AlphaZero-style Chess Engine</h3>
+        <p class="lede">
+          An engine given the rules of chess and nothing else &mdash; no openings, no human games, no
+          evaluation function &mdash; that learns entirely from playing itself. You can play the
+          trained network in your browser.
+        </p>
+      </div>
+
+      <figure class="plate">
+        <div class="plate-frame">
+          <video
+            muted loop playsinline preload="none"
+            width="1000" height="587"
+            poster="media/rlchess-selfplay.webp"
+            data-src="media/rlchess-selfplay.mp4"
+            aria-label="The engine playing itself in the browser: pieces move on the board while the panel on the left lists the engine's top three candidate moves with their evaluations and the move list fills in below."></video>
+          <button type="button" class="plate-toggle" data-play>Pause</button>
+          <a class="plate-cover" href="https://rlchess.xyz">
+            <span class="plate-cta">Play the engine &nearr;</span>
+          </a>
+        </div>
+        <figcaption>
+          <span class="chip">Screen recording &middot; self-play in the browser</span>
+          <b>The network playing itself, client-side.</b> Candidate moves and their evaluations appear on
+          the left as the search runs; the move list and captured material fill in as the game goes. The
+          same page lets you take White and play the trained network yourself.
+        </figcaption>
+      </figure>
+
+      <dl class="figs">
+        <div><dt>Self-play games trained</dt><dd>1,000 <small>~9.8h on 2&times;T4</small></dd></div>
+        <div><dt>Elo vs. random baseline</dt><dd>&minus;21 &rarr; +28</dd></div>
+        <div><dt>Policy head</dt><dd>4,672 <small>move logits</small></dd></div>
+      </dl>
+
+      <p class="prose">
+        A dual-headed ResNet reads an <code>18&times;8&times;8</code> position tensor and emits both a move
+        policy and a position value in <code>[&minus;1, 1]</code>; PUCT Monte-Carlo tree search balances the
+        running value estimate against the network's priors; self-play generates the
+        (position, search policy, outcome) tuples it then trains on. The browser opponent runs the
+        exported network client-side through ONNX Runtime Web.
+      </p>
+
+      <div class="finding">
+        <p class="eyebrow">Reported finding</p>
+        <p>
+          Scaling self-play 10&times; barely moved the needle: 92% of games were still non-decisive and
+          Elo went from &minus;21 to only &minus;7. Adding a material signal reached +28. The diagnosis in
+          the writeup is that this is <em>&ldquo;a self-play signal problem, not a compute ceiling&rdquo;</em>
+          &mdash; draw-heavy self-play starves the value head of gradient. The classical alpha-beta
+          engine built as a control beat the random baseline 10&ndash;0, confirming the harness itself was sound.
+        </p>
+      </div>
+
+      <details class="method">
+        <summary>Method</summary>
+        <div class="inner">
+          <ul>
+            <li>Modular by component so each piece is testable in isolation: <code>chess_game.py</code> (rules and encoding), <code>model.py</code> (network), <code>mcts.py</code> (search), <code>self_play.py</code> / <code>training.py</code> (the learning loop), <code>evaluation.py</code> (strength measurement).</li>
+            <li>Trained with cross-entropy loss against the MCTS visit distribution and mean-squared error against the final game outcome.</li>
+            <li>Three ways in: a browser UI, a console client, and a FastAPI HTTP API.</li>
+            <li>25-test pytest suite on GitHub Actions.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="stack">
+        <span>PyTorch</span><span>Python 3.10+</span><span>FastAPI</span><span>ONNX Runtime Web</span><span>chessboard.js</span><span>Vercel</span>
+      </div>
+      <div class="links">
+        <a class="primary" href="https://rlchess.xyz">Play the engine &rarr;</a>
+        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/technical-report.md">Technical report</a>
+        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md">Experiment results</a>
+        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine">Source</a>
+      </div>
+    </article>
+
+    <!-- ============ 05 · TRADESKI ============ -->
+    <article class="rec" data-field="quant" id="tradeski">
+      <div class="rec-head">
+        <div class="rank"><span class="num">05</span><span class="lede-note">Real-time infrastructure</span></div>
         <div class="tags">
           <span class="tag type">Live system</span>
           <span class="tag">Real-time infrastructure</span>
-          <span class="tag live">tradeski.dev</span>
+          <span class="tag warn">Backend paused &middot; dashboard runs on snapshot data</span>
         </div>
         <h3>Tradeski</h3>
         <p class="lede">
@@ -813,10 +1055,36 @@
         </p>
       </div>
 
+      <figure class="plate">
+        <div class="plate-frame plate-scroll">
+          <img src="media/tradeski-dashboard.webp" width="1400" height="1050" loading="lazy" decoding="async"
+               alt="The Tradeski terminal: a top ticker strip of eleven symbols with percentage moves, a macro strip showing high-yield spread, CPI, the ten-year, the Fed rate, GDP, the yield curve and unemployment, a candlestick chart of AAPL with Bollinger Bands and moving-average overlays, and a right-hand indicator panel showing RSI, MACD, Bollinger Bands, Z-score and moving averages.">
+          <a class="plate-cover" href="https://www.tradeski.dev/">
+            <span class="plate-cta">Open the project &nearr;</span>
+          </a>
+        </div>
+        <figcaption>
+          <span class="chip">Screenshot &middot; the dashboard with the backend up</span>
+          <b>The terminal in normal operation.</b> Streaming ticker strip, seven FRED macro series,
+          candlesticks with hand-rolled overlays, and a live indicator panel &mdash; every quantitative
+          figure computed on raw NumPy arrays rather than a TA library.
+         <span class="plate-hint">Scroll it sideways to read the detail.</span>
+        </figcaption>
+      </figure>
+
+      <p class="caveat">
+        <b>Honest status:</b> the data backend is paused, so nothing here is streaming live. Rather than
+        let the dashboard render fetch errors, it now detects an unreachable backend and replays a
+        recorded snapshot of <em>real</em> market data &mdash; charts, indicators, the screener and the
+        macro strip are genuine values, and a banner says so and dates them. Live streaming, news and
+        accounts still need the backend. The fallback is read-only by construction: a failed write is
+        never faked. This is a hosting-cost decision, not a broken build.
+      </p>
+
       <dl class="figs">
         <div><dt>Symbols tracked live</dt><dd>11 <small>ticker + correlation matrix</small></dd></div>
         <div><dt>Fed series, hourly refresh</dt><dd>7 <small>via FRED API</small></dd></div>
-        <div><dt>Tests in CI</dt><dd>75 <small>across 11 files</small></dd></div>
+        <div><dt>Tests in CI</dt><dd>86 <small>across 12 files</small></dd></div>
       </dl>
 
       <p class="prose">
@@ -845,15 +1113,17 @@
         <span>Python 3.12</span><span>Flask-SocketIO</span><span>gevent</span><span>Plotly.js</span><span>FRED API</span><span>NewsAPI</span><span>Claude Haiku 4.5</span><span>Postgres</span>
       </div>
       <div class="links">
-        <a href="https://www.tradeski.dev/">Open the dashboard &rarr;</a>
+        <a class="primary" href="https://www.tradeski.dev/">Open the project &rarr;</a>
+        <a class="secondary" href="https://www.tradeski.dev/app">Open the dashboard</a>
         <a class="secondary" href="reports/Tradeski-Technical-Report.pdf">Technical report</a>
         <a class="secondary" href="https://github.com/Danny-397/Tradeski">Source</a>
       </div>
     </article>
 
-    <!-- ============ NEURAL CANVAS ============ -->
-    <article class="rec" data-field="art">
+    <!-- ============ 06 · NEURAL CANVAS ============ -->
+    <article class="rec" data-field="art" id="neural-canvas">
       <div class="rec-head">
+        <div class="rank"><span class="num">06</span><span class="lede-note">Hackathon piece</span></div>
         <div class="tags">
           <span class="tag type">Artwork</span>
           <span class="tag">Hack the Arts 2026</span>
@@ -865,6 +1135,27 @@
           a webcam, a neural network, and a pinch of your fingers.
         </p>
       </div>
+
+      <figure class="plate">
+        <div class="plate-frame">
+          <video
+            muted loop playsinline preload="none"
+            width="960" height="600"
+            poster="media/neuralcanvas-paint.webp"
+            data-src="media/neuralcanvas-paint.mp4"
+            aria-label="The painting engine drawing a glowing violet mandala: a single stroke path is mirrored into six-fold kaleidoscope symmetry with additive blending and shadow-blur glow, slowly fading as new strokes are laid down."></video>
+          <button type="button" class="plate-toggle" data-play>Pause</button>
+          <a class="plate-cover" href="https://danny-397.github.io/neural-canvas/">
+            <span class="plate-cta">Paint with your hands &nearr;</span>
+          </a>
+        </div>
+        <figcaption>
+          <span class="chip">Screen recording &middot; the app's idle demo</span>
+          <b>The brush engine, in the app's own idle mode.</b> With no hand in frame the canvas drives
+          itself, which shows the rendering honestly: one stroke path mirrored into six-fold symmetry,
+          additive blending, shadow-blur glow and a slow fade. With a webcam, that path is your fingertip.
+        </figcaption>
+      </figure>
 
       <dl class="figs">
         <div><dt>Hand landmarks tracked</dt><dd>21 <small>per hand, in 3D</small></dd></div>
@@ -897,7 +1188,7 @@
         <span>JavaScript</span><span>MediaPipe Tasks Vision</span><span>WebAssembly</span><span>Canvas 2D</span><span>One-euro filter</span>
       </div>
       <div class="links">
-        <a href="https://danny-397.github.io/neural-canvas/">Paint with your hands &rarr;</a>
+        <a class="primary" href="https://danny-397.github.io/neural-canvas/">Paint with your hands &rarr;</a>
         <a class="secondary" href="reports/Neural-Canvas-Technical-Report.pdf">Technical report</a>
         <a class="secondary" href="https://github.com/Danny-397/neural-canvas">Source</a>
       </div>
@@ -924,6 +1215,14 @@
       </p>
     </div>
     <div>
+      <p class="eyebrow">On the screens</p>
+      <p>
+        Every image and recording is captured from the deployed application itself, in
+        September 2026 &mdash; no mockups, no staged data. Where a service is not currently
+        serving, the record says so.
+      </p>
+    </div>
+    <div>
       <p class="eyebrow">Colophon</p>
       <p>
         Set in Iowan Old Style and Cascadia Mono. Drawn in a single HTML file with no
@@ -935,23 +1234,13 @@
 
 <script>
 (function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   /* ---------- field filter ---------- */
   var bar = document.getElementById('filters');
   var recs = Array.prototype.slice.call(document.querySelectorAll('.rec'));
 
-  bar.addEventListener('click', function (e) {
-    var btn = e.target.closest('button[data-f]');
-    if (!btn) return;
-    var f = btn.getAttribute('data-f');
-
-    Array.prototype.forEach.call(bar.querySelectorAll('button'), function (b) {
-      b.setAttribute('aria-pressed', String(b === btn));
-    });
-    recs.forEach(function (r) {
-      r.hidden = !(f === 'all' || r.getAttribute('data-field') === f);
-    });
-
-    /* keep the first visible record flush with the top of the stack */
+  function restripe() {
     var first = true;
     recs.forEach(function (r) {
       r.style.borderTop = '';
@@ -962,13 +1251,107 @@
         first = false;
       }
     });
+  }
+
+  function applyFilter(f) {
+    Array.prototype.forEach.call(bar.querySelectorAll('button'), function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-f') === f));
+    });
+    recs.forEach(function (r) {
+      r.hidden = !(f === 'all' || r.getAttribute('data-field') === f);
+    });
+    restripe();
+  }
+
+  bar.addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-f]');
+    if (!btn) return;
+    applyFilter(btn.getAttribute('data-f'));
   });
+
+  /* a table-of-contents click must never land on a filtered-out record */
+  document.getElementById('toc').addEventListener('click', function (e) {
+    var a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var target = document.querySelector(a.getAttribute('href'));
+    if (target && target.hidden) applyFilter('all');
+  });
+
+  /* ---------- lazy, viewport-driven demo playback ---------- */
+  var vids = Array.prototype.slice.call(document.querySelectorAll('video[data-src]'));
+
+  function load(v) {
+    if (!v.getAttribute('src')) v.setAttribute('src', v.getAttribute('data-src'));
+  }
+
+  vids.forEach(function (v) {
+    var btn = v.parentElement.querySelector('[data-play]');
+    if (!btn) return;
+    if (reduce) btn.textContent = 'Play';
+    btn.addEventListener('click', function () {
+      if (v.paused) {
+        load(v);
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});
+        btn.textContent = 'Pause';
+        v.removeAttribute('data-user-paused');
+      } else {
+        v.pause();
+        btn.textContent = 'Play';
+        v.setAttribute('data-user-paused', '1');
+      }
+    });
+  });
+
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var v = en.target;
+        if (en.isIntersecting) {
+          load(v);
+          if (!v.hasAttribute('data-user-paused')) {
+            var p = v.play();
+            if (p && p.catch) p.catch(function () {});
+          }
+        } else {
+          v.pause();
+        }
+      });
+    }, { rootMargin: '150px 0px', threshold: 0.2 });
+    vids.forEach(function (v) { io.observe(v); });
+  }
+
+  /* ---------- sticky utility bar + current-section marker ---------- */
+  var util = document.getElementById('util');
+  var mast = document.querySelector('.masthead');
+  var tocLinks = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+
+  function onScroll() {
+    var past = window.scrollY > mast.offsetHeight - 40;
+    util.classList.toggle('on', past);
+    util.setAttribute('aria-hidden', String(!past));
+
+    var here = null;
+    recs.forEach(function (r) {
+      if (r.hidden) return;
+      if (r.getBoundingClientRect().top <= 140) here = r.id;
+    });
+    tocLinks.forEach(function (a) {
+      a.classList.toggle('here', a.getAttribute('href') === '#' + here);
+    });
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { onScroll(); ticking = false; });
+  }, { passive: true });
+  onScroll();
 
   /* ---------- masthead: five seeds, one median ---------- */
   var cv = document.getElementById('plot');
   if (!cv || !cv.getContext) return;
   var ctx = cv.getContext('2d');
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var N = 260, SEEDS = 5;
   var paths = [], median = [];
 

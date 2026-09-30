@@ -715,8 +715,8 @@
 
       <dl class="figs">
         <div><dt>The single lucky run</dt><dd>+275% <small>vs. +19% benchmark</small></dd></div>
-        <div><dt>Same agent, 5 seeds</dt><dd>&minus;2.7% <small>[&minus;31%, +27%]</small></dd></div>
-        <div><dt>Domain randomization, held-out</dt><dd>&minus;26% &rarr; +36% <small>stocks, 5 seeds</small></dd></div>
+        <div><dt>Same agent, 10 seeds</dt><dd>+57% <small>vs. +34% buy-and-hold &middot; p = 0.79</small></dd></div>
+        <div><dt>Domain randomization, held-out</dt><dd>&minus;26% &rarr; +47% <small>stocks, 5 seeds</small></dd></div>
       </dl>
 
       <p class="prose">
@@ -750,12 +750,14 @@
         <p class="eyebrow">Reported finding</p>
         <p>
           <strong>No seed-robust edge over buy-and-hold.</strong> One favorable run returned +275% against a
-          +19% benchmark. Across five seeds the crypto agent returned &minus;2.7% with a confidence interval
-          of [&minus;31%, +27%] straddling zero (p &asymp; 0.97), and the stock agent returned &minus;19%
-          [&minus;29%, &minus;7%] against buy-and-hold's +260% &mdash; significantly <em>worse</em>, at p &asymp; 0.002.
+          +19% benchmark. Across ten seeds its individual returns ranged from &minus;29% to +226%; the mean,
+          +57% [+16%, +106%], cannot be distinguished from buy-and-hold's +34% (p = 0.79). The stock agent
+          returned &minus;19% [&minus;27%, &minus;11%] against buy-and-hold's +240% &mdash; significantly
+          <em>worse</em>, at p = 0.002. Retrained across four separate slices of Bitcoin's history, it lost
+          money in every one.
           Separately, an agent trained on a single price path memorizes it catastrophically; training on a
-          freshly generated synthetic path each episode flips held-out return from &minus;26% to +36% on
-          equities and from &minus;51% to +132% on crypto &mdash; across five seeds, with all four confidence
+          freshly generated synthetic path each episode flips held-out return from &minus;26% to +47% on
+          equities and from &minus;51% to +129% on crypto &mdash; across five seeds, with all four confidence
           intervals excluding zero. Reported as a distribution rather than a single run, because the
           in-sample figure that version quoted swings by an order of magnitude between seeds.
           The result reproduces Henderson et al. (2018) on the unreliability of

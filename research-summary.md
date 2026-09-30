@@ -10,7 +10,8 @@
   a measurement, and it would be the only claim. Not required for the document
   to work.
 
-  All figures verified against source on 2026-08-01.
+  All figures verified against source on 2026-08-01; RL-Trader and Tradeski
+  figures re-verified 2026-09-30.
 -->
 
 Six projects, built May–August 2026. Each entry states what the project does and what
@@ -26,9 +27,11 @@ Exports SARIF and CycloneDX CBOM, so it drops into real CI.
 
 **RL-Trader** · [4-page paper](reports/RL-Trader-Paper.pdf) — PPO from scratch, aimed
 at markets as a hostile testbed, asking whether an agent that looks brilliant once
-survives five runs. It doesn't. One seed shows **+275%** against a **+19%** benchmark;
-across five the same agent averages **−2.7%**, CI **[−31%, +27%]** — indistinguishable
-from buy-and-hold, and significantly *worse* on equities (p ≈ 0.002). Its own
+survives ten runs. It doesn't. One seed showed **+275%** against a **+19%** benchmark;
+across ten, individual returns span −29% to +226% and the mean, **+57%** [+16%, +106%],
+is indistinguishable from buy-and-hold's +34% (p = 0.79) — and significantly *worse* on
+equities (p = 0.002). Retrained over four slices of Bitcoin's history, it lost money in
+all four. Its own
 significance tooling caught the false positive a naive version ships, reproducing
 Henderson et al. (2018) in a new domain. Adds an original surrogate-data test
 separating "the agent is weak" from "there is no signal."
@@ -49,7 +52,7 @@ friendlier run. 169 tests in CI.
 
 **Tradeski** · [tradeski.dev](https://www.tradeski.dev/) — Live market, macro, and
 sentiment data in one dashboard: 11 ticker symbols, 7 FRED series hourly, a 29-symbol
-screener, a retrieval-grounded assistant, 75 tests. Its most useful lesson was a bug:
+screener, a retrieval-grounded assistant, 86 tests. Its most useful lesson was a bug:
 live prices never reached the browser because the server emitted on one Socket.IO
 namespace while the client listened on another. Both halves were correct alone, and all
 71 tests passed throughout — every one of them tested a pure function, so no test

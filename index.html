@@ -922,7 +922,7 @@ catch (e) { /* private mode */ }</script>
             poster="media/rltrader-lab.webp"
             data-src="media/rltrader-lab.mp4"
             aria-label="The Agent Playground running a full episode on real BTC-USD data: the equity curve, target exposure, per-bar reward and drawdown all stream in as the episode steps forward."></video>
-          <button type="button" class="plate-toggle" data-play>Pause</button>
+          <button type="button" class="plate-toggle" data-play data-clip="the RL-Trader agent playground">Pause</button>
           <a class="plate-cover" href="https://rl-for-crypto-and-stocks.vercel.app/#lab">
             <span class="plate-cta">Run your own episode &nearr;</span>
           </a>
@@ -1194,7 +1194,7 @@ catch (e) { /* private mode */ }</script>
             poster="media/alphaglyph-replay.webp"
             data-src="media/alphaglyph-replay.mp4"
             aria-label="The Watch It Trade replay: the strategy equity curve grows day by day against the SPY benchmark while each executed trade streams into a log beneath it with a plain-English reason and its realised profit or loss."></video>
-          <button type="button" class="plate-toggle" data-play>Pause</button>
+          <button type="button" class="plate-toggle" data-play data-clip="the AlphaGlyph replay">Pause</button>
           <a class="plate-cover" href="https://alphaglyph.org/backtest.html">
             <span class="plate-cta">Run your own backtest &nearr;</span>
           </a>
@@ -1325,7 +1325,7 @@ catch (e) { /* private mode */ }</script>
             poster="media/rlchess-selfplay.webp"
             data-src="media/rlchess-selfplay.mp4"
             aria-label="The engine playing itself in the browser: pieces move on the board while the panel on the left lists the engine's top three candidate moves with their evaluations and the move list fills in below."></video>
-          <button type="button" class="plate-toggle" data-play>Pause</button>
+          <button type="button" class="plate-toggle" data-play data-clip="the chess engine self-play clip">Pause</button>
           <a class="plate-cover" href="https://rlchess.xyz">
             <span class="plate-cta">Play the engine &nearr;</span>
           </a>
@@ -1491,7 +1491,7 @@ catch (e) { /* private mode */ }</script>
             poster="media/neuralcanvas-paint.webp"
             data-src="media/neuralcanvas-paint.mp4"
             aria-label="The painting engine drawing a glowing violet mandala: a single stroke path is mirrored into six-fold kaleidoscope symmetry with additive blending and shadow-blur glow, slowly fading as new strokes are laid down."></video>
-          <button type="button" class="plate-toggle" data-play>Pause</button>
+          <button type="button" class="plate-toggle" data-play data-clip="the Neural Canvas demo">Pause</button>
           <a class="plate-cover" href="https://danny-397.github.io/neural-canvas/">
             <span class="plate-cta">Paint with your hands &nearr;</span>
           </a>
@@ -1623,20 +1623,29 @@ catch (e) { /* private mode */ }</script>
     if (!v.getAttribute('src')) v.setAttribute('src', v.getAttribute('data-src'));
   }
 
+  /* The visible word stays short, but four buttons all reading "Pause" are
+     indistinguishable to a screen reader tabbing through the page. Name the
+     clip in aria-label, and keep that label in step with the state. */
+  function setPlayState(btn, word) {
+    btn.textContent = word;
+    var clip = btn.getAttribute('data-clip');
+    if (clip) btn.setAttribute('aria-label', word + ' ' + clip);
+  }
+
   vids.forEach(function (v) {
     var btn = v.parentElement.querySelector('[data-play]');
     if (!btn) return;
-    if (reduce) btn.textContent = 'Play';
+    setPlayState(btn, reduce ? 'Play' : 'Pause');
     btn.addEventListener('click', function () {
       if (v.paused) {
         load(v);
         var p = v.play();
         if (p && p.catch) p.catch(function () {});
-        btn.textContent = 'Pause';
+        setPlayState(btn, 'Pause');
         v.removeAttribute('data-user-paused');
       } else {
         v.pause();
-        btn.textContent = 'Play';
+        setPlayState(btn, 'Play');
         v.setAttribute('data-user-paused', '1');
       }
     });

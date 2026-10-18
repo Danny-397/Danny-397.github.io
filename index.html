@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dan Lichtenberger — Selected Work</title>
-<meta name="description" content="Six systems built May–August 2026 — reinforcement learning, post-quantum cryptography, quantitative finance, and interactive art. Every one deployed to a public URL; three report null or negative results, with the confidence intervals that show it.">
+<meta name="description" content="Six systems built May–September 2026 — reinforcement learning, post-quantum cryptography, quantitative finance, and interactive art. Every one deployed to a public URL; three report null or negative results, with the confidence intervals that show it.">
 <meta name="author" content="Dan Lichtenberger">
 <link rel="canonical" href="https://danny-397.github.io/">
 
@@ -24,56 +24,79 @@
 <meta name="twitter:image" content="https://danny-397.github.io/og-image.png">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1319'/><text x='50' y='54' font-size='58' font-family='Georgia,serif' fill='%237FA6E8' text-anchor='middle' dominant-baseline='central'>D</text></svg>">
+<script>document.documentElement.className += " js";
+/* Apply the saved theme here, before first paint. Setting it further down the
+   page meant a stored choice that disagreed with the OS flashed the wrong
+   colors on every load. */
+try { var savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light')
+        document.documentElement.setAttribute('data-theme', savedTheme); }
+catch (e) { /* private mode */ }</script>
 <style>
   :root {
-    --bg:        #E8E6DE;
-    --surface:   #F1EFE9;
-    --text:      #171A20;
-    --muted:     #585D66;
-    --faint:     #64686B;
-    --rule:      #C9C5BA;
-    --rule-soft: #D8D5CB;
+    --bg:        #EAE7DF;
+    --bg-deep:   #DFDBD1;
+    --surface:   #F5F3ED;
+    --surface-2: #FBFAF6;
+    --text:      #15181E;
+    --muted:     #565B64;
+    --faint:     #6B6F76;
+    --rule:      #C7C3B8;
+    --rule-soft: #D9D6CC;
     --accent:    #1F4B99;
     --accent-ink:#173A78;
-    --accent-wash: rgba(31,75,153,.09);
+    --accent-lift: #2E63BC;
+    --accent-wash: rgba(31,75,153,.085);
+    --accent-glow: rgba(31,75,153,.16);
     --flag:      #A8402F;
+    --flag-wash: rgba(168,64,47,.09);
     --ok:        #3F6B4F;
     --plate:     #0E1218;
+    --shadow:    0 1px 2px rgba(20,24,32,.05), 0 8px 24px -12px rgba(20,24,32,.14);
+    --shadow-lift: 0 2px 4px rgba(20,24,32,.06), 0 18px 44px -18px rgba(20,24,32,.22);
 
     --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","Hoefler Text",Georgia,serif;
     --sans: "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
     --mono: ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SF Mono",Menlo,"DejaVu Sans Mono",monospace;
 
     --s1: .375rem; --s2: .75rem; --s3: 1.25rem; --s4: 2rem; --s5: 3.25rem; --s6: 5rem;
-    --maxw: 1180px;
+    --maxw: 1200px;
+    --ease: cubic-bezier(.22,.61,.36,1);
   }
 
   @media (prefers-color-scheme: dark) {
-    :root {
-      --bg:        #0F1319;
-      --surface:   #151A21;
-      --text:      #DEE2E7;
-      --muted:     #8B939E;
-      --faint:     #757E8A;
-      --rule:      #262D36;
-      --rule-soft: #1E242C;
+    :root:not([data-theme="light"]) {
+      --bg:        #0D1117;
+      --bg-deep:   #080B10;
+      --surface:   #141920;
+      --surface-2: #1A2029;
+      --text:      #E2E6EB;
+      --muted:     #939BA6;
+      --faint:     #7C858F;
+      --rule:      #272E38;
+      --rule-soft: #1D232B;
       --accent:    #7FA6E8;
-      --accent-ink:#A6C2F0;
+      --accent-ink:#A9C4F1;
+      --accent-lift: #9DBCF0;
       --accent-wash: rgba(127,166,232,.10);
-      --flag:      #D9705C;
-      --ok:        #6FA982;
-      --plate:     #0A0D12;
+      --accent-glow: rgba(127,166,232,.20);
+      --flag:      #E08472;
+      --flag-wash: rgba(224,132,114,.11);
+      --ok:        #7CB68F;
+      --plate:     #06090D;
+      --shadow:    0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+      --shadow-lift: 0 2px 4px rgba(0,0,0,.45), 0 18px 44px -18px rgba(0,0,0,.75);
     }
   }
   :root[data-theme="dark"] {
-    --bg:#0F1319; --surface:#151A21; --text:#DEE2E7; --muted:#8B939E; --faint:#757E8A;
-    --rule:#262D36; --rule-soft:#1E242C; --accent:#7FA6E8; --accent-ink:#A6C2F0;
-    --accent-wash: rgba(127,166,232,.10); --flag:#D9705C; --ok:#6FA982; --plate:#0A0D12;
-  }
-  :root[data-theme="light"] {
-    --bg:#E8E6DE; --surface:#F1EFE9; --text:#171A20; --muted:#585D66; --faint:#64686B;
-    --rule:#C9C5BA; --rule-soft:#D8D5CB; --accent:#1F4B99; --accent-ink:#173A78;
-    --accent-wash: rgba(31,75,153,.09); --flag:#A8402F; --ok:#3F6B4F; --plate:#0E1218;
+    --bg:#0D1117; --bg-deep:#080B10; --surface:#141920; --surface-2:#1A2029;
+    --text:#E2E6EB; --muted:#939BA6; --faint:#7C858F;
+    --rule:#272E38; --rule-soft:#1D232B;
+    --accent:#7FA6E8; --accent-ink:#A9C4F1; --accent-lift:#9DBCF0;
+    --accent-wash: rgba(127,166,232,.10); --accent-glow: rgba(127,166,232,.20);
+    --flag:#E08472; --flag-wash: rgba(224,132,114,.11); --ok:#7CB68F; --plate:#06090D;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    --shadow-lift: 0 2px 4px rgba(0,0,0,.45), 0 18px 44px -18px rgba(0,0,0,.75);
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -86,14 +109,16 @@
     line-height: 1.62;
     margin: 0;
     overflow-x: hidden;
+    font-feature-settings: "kern" 1;
+    text-rendering: optimizeLegibility;
   }
-  ::selection { background: var(--accent-wash); }
+  ::selection { background: var(--accent-glow); }
 
   a { color: inherit; }
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
-    border-radius: 1px;
+    border-radius: 2px;
   }
 
   .wrap {
@@ -105,9 +130,18 @@
   .skip {
     position: absolute; left: -9999px; top: 0; z-index: 100;
     background: var(--surface); color: var(--text);
-    padding: .6rem 1rem; border: 1px solid var(--rule);
+    padding: .6rem 1rem; border: 1px solid var(--rule); border-radius: 4px;
   }
   .skip:focus { left: var(--s3); top: var(--s2); }
+
+  /* ---------- scroll progress ---------- */
+  .progress {
+    position: fixed; top: 0; left: 0; z-index: 60;
+    height: 2px; width: 100%;
+    transform: scaleX(0); transform-origin: 0 50%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-lift));
+    pointer-events: none;
+  }
 
   /* ---------- eyebrow / labels ---------- */
   .eyebrow {
@@ -122,58 +156,104 @@
   /* ---------- sticky utility bar ---------- */
   .util {
     position: fixed; top: 0; left: 0; right: 0; z-index: 40;
-    background: var(--bg);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(150%) blur(12px);
+    -webkit-backdrop-filter: saturate(150%) blur(12px);
     border-bottom: 1px solid var(--rule);
     transform: translateY(-101%);
-    transition: transform .26s ease;
+    transition: transform .3s var(--ease);
   }
+  @supports not (backdrop-filter: blur(1px)) { .util { background: var(--bg); } }
   .util.on { transform: none; }
   .util-in {
-    max-width: var(--maxw); margin: 0 auto; padding: .5rem var(--s3);
+    max-width: var(--maxw); margin: 0 auto; padding: .55rem var(--s3);
     display: flex; align-items: center; justify-content: space-between; gap: var(--s3);
   }
-  .util-name { font-family: var(--serif); font-size: 1rem; letter-spacing: -.01em; white-space: nowrap; }
-  .util-links { display: flex; gap: var(--s3); flex-wrap: wrap; }
+  .util-name { font-family: var(--serif); font-size: 1.02rem; letter-spacing: -.01em; white-space: nowrap; }
+  .util-links { display: flex; gap: var(--s3); flex-wrap: wrap; align-items: center; }
   .util-links a {
     font-family: var(--mono); font-size: .71rem; letter-spacing: .08em;
     text-transform: uppercase; text-decoration: none; color: var(--muted);
+    transition: color .15s;
   }
   .util-links a:hover { color: var(--accent-ink); }
-  @media (max-width: 640px) { .util-links a.opt { display: none; } }
+  @media (max-width: 700px) { .util-links a.opt { display: none; } }
+
+  /* ---------- theme toggle ---------- */
+  .themebtn {
+    appearance: none; cursor: pointer;
+    display: inline-grid; place-items: center;
+    width: 30px; height: 30px; padding: 0;
+    background: transparent;
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    color: var(--muted);
+    transition: color .18s, border-color .18s, background .18s, transform .18s var(--ease);
+    flex: none;
+  }
+  .themebtn:hover {
+    color: var(--accent-ink); border-color: var(--accent);
+    background: var(--accent-wash); transform: rotate(-18deg);
+  }
+  .themebtn svg { width: 15px; height: 15px; display: block; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+  .themebtn .i-sun { display: none; }
+  .themebtn .i-moon { display: block; }
+  :root[data-theme="dark"] .themebtn .i-sun { display: block; }
+  :root[data-theme="dark"] .themebtn .i-moon { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .themebtn .i-sun { display: block; }
+    :root:not([data-theme="light"]) .themebtn .i-moon { display: none; }
+  }
 
   /* ---------- masthead ---------- */
   .masthead {
     border-bottom: 1px solid var(--rule);
     position: relative;
     overflow: hidden;
+    background:
+      radial-gradient(1100px 520px at 78% 8%, var(--accent-wash), transparent 68%),
+      linear-gradient(180deg, var(--surface) 0%, var(--bg) 62%);
+  }
+  /* fine grain, so the paper ground is not a flat fill */
+  .masthead::before {
+    content: "";
+    position: absolute; inset: 0; z-index: 1;
+    pointer-events: none; opacity: .5; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E");
+  }
+  :root[data-theme="dark"] .masthead::before { mix-blend-mode: screen; opacity: .26; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .masthead::before { mix-blend-mode: screen; opacity: .26; }
   }
   #plot {
     position: absolute; inset: 0;
     width: 100%; height: 100%;
-    opacity: .40;
+    opacity: .42;
     pointer-events: none;
   }
-  @media (prefers-color-scheme: dark) { #plot { opacity: .52; } }
-  :root[data-theme="dark"] #plot { opacity: .52; }
-  :root[data-theme="light"] #plot { opacity: .40; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #plot { opacity: .54; } }
+  :root[data-theme="dark"] #plot { opacity: .54; }
+  :root[data-theme="light"] #plot { opacity: .42; }
 
   /* keep the plot behind the words: a scrim that clears the reading column */
   .masthead::after {
     content: "";
-    position: absolute; inset: 0; z-index: 1;
+    position: absolute; inset: 0; z-index: 2;
     pointer-events: none;
     background:
-      linear-gradient(to right, var(--bg) 0%, var(--bg) 30%, rgba(0,0,0,0) 84%),
-      linear-gradient(to bottom, rgba(0,0,0,0) 58%, var(--bg) 100%);
+      linear-gradient(to right, var(--bg) 0%, var(--bg) 28%, rgba(0,0,0,0) 82%),
+      linear-gradient(to bottom, rgba(0,0,0,0) 56%, var(--bg) 100%);
   }
 
   .masthead-inner {
     position: relative;
-    z-index: 2;
-    padding: var(--s5) 0 var(--s4);
+    z-index: 3;
+    /* padding-block only: a shorthand here would zero the side gutter .wrap sets */
+    padding-block: var(--s6) var(--s4);
     display: grid;
     gap: var(--s3);
   }
+  @media (max-width: 700px) { .masthead-inner { padding-block-start: var(--s5); } }
   .id-line {
     display: flex; flex-wrap: wrap;
     gap: var(--s2) var(--s3);
@@ -182,25 +262,33 @@
   h1 {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: clamp(2.15rem, 5.4vw, 3.4rem);
-    line-height: 1.06;
-    letter-spacing: -.012em;
+    font-size: clamp(2.3rem, 6vw, 4rem);
+    line-height: 1.04;
+    letter-spacing: -.02em;
     margin: 0;
     text-wrap: balance;
   }
   h1 .sub {
-    display: block;
+    display: flex; align-items: center; gap: .6rem;
     font-family: var(--mono);
     font-size: clamp(.72rem, 1.5vw, .8rem);
     letter-spacing: .18em;
     text-transform: uppercase;
     color: var(--accent);
-    margin-bottom: .9rem;
+    margin-bottom: 1.1rem;
     line-height: 1.4;
+  }
+  h1 .sub::after {
+    content: ""; flex: 1; height: 1px; max-width: 120px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+  h1 .hl {
+    font-style: italic;
+    background: linear-gradient(transparent 62%, var(--accent-glow) 62%);
   }
   .thesis {
     font-family: var(--serif);
-    font-size: clamp(1.12rem, 2.1vw, 1.3rem);
+    font-size: clamp(1.16rem, 2.1vw, 1.38rem);
     line-height: 1.55;
     max-width: 34em;
     margin: 0;
@@ -210,7 +298,9 @@
   .whoami { max-width: 44em; margin: 0; color: var(--muted); font-size: .95rem; }
   .kbd {
     font-family: var(--mono); font-size: .85em;
-    background: var(--accent-wash); padding: .06em .34em; border-radius: 2px;
+    background: var(--accent-wash); color: var(--accent-ink);
+    padding: .1em .38em; border-radius: 3px;
+    border: 1px solid var(--rule-soft);
   }
 
   /* ---------- ledger strip ---------- */
@@ -218,41 +308,47 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     border-top: 1px solid var(--rule);
-    margin-top: var(--s3);
+    margin-top: var(--s4);
   }
   .ledger div {
     padding: var(--s3) var(--s3) var(--s3) 0;
     border-right: 1px solid var(--rule-soft);
+    position: relative;
+  }
+  .ledger div::before {
+    content: ""; position: absolute; top: -1px; left: 0; width: 28px; height: 2px;
+    background: var(--accent);
   }
   .ledger div:last-child { border-right: 0; }
   .ledger dt {
     display: block;
     font-family: var(--mono);
     font-variant-numeric: tabular-nums;
-    font-size: 1.45rem;
+    font-size: 1.6rem;
     font-weight: 600;
-    letter-spacing: -.01em;
+    letter-spacing: -.02em;
     color: var(--accent-ink);
+    line-height: 1.1;
   }
   .ledger dd {
     display: block;
     font-size: .82rem;
     color: var(--muted);
     line-height: 1.45;
-    margin: .2rem 0 0;
+    margin: .3rem 0 0;
     max-width: 20em;
   }
 
   /* ---------- body grid ---------- */
   .layout {
     display: grid;
-    grid-template-columns: 236px 1fr;
+    grid-template-columns: 240px 1fr;
     gap: var(--s6);
-    padding: var(--s5) 0 var(--s6);
+    padding-block: var(--s5) var(--s6);
     align-items: start;
   }
   @media (max-width: 980px) {
-    .layout { grid-template-columns: 1fr; gap: var(--s4); padding-top: var(--s4); }
+    .layout { grid-template-columns: 1fr; gap: var(--s4); padding-block-start: var(--s4); }
   }
 
   /* ---------- index rail ---------- */
@@ -265,13 +361,16 @@
     display: grid;
     grid-template-columns: 2rem 1fr;
     align-items: baseline;
-    padding: .5rem 0;
+    padding: .5rem 0 .5rem .5rem;
     text-decoration: none;
     border-bottom: 1px solid var(--rule-soft);
+    border-left: 2px solid transparent;
     color: var(--muted);
-    transition: color .15s;
+    transition: color .18s, border-color .18s, background .18s, padding-left .18s var(--ease);
   }
-  .toc a:hover, .toc a.here { color: var(--accent-ink); }
+  .toc a:hover, .toc a.here { color: var(--accent-ink); background: var(--accent-wash); }
+  .toc a.here { border-left-color: var(--accent); }
+  .toc a:hover { padding-left: .7rem; }
   .toc a.here .tnum { color: var(--accent); }
   .tnum {
     font-family: var(--mono); font-size: .7rem; color: var(--faint);
@@ -281,31 +380,32 @@
   .toc a.here .tname { font-weight: 600; }
 
   .filters {
-    display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+    display: flex; flex-wrap: wrap; gap: var(--s1);
     border-top: 1px solid var(--rule-soft);
-    padding-top: var(--s2);
-  }
-  @media (max-width: 980px) {
-    .filters { flex-direction: row; flex-wrap: wrap; gap: var(--s1) var(--s2); }
+    padding-top: var(--s3);
   }
   .filters button {
-    appearance: none; background: none; border: 0;
-    border-left: 2px solid transparent;
-    padding: .3rem 0 .3rem .6rem;
-    margin: 0; font: inherit; font-size: .9rem;
-    color: var(--muted); cursor: pointer; text-align: left;
-    transition: color .15s, border-color .15s;
+    appearance: none; cursor: pointer;
+    background: transparent;
+    border: 1px solid var(--rule);
+    border-radius: 100px;
+    padding: .26rem .7rem;
+    margin: 0; font: inherit; font-size: .84rem;
+    color: var(--muted); text-align: left;
+    transition: color .18s, border-color .18s, background .18s;
   }
-  .filters button:hover { color: var(--text); }
+  .filters button:hover { color: var(--text); border-color: var(--muted); }
   .filters button[aria-pressed="true"] {
-    color: var(--accent-ink);
-    border-left-color: var(--accent);
-    font-weight: 600;
+    color: var(--surface-2);
+    background: var(--accent);
+    border-color: var(--accent);
+    font-weight: 500;
   }
   .filters .n {
-    font-family: var(--mono); font-size: .72rem; color: var(--faint);
-    font-weight: 400; margin-left: .35rem; font-variant-numeric: tabular-nums;
+    font-family: var(--mono); font-size: .7rem; color: var(--faint);
+    font-weight: 400; margin-left: .3rem; font-variant-numeric: tabular-nums;
   }
+  .filters button[aria-pressed="true"] .n { color: var(--surface-2); opacity: .72; }
   .rail-note {
     font-size: .82rem; color: var(--muted); line-height: 1.5;
     border-top: 1px solid var(--rule-soft);
@@ -314,16 +414,34 @@
   .rail-note a { color: var(--accent-ink); }
 
   /* ---------- records ---------- */
-  .records { display: grid; gap: 0; }
+  .records { display: grid; gap: var(--s4); }
   .rec {
-    border-top: 1px solid var(--rule);
-    padding: var(--s5) 0;
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--rule-soft);
+    border-radius: 8px;
+    padding: var(--s4) var(--s4) var(--s4);
     display: grid;
     gap: var(--s3);
     scroll-margin-top: 4.5rem;
+    box-shadow: var(--shadow);
+    transition: box-shadow .3s var(--ease), border-color .3s var(--ease), transform .3s var(--ease);
   }
+  .rec::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 8px 0 0 8px;
+    background: linear-gradient(180deg, var(--accent), transparent 72%);
+    opacity: .85;
+  }
+  .rec:hover { box-shadow: var(--shadow-lift); border-color: var(--rule); }
+  @media (max-width: 700px) { .rec { padding: var(--s3); border-radius: 6px; } }
   .rec[hidden] { display: none; }
-  .rec:first-child { border-top: 0; padding-top: 0; }
+
+  /* Reveal on scroll, but only once JS has confirmed it is running: the .js class
+     is set by an inline script in <head>. Without it every .reveal stays visible,
+     so a blocked script can never leave a chart invisible. */
+  .js .reveal { opacity: 0; transform: translateY(14px); }
+  .js .reveal.in { opacity: 1; transform: none; transition: opacity .55s var(--ease), transform .55s var(--ease); }
 
   .rec-head { display: grid; gap: var(--s2); }
 
@@ -332,7 +450,7 @@
     font-family: var(--mono);
   }
   .rank .num {
-    font-size: 1.5rem; font-weight: 600; letter-spacing: -.02em;
+    font-size: 1.7rem; font-weight: 600; letter-spacing: -.03em;
     color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1;
   }
   .rank .lede-note {
@@ -340,31 +458,33 @@
     color: var(--faint);
   }
 
-  .tags { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+  .tags { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s2); align-items: center; }
   .tag {
-    font-family: var(--mono); font-size: .67rem; letter-spacing: .13em;
+    font-family: var(--mono); font-size: .66rem; letter-spacing: .12em;
     text-transform: uppercase; color: var(--muted);
+    border: 1px solid var(--rule); border-radius: 100px;
+    padding: .16rem .55rem; line-height: 1.5;
   }
-  .tag.type { color: var(--accent-ink); }
+  .tag.type { color: var(--accent-ink); border-color: var(--accent); background: var(--accent-wash); }
   .tag.live::before,
   .tag.warn::before {
     content: ""; display: inline-block;
     width: 6px; height: 6px; border-radius: 50%;
     margin-right: .45rem; vertical-align: .08em;
   }
-  .tag.live::before { background: var(--ok); }
-  .tag.live { color: var(--ok); }
+  .tag.live::before { background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 22%, transparent); }
+  .tag.live { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, var(--rule)); }
   .tag.warn::before { background: none; border: 1px solid var(--flag); }
-  .tag.warn { color: var(--flag); }
+  .tag.warn { color: var(--flag); border-color: color-mix(in srgb, var(--flag) 45%, var(--rule)); background: var(--flag-wash); }
 
   .rec h3 {
     font-family: var(--serif); font-weight: 400;
-    font-size: clamp(1.5rem, 3vw, 1.95rem);
-    line-height: 1.15; letter-spacing: -.01em;
+    font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+    line-height: 1.12; letter-spacing: -.015em;
     margin: 0; text-wrap: balance;
   }
   .lede {
-    font-family: var(--serif); font-size: 1.08rem; line-height: 1.55;
+    font-family: var(--serif); font-size: 1.12rem; line-height: 1.55;
     color: var(--text); max-width: 40em; margin: 0;
   }
   .rec p { margin: 0; max-width: 42em; }
@@ -380,9 +500,10 @@
     position: relative;
     background: var(--plate);
     border: 1px solid var(--rule);
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
     line-height: 0;
+    box-shadow: var(--shadow);
   }
   .plate-frame img,
   .plate-frame video {
@@ -395,9 +516,9 @@
     display: flex; align-items: flex-end; justify-content: flex-start;
     padding: var(--s3);
     text-decoration: none;
-    background: linear-gradient(to top, rgba(6,9,13,.78) 0%, rgba(6,9,13,0) 42%);
+    background: linear-gradient(to top, rgba(6,9,13,.82) 0%, rgba(6,9,13,0) 46%);
     opacity: 0;
-    transition: opacity .18s ease;
+    transition: opacity .22s var(--ease);
   }
   .plate-frame:hover .plate-cover,
   .plate-cover:focus-visible { opacity: 1; }
@@ -414,8 +535,8 @@
     text-transform: uppercase;
     color: var(--faint);
     border: 1px solid var(--rule);
-    border-radius: 2px;
-    padding: .1rem .4rem;
+    border-radius: 100px;
+    padding: .1rem .5rem;
     margin-right: .5rem;
     line-height: 1.6;
     vertical-align: .08em;
@@ -429,9 +550,10 @@
     color: #CBD4E0;
     background: rgba(8,11,16,.82);
     border: 1px solid rgba(203,212,224,.22);
-    border-radius: 2px;
-    padding: .2rem .5rem;
+    border-radius: 100px;
+    padding: .22rem .6rem;
     line-height: 1.5;
+    transition: color .15s, border-color .15s;
   }
   .plate-toggle:hover { color: #fff; border-color: rgba(203,212,224,.5); }
 
@@ -460,28 +582,100 @@
     grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
     gap: var(--s3);
     margin: 0;
-    padding: var(--s3) 0;
-    border-top: 1px solid var(--rule-soft);
-    border-bottom: 1px solid var(--rule-soft);
+    padding: var(--s3);
+    background: var(--surface-2);
+    border: 1px solid var(--rule-soft);
+    border-radius: 6px;
   }
   .figs > div { display: grid; gap: .15rem; }
   .figs dt {
-    font-family: var(--mono); font-size: .67rem; letter-spacing: .11em;
+    font-family: var(--mono); font-size: .66rem; letter-spacing: .11em;
     text-transform: uppercase; color: var(--faint); order: 2;
   }
   .figs dd {
     margin: 0; order: 1;
     font-family: var(--mono); font-variant-numeric: tabular-nums;
-    font-size: 1.18rem; font-weight: 600; letter-spacing: -.015em;
+    font-size: 1.24rem; font-weight: 600; letter-spacing: -.02em;
     color: var(--text); line-height: 1.25;
   }
-  .figs dd small { font-size: .8rem; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+  .figs dd small { font-size: .78rem; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+
+  /* ---------- inline charts ---------- */
+  .viz {
+    margin: 0;
+    display: grid; gap: var(--s2);
+    padding: var(--s3);
+    background: var(--surface-2);
+    border: 1px solid var(--rule-soft);
+    border-radius: 6px;
+  }
+  .viz-head { display: grid; gap: .2rem; }
+  .viz-title { font-size: .92rem; font-weight: 600; color: var(--text); margin: 0; }
+  .viz-sub { font-size: .8rem; color: var(--muted); margin: 0; line-height: 1.45; }
+  .viz svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .viz .ax { font-family: var(--mono); font-size: 9.5px; fill: var(--faint); letter-spacing: .03em; }
+  .viz .lbl { font-family: var(--mono); font-size: 10px; fill: var(--muted); }
+  .viz .lbl-em { font-family: var(--mono); font-size: 10px; fill: var(--text); font-weight: 600; }
+  .viz .grid { stroke: var(--rule-soft); stroke-width: 1; }
+  .viz .zero { stroke: var(--muted); stroke-width: 1; }
+  .viz .bh { stroke: var(--text); stroke-width: 1.5; }
+  .viz .ci { stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
+  .viz .dot { fill: var(--accent); stroke: var(--surface-2); stroke-width: 2; }
+  .viz .dot-hit { fill: transparent; cursor: pointer; }
+  .viz .mean { fill: var(--accent-ink); stroke: var(--surface-2); stroke-width: 2; }
+  .viz-row { display: grid; gap: .3rem; }
+  .viz-tt {
+    position: absolute; z-index: 5; pointer-events: none;
+    background: var(--plate); color: #EDF1F6;
+    font-family: var(--mono); font-size: .7rem;
+    padding: .3rem .5rem; border-radius: 4px;
+    white-space: nowrap; opacity: 0; transition: opacity .12s;
+    box-shadow: var(--shadow-lift);
+  }
+  .viz-wrap { position: relative; }
+  .viz table { border-collapse: collapse; font-size: .8rem; width: 100%; }
+  .viz table th, .viz table td {
+    text-align: right; padding: .22rem .5rem .22rem 0;
+    border-bottom: 1px solid var(--rule-soft);
+    font-variant-numeric: tabular-nums; font-family: var(--mono);
+  }
+  .viz table th { color: var(--faint); font-weight: 500; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; }
+  .viz table th:first-child, .viz table td:first-child { text-align: left; }
+  .viz details summary {
+    cursor: pointer; font-family: var(--mono); font-size: .68rem;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--accent-ink);
+    padding: .2rem 0;
+  }
+
+  /* meter */
+  .meter-track {
+    position: relative; height: 10px; border-radius: 100px;
+    background: var(--accent-wash);
+    border: 1px solid var(--rule-soft);
+    overflow: hidden;
+  }
+  .meter-fill {
+    position: absolute; inset: 0 auto 0 0; border-radius: 100px;
+    background: linear-gradient(90deg, var(--accent), var(--flag));
+  }
+  .meter-mid {
+    position: absolute; top: -3px; bottom: -3px; width: 2px;
+    background: var(--surface-2);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 45%, transparent);
+  }
+  .meter-scale {
+    display: flex; justify-content: space-between;
+    font-family: var(--mono); font-size: .66rem; color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
 
   /* reported finding */
   .finding {
-    border-left: 2px solid var(--flag);
-    padding: .1rem 0 .1rem var(--s3);
-    display: grid; gap: .3rem; max-width: 44em;
+    border-left: 3px solid var(--flag);
+    border-radius: 0 6px 6px 0;
+    background: var(--flag-wash);
+    padding: var(--s3);
+    display: grid; gap: .35rem; max-width: 46em;
   }
   .finding .eyebrow { color: var(--flag); }
   .finding p { font-size: .95rem; color: var(--text); }
@@ -496,7 +690,9 @@
     font-family: var(--mono); font-size: .72rem; letter-spacing: .13em;
     text-transform: uppercase; color: var(--accent-ink);
     display: flex; align-items: center; gap: .55rem; padding: .15rem 0;
+    transition: color .15s;
   }
+  details.method > summary:hover { color: var(--accent); }
   details.method > summary::-webkit-details-marker { display: none; }
   details.method > summary::before {
     content: "+"; font-size: .95rem; line-height: 1; width: .8em; color: var(--accent);
@@ -512,16 +708,18 @@
   code {
     font-family: var(--mono); font-size: .87em;
     background: var(--accent-wash);
-    padding: .08em .35em; border-radius: 2px;
+    padding: .08em .35em; border-radius: 3px;
   }
 
   /* stack + links */
   .stack { display: flex; flex-wrap: wrap; gap: var(--s1); }
   .stack span {
     font-family: var(--mono); font-size: .71rem; color: var(--muted);
-    border: 1px solid var(--rule); border-radius: 2px;
-    padding: .16rem .45rem; white-space: nowrap;
+    border: 1px solid var(--rule); border-radius: 100px;
+    padding: .16rem .55rem; white-space: nowrap;
+    transition: color .15s, border-color .15s;
   }
+  .stack span:hover { color: var(--text); border-color: var(--muted); }
   .links { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); align-items: center; }
   .links a {
     font-family: var(--mono); font-size: .78rem; letter-spacing: .06em;
@@ -533,27 +731,36 @@
   .links a:hover { background: var(--accent-wash); }
   .links a.primary {
     border: 1px solid var(--accent);
-    border-radius: 3px;
-    padding: .42rem .8rem;
+    border-radius: 100px;
+    padding: .5rem .95rem;
     background: var(--accent-wash);
+    color: var(--accent-ink);
+    transition: background .2s var(--ease), color .2s, box-shadow .2s, transform .2s var(--ease);
   }
-  .links a.primary:hover { background: var(--accent); color: var(--surface); }
+  .links a.primary:hover {
+    background: var(--accent); color: var(--surface-2);
+    box-shadow: 0 6px 18px -8px var(--accent-glow);
+    transform: translateY(-1px);
+  }
   .links a.secondary { color: var(--muted); border-bottom-color: var(--rule); }
   .links a.secondary:hover { color: var(--text); }
 
   .caveat {
     font-size: .88rem;
     color: var(--muted);
-    border-left: 2px solid var(--rule);
-    padding-left: var(--s3);
-    max-width: 44em;
+    border-left: 3px solid var(--rule);
+    background: var(--surface-2);
+    border-radius: 0 6px 6px 0;
+    padding: var(--s3);
+    max-width: 46em;
   }
   .caveat b { color: var(--text); font-weight: 600; }
 
   /* ---------- colophon ---------- */
   .colophon {
     border-top: 1px solid var(--rule);
-    padding: var(--s4) 0 var(--s5);
+    padding: var(--s5) 0 var(--s5);
+    background: linear-gradient(180deg, var(--bg), var(--bg-deep));
   }
   .colophon-grid {
     display: grid;
@@ -567,12 +774,16 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     * { transition: none !important; animation: none !important; }
+    .reveal { opacity: 1; transform: none; }
+    .themebtn:hover { transform: none; }
   }
 </style>
 </head>
 <body>
 
 <a class="skip" href="#records">Skip to the projects</a>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
 
 <div class="util" id="util" aria-hidden="true">
   <div class="util-in">
@@ -582,6 +793,12 @@
       <a class="opt" href="reports.html">Reports</a>
       <a class="opt" href="https://github.com/Danny-397">GitHub</a>
       <a href="mailto:dlichtenberger91@gmail.com">Email</a>
+      <button type="button" class="themebtn" id="theme-util" aria-label="Switch between light and dark">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g class="i-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></g>
+          <g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></g>
+        </svg>
+      </button>
     </nav>
   </div>
 </div>
@@ -592,8 +809,14 @@
     <div class="id-line">
       <h1>
         <span class="sub">Dan Lichtenberger · New York</span>
-        Six systems, and what<br>each one actually proved.
+        Six systems, and what<br><span class="hl">each one actually proved.</span>
       </h1>
+      <button type="button" class="themebtn" id="theme-top" aria-label="Switch between light and dark">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g class="i-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></g>
+          <g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></g>
+        </svg>
+      </button>
     </div>
 
     <p class="thesis">
@@ -603,7 +826,7 @@
     </p>
 
     <p class="whoami">
-      Everything here was written between May and August 2026: reinforcement learning,
+      Everything here was written between May and September 2026: reinforcement learning,
       post-quantum cryptography, quantitative finance, and one piece of interactive art.
       Every project is deployed to a public URL you can open right now, and every screen
       below is a recording or screenshot of that deployment — not a mockup. They are ordered
@@ -617,11 +840,11 @@
         <dd>projects deployed to a public URL — not just a repository</dd>
       </div>
       <div>
-        <dt>431</dt>
+        <dt>830</dt>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
-        <dt>13 weeks</dt>
+        <dt>20 weeks</dt>
         <dd>from the first commit of the oldest project to the most recent</dd>
       </div>
       <div>
@@ -662,7 +885,7 @@
       <h2 class="eyebrow">Also</h2>
       <p class="rail-note" style="border-top:0;padding-top:var(--s2)">
         <a href="reports.html">Technical reports &rarr;</a><br>
-        <span style="color:var(--faint)">Eight documents, ~57 pages, one per project</span>
+        <span style="color:var(--faint)">Nine documents, ~59 pages, one per project</span>
       </p>
     </div>
 
@@ -714,10 +937,90 @@
       </figure>
 
       <dl class="figs">
-        <div><dt>The single lucky run</dt><dd>+275% <small>vs. +19% benchmark</small></dd></div>
-        <div><dt>Same agent, 10 seeds</dt><dd>+57% <small>vs. +34% buy-and-hold &middot; p = 0.79</small></dd></div>
+        <div><dt>The run I nearly published</dt><dd>+275% <small>vs. +19% &middot; superseded v1, commit d4c0ef9</small></dd></div>
+        <div><dt>Rebuilt, 10 seeds</dt><dd>+57% <small>vs. +34% buy-and-hold &middot; p = 0.79</small></dd></div>
         <div><dt>Domain randomization, held-out</dt><dd>&minus;26% &rarr; +47% <small>stocks, 5 seeds</small></dd></div>
       </dl>
+
+      <figure class="viz reveal">
+        <div class="viz-head">
+          <p class="viz-title">Every seed, plotted against the benchmark it has to beat</p>
+          <p class="viz-sub">
+            Each dot is one training seed's return <em>minus</em> buy-and-hold over the same window, so
+            the zero line means &ldquo;tied with simply holding the asset.&rdquo; The bracket is the 95%
+            confidence interval of the mean.
+          </p>
+        </div>
+        <div class="viz-wrap">
+      <svg viewBox="0 0 700 200" role="img" aria-label="Excess return over buy-and-hold for each of ten training seeds, per market. The ten crypto seeds scatter across zero and their mean interval includes zero; every one of the ten stock seeds sits far below zero.">
+        <g class="ax" text-anchor="middle">
+          <line class="grid" x1="14.0" y1="34" x2="14.0" y2="172"/>
+          <text x="14.0" y="188">-300%</text>
+          <line class="grid" x1="144.5" y1="34" x2="144.5" y2="172"/>
+          <text x="144.5" y="188">-200%</text>
+          <line class="grid" x1="275.0" y1="34" x2="275.0" y2="172"/>
+          <text x="275.0" y="188">-100%</text>
+          <line class="grid" x1="405.5" y1="34" x2="405.5" y2="172"/>
+          <text x="405.5" y="188">0</text>
+          <line class="grid" x1="535.9" y1="34" x2="535.9" y2="172"/>
+          <text x="535.9" y="188">+100%</text>
+          <line class="grid" x1="666.4" y1="34" x2="666.4" y2="172"/>
+          <text x="666.4" y="188">+200%</text>
+        </g>
+        <line class="zero" x1="405.5" y1="28" x2="405.5" y2="172" stroke-width="1.5"/>
+        <text class="lbl-em" x="405.5" y="22" text-anchor="middle">ties buy-and-hold</text>
+        <text class="lbl" x="14" y="60">Crypto · 10 seeds</text>
+        <text class="lbl-em" x="686" y="60" text-anchor="end">mean +23% · 95% CI [-17%, +73%] · p = 0.79</text>
+        <line class="ci" x1="383.1" y1="80" x2="500.5" y2="80" opacity=".45"/>
+        <line class="ci" x1="383.1" y1="74" x2="383.1" y2="86"/>
+        <line class="ci" x1="500.5" y1="74" x2="500.5" y2="86"/>
+        <circle class="dot" cx="656.0" cy="82.5" r="4.5"/><circle class="dot-hit" cx="656.0" cy="82.5" r="12" data-tip="seed 42: +192% vs buy-and-hold"/>
+        <circle class="dot" cx="537.9" cy="75.1" r="4.5"/><circle class="dot-hit" cx="537.9" cy="75.1" r="12" data-tip="seed 43: +102% vs buy-and-hold"/>
+        <circle class="dot" cx="357.3" cy="87.3" r="4.5"/><circle class="dot-hit" cx="357.3" cy="87.3" r="12" data-tip="seed 44: -37% vs buy-and-hold"/>
+        <circle class="dot" cx="324.2" cy="77.5" r="4.5"/><circle class="dot-hit" cx="324.2" cy="77.5" r="12" data-tip="seed 45: -62% vs buy-and-hold"/>
+        <circle class="dot" cx="453.3" cy="84.9" r="4.5"/><circle class="dot-hit" cx="453.3" cy="84.9" r="12" data-tip="seed 46: +37% vs buy-and-hold"/>
+        <circle class="dot" cx="468.4" cy="72.7" r="4.5"/><circle class="dot-hit" cx="468.4" cy="72.7" r="12" data-tip="seed 47: +48% vs buy-and-hold"/>
+        <circle class="dot" cx="343.0" cy="82.5" r="4.5"/><circle class="dot-hit" cx="343.0" cy="82.5" r="12" data-tip="seed 48: -48% vs buy-and-hold"/>
+        <circle class="dot" cx="401.0" cy="75.1" r="4.5"/><circle class="dot-hit" cx="401.0" cy="75.1" r="12" data-tip="seed 49: -3% vs buy-and-hold"/>
+        <circle class="dot" cx="396.8" cy="87.3" r="4.5"/><circle class="dot-hit" cx="396.8" cy="87.3" r="12" data-tip="seed 50: -7% vs buy-and-hold"/>
+        <circle class="dot" cx="420.5" cy="77.5" r="4.5"/><circle class="dot-hit" cx="420.5" cy="77.5" r="12" data-tip="seed 51: +12% vs buy-and-hold"/>
+        <circle class="mean" cx="435.8" cy="80" r="6"/>
+        <text class="lbl" x="14" y="126">Stocks · 10 seeds</text>
+        <text class="lbl-em" x="686" y="126" text-anchor="end">mean -259% · 95% CI [-266%, -251%] · p = 0.002</text>
+        <line class="ci" x1="58.1" y1="146" x2="78.2" y2="146" opacity=".45"/>
+        <line class="ci" x1="58.1" y1="140" x2="58.1" y2="152"/>
+        <line class="ci" x1="78.2" y1="140" x2="78.2" y2="152"/>
+        <circle class="dot" cx="65.6" cy="148.5" r="4.5"/><circle class="dot-hit" cx="65.6" cy="148.5" r="12" data-tip="seed 42: -260% vs buy-and-hold"/>
+        <circle class="dot" cx="62.1" cy="141.1" r="4.5"/><circle class="dot-hit" cx="62.1" cy="141.1" r="12" data-tip="seed 43: -263% vs buy-and-hold"/>
+        <circle class="dot" cx="77.0" cy="153.3" r="4.5"/><circle class="dot-hit" cx="77.0" cy="153.3" r="12" data-tip="seed 44: -252% vs buy-and-hold"/>
+        <circle class="dot" cx="73.9" cy="143.5" r="4.5"/><circle class="dot-hit" cx="73.9" cy="143.5" r="12" data-tip="seed 45: -254% vs buy-and-hold"/>
+        <circle class="dot" cx="45.3" cy="150.9" r="4.5"/><circle class="dot-hit" cx="45.3" cy="150.9" r="12" data-tip="seed 46: -276% vs buy-and-hold"/>
+        <circle class="dot" cx="44.8" cy="138.7" r="4.5"/><circle class="dot-hit" cx="44.8" cy="138.7" r="12" data-tip="seed 47: -276% vs buy-and-hold"/>
+        <circle class="dot" cx="98.2" cy="148.5" r="4.5"/><circle class="dot-hit" cx="98.2" cy="148.5" r="12" data-tip="seed 48: -235% vs buy-and-hold"/>
+        <circle class="dot" cx="87.2" cy="141.1" r="4.5"/><circle class="dot-hit" cx="87.2" cy="141.1" r="12" data-tip="seed 49: -244% vs buy-and-hold"/>
+        <circle class="dot" cx="72.3" cy="153.3" r="4.5"/><circle class="dot-hit" cx="72.3" cy="153.3" r="12" data-tip="seed 50: -255% vs buy-and-hold"/>
+        <circle class="dot" cx="53.9" cy="143.5" r="4.5"/><circle class="dot-hit" cx="53.9" cy="143.5" r="12" data-tip="seed 51: -269% vs buy-and-hold"/>
+        <circle class="mean" cx="68.0" cy="146" r="6"/>
+      </svg>
+          <div class="viz-tt" id="tt-seeds"></div>
+        </div>
+        <p class="viz-sub">
+          <b>The crypto cloud straddles zero</b> &mdash; its interval includes &ldquo;no edge at all,&rdquo;
+          which is what p&nbsp;=&nbsp;0.79 means. <b>Every stock seed lands far left of it:</b> that arm is
+          not inconclusive, it is reliably worse than holding the index. A single dot from the right-hand
+          tail, reported alone, would have looked like a discovery.
+        </p>
+        <details>
+          <summary>Table view</summary>
+      <table>
+        <thead><tr><th>Market</th><th>Worst seed</th><th>Best seed</th><th>Mean excess</th><th>95% CI</th><th>p</th></tr></thead>
+        <tbody>
+          <tr><td>Crypto</td><td>-62%</td><td>+192%</td><td>+23%</td><td>[-17%, +73%]</td><td>0.79</td></tr>
+          <tr><td>Stocks</td><td>-276%</td><td>-235%</td><td>-259%</td><td>[-266%, -251%]</td><td>0.002</td></tr>
+        </tbody>
+      </table>
+        </details>
+      </figure>
 
       <p class="prose">
         This is the project I'd point at first, and it is first for that reason. It is designed to
@@ -750,7 +1053,10 @@
         <p class="eyebrow">Reported finding</p>
         <p>
           <strong>No seed-robust edge over buy-and-hold.</strong> One favorable run returned +275% against a
-          +19% benchmark. Across ten seeds its individual returns ranged from &minus;29% to +226%; the mean,
+          +19% benchmark, and that was the version I nearly wrote up as the finding &mdash; it is
+          superseded, and the project site cites the commit
+          (<code>d4c0ef9</code>, test window ending 2026&#8209;06&#8209;17) rather than quoting it as current.
+          Rebuilt and rerun under ten seeds, individual returns ranged from &minus;29% to +226%; the mean,
           +57% [+16%, +106%], cannot be distinguished from buy-and-hold's +34% (p = 0.79). The stock agent
           returned &minus;19% [&minus;27%, &minus;11%] against buy-and-hold's +240% &mdash; significantly
           <em>worse</em>, at p = 0.002. Retrained across four separate slices of Bitcoin's history, it lost
@@ -869,12 +1175,14 @@
         <div class="tags">
           <span class="tag type">Live system</span>
           <span class="tag">Statistical validation</span>
+          <span class="tag">Probabilistic forecasting</span>
           <span class="tag live">alphaglyph.org</span>
         </div>
         <h3>AlphaGlyph</h3>
         <p class="lede">
-          A backtesting laboratory built on the assumption that its own results are wrong until they
-          survive the statistical tests institutional quant funds use to separate skill from luck.
+          A backtesting and forecasting laboratory built on the assumption that its own results are wrong
+          until they survive the statistical tests institutional quant funds use to separate skill from luck
+          &mdash; including the forecast it makes about tomorrow.
         </p>
       </div>
 
@@ -901,10 +1209,33 @@
       </figure>
 
       <dl class="figs">
-        <div><dt>Probability of backtest overfitting</dt><dd>72% <small>CPCV, 42-variant grid</small></dd></div>
+        <div><dt>Forecaster test AUC</dt><dd>&asymp;0.51 <small>a coin flip</small></dd></div>
         <div><dt>In-sample Sharpe surviving OOS</dt><dd>~52% <small>median</small></dd></div>
         <div><dt>Tests in CI</dt><dd>169</dd></div>
       </dl>
+
+      <figure class="viz reveal">
+        <div class="viz-head">
+          <p class="viz-title">Probability that the best backtest in the search is fooling you</p>
+          <p class="viz-sub">
+            Combinatorially-symmetric cross-validation over a 42-variant trend and mean-reversion grid on
+            SPY. Above the 50% mark, the in-sample winner is more likely than not to land in the bottom
+            half out-of-sample.
+          </p>
+        </div>
+        <div class="meter-track" role="img" aria-label="Probability of backtest overfitting: 72 percent, above the 50 percent coin-flip mark.">
+          <div class="meter-fill" style="width:72%"></div>
+          <div class="meter-mid" style="left:50%"></div>
+        </div>
+        <div class="meter-scale">
+          <span>0%</span><span>50% &middot; coin flip</span><span>100%</span>
+        </div>
+        <p class="viz-sub">
+          <b>72%</b> on the run of 2026-08-01. An earlier run of the identical procedure returned
+          <b>63%</b> &mdash; same code, same grid, same ticker, a different window. The drift is the point:
+          a single PBO quoted as a constant is the exact error the metric exists to catch.
+        </p>
+      </figure>
 
       <p class="prose">
         Anyone can produce a backtest with a good-looking equity curve. This one runs day-by-day
@@ -913,6 +1244,17 @@
         Probabilistic and Deflated Sharpe ratios, Fama-French factor decomposition, cost-sensitivity
         sweeps, and an append-only forward ledger that grades live predictions after the fact so past
         calls can't be quietly revised.
+      </p>
+
+      <p class="prose">
+        The other half of the system points forward. A 106k-parameter multi-modal transformer &mdash;
+        deliberately tiny, because daily market data is small data drowning in noise &mdash; reads 60 days
+        of 13 features and emits three things: the probability of an up-move, a q10&ndash;q90 distribution of
+        the return built so the quantiles can never cross, and a volatility forecast. A Predictor view
+        blends that price channel with post-earnings drift and news sentiment, weights each by its own
+        confidence, and <em>lowers</em> the combined confidence when the channels disagree. That is the part
+        I'd defend: the useful output of a forecaster isn't a number, it's a calibrated distribution and an
+        honest confidence attached to it.
       </p>
 
       <div class="finding">
@@ -936,8 +1278,10 @@
         <div class="inner">
           <ul>
             <li><strong>The Data-Mining Lab.</strong> Generates hundreds of random long/flat strategies that have no edge <em>by construction</em>, keeps the luckiest, and shows the naive statistics calling it significant while the Deflated Sharpe correctly calls it noise. The gap between those two numbers is the argument the whole system is built on.</li>
-            <li><strong>Architecture.</strong> The browser holds all UI state and the backend is a pure compute layer; the ML model is trained offline and shipped as a portable ONNX artifact. 15 API endpoints.</li>
-            <li><strong>Indicators from first principles.</strong> SMA, EMA, RSI, MACD, ADX and Bollinger Bands implemented directly rather than pulled from a TA library.</li>
+            <li><strong>Architecture.</strong> The browser holds all UI state and the backend is a pure compute layer; the ML model is trained offline and shipped as a portable ONNX artifact &mdash; ~40&nbsp;MB of ONNX Runtime instead of PyTorch's 700&nbsp;MB, which is what lets it serve inside a 512&nbsp;MB free tier. 15 API endpoints, five of them forward-looking rather than backtest-looking.</li>
+            <li><strong>Forecast honesty.</strong> Calibration scores the model only on data after its validation cutoff &mdash; a claim of &ldquo;60% up&rdquo; is worthless unless the market rises about 60% of the time it is said. Test AUC comes back at &asymp;0.51 and the page says so. The forward ledger then logs every live prediction at the moment it is made and grades it once the horizon elapses, append-only, so the hit rate cannot be refitted in hindsight.</li>
+            <li><strong>What the shipped model can't do.</strong> The committed checkpoint was trained with the macro and news blocks zero-filled, so it currently predicts from price alone; the multi-modal plumbing is real and tested, and a retrain activates the other two channels with no code change. The metadata file shows it &mdash; those five features carry a standard deviation of exactly zero.</li>
+            <li><strong>Indicators from first principles.</strong> SMA, EMA, RSI, MACD, ADX and Bollinger Bands implemented directly rather than pulled from a TA library, across six strategies plus a no-code custom rule builder and a regime-detecting adaptive mode.</li>
             <li><strong>Data resilience.</strong> A three-stage cascade &mdash; Tiingo, then yfinance, then Stooq &mdash; so a single upstream outage doesn't take the system down.</li>
             <li><strong>Pipeline.</strong> GitHub Actions running 169 pytest cases, flake8 linting and smoke tests on every push.</li>
           </ul>
@@ -949,6 +1293,7 @@
       </div>
       <div class="links">
         <a class="primary" href="https://alphaglyph.org/backtest.html">Run a backtest &rarr;</a>
+        <a class="secondary" href="https://alphaglyph.org/tools.html">Predictor &amp; research lab</a>
         <a class="secondary" href="https://alphaglyph.org">Project site</a>
         <a class="secondary" href="https://github.com/Danny-397/Alphaglyph/blob/main/docs/technical-report.md">Technical report</a>
         <a class="secondary" href="https://github.com/Danny-397/Alphaglyph">Source</a>
@@ -1242,18 +1587,10 @@
   var bar = document.getElementById('filters');
   var recs = Array.prototype.slice.call(document.querySelectorAll('.rec'));
 
-  function restripe() {
-    var first = true;
-    recs.forEach(function (r) {
-      r.style.borderTop = '';
-      r.style.paddingTop = '';
-      if (!r.hidden && first) {
-        r.style.borderTop = '0';
-        r.style.paddingTop = '0';
-        first = false;
-      }
-    });
-  }
+  /* Records used to be a rule-separated list, where the first visible one had to
+     lose its top rule. They are self-contained cards now, so there is nothing to
+     restripe -- and zeroing padding here would collapse the first card. */
+  function restripe() {}
 
   function applyFilter(f) {
     Array.prototype.forEach.call(bar.querySelectorAll('button'), function (b) {
@@ -1467,5 +1804,93 @@
 })();
 </script>
 
+<script>
+/* ---------- theme, motion, and the two inline charts ---------- */
+(function () {
+  var root = document.documentElement;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- theme toggle ----------
+     The CSS has carried data-theme overrides for a while but nothing ever set
+     the attribute, so the viewer was stuck with whatever the OS reported. */
+  function stored() {
+    try { return localStorage.getItem('theme'); } catch (e) { return null; }
+  }
+  function systemDark() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function currentlyDark() {
+    var t = root.getAttribute('data-theme');
+    return t ? t === 'dark' : systemDark();
+  }
+  var saved = stored();
+  if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+
+  function flip() {
+    var next = currentlyDark() ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) { /* private mode */ }
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.themebtn'), function (b) {
+    b.addEventListener('click', flip);
+  });
+
+  /* ---------- scroll progress ---------- */
+  var bar = document.getElementById('progress');
+  function progress() {
+    if (!bar) return;
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.transform = 'scaleX(' + (h > 0 ? Math.min(1, window.scrollY / h) : 0) + ')';
+  }
+  var queued = false;
+  window.addEventListener('scroll', function () {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function () { progress(); queued = false; });
+  }, { passive: true });
+  progress();
+
+  /* ---------- reveal on scroll ---------- */
+  var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  if (reduce || !('IntersectionObserver' in window)) {
+    reveals.forEach(function (el) { el.classList.add('in'); });
+  } else {
+    var ro = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('in');
+        ro.unobserve(en.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    reveals.forEach(function (el) { ro.observe(el); });
+  }
+
+  /* ---------- chart hover: enhances the labels, never the only way to read a value
+     (every figure is also in the table view under each chart) ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.viz-wrap'), function (wrap) {
+    var tip = wrap.querySelector('.viz-tt');
+    if (!tip) return;
+    function show(e) {
+      var t = e.target.getAttribute('data-tip');
+      if (!t) return;
+      tip.textContent = t;
+      tip.style.opacity = '1';
+      var box = wrap.getBoundingClientRect();
+      var dot = e.target.getBoundingClientRect();
+      tip.style.left = Math.round(dot.left - box.left + dot.width / 2 - tip.offsetWidth / 2) + 'px';
+      tip.style.top = Math.round(dot.top - box.top - tip.offsetHeight - 4) + 'px';
+    }
+    function hide() { tip.style.opacity = '0'; }
+    wrap.addEventListener('mouseover', show);
+    wrap.addEventListener('mouseout', hide);
+    wrap.addEventListener('focusin', show);
+    wrap.addEventListener('focusout', hide);
+  });
+
+  /* No count-up on the ledger figures. They are factual claims, and an animation
+     that counts 584 -> 830 means the page displays a wrong number for a second --
+     which is the exact failure mode the rest of this site argues against. */
+})();
+</script>
 </body>
 </html>

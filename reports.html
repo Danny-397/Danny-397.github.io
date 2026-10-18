@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Technical Reports — Dan Lichtenberger</title>
+<script>document.documentElement.className += " js";
+/* Apply the saved theme here, before first paint. Setting it further down the
+   page meant a stored choice that disagreed with the OS flashed the wrong
+   colors on every load. */
+try { var savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light')
+        document.documentElement.setAttribute('data-theme', savedTheme); }
+catch (e) { /* private mode */ }</script>
 <link rel="stylesheet" href="site.css">
 <style>
   .head { padding: var(--s5) 0 var(--s4); border-bottom: 1px solid var(--rule); }
@@ -19,17 +27,28 @@
   .standfirst em { font-style: italic; color: var(--accent-ink); }
   .note { color: var(--muted); font-size: .95rem; max-width: 42em; margin: 0; }
 
-  .list { padding: var(--s4) 0 0; display: grid; gap: 0; }
+  .list { padding: var(--s4) 0 0; display: grid; gap: var(--s3); }
   .doc {
-    border-top: 1px solid var(--rule);
-    padding: var(--s4) 0;
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--rule-soft);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: var(--s4);
     display: grid;
     grid-template-columns: 132px 1fr;
     gap: var(--s4);
     align-items: start;
+    transition: box-shadow .3s var(--ease), border-color .3s var(--ease);
   }
-  .doc:first-child { border-top: 0; padding-top: var(--s2); }
-  @media (max-width: 760px) { .doc { grid-template-columns: 1fr; gap: var(--s2); } }
+  .doc::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 8px 0 0 8px;
+    background: linear-gradient(180deg, var(--accent), transparent 72%);
+    opacity: .85;
+  }
+  .doc:hover { box-shadow: var(--shadow-lift); border-color: var(--rule); }
+  @media (max-width: 760px) { .doc { grid-template-columns: 1fr; gap: var(--s2); padding: var(--s3); } }
 
   .meta { display: grid; gap: .3rem; }
   .meta .k {
@@ -64,6 +83,7 @@
   .links a:hover { background: var(--accent-wash); }
   .links a.secondary { color: var(--muted); border-bottom-color: var(--rule); }
   .links a.secondary:hover { color: var(--text); }
+  .bar .wrap nav { align-items: center; }
 </style>
 </head>
 <body>
@@ -75,6 +95,12 @@
       <a href="index.html">Work</a>
       <a href="reports.html" aria-current="page">Reports</a>
       <a href="https://github.com/Danny-397">GitHub</a>
+      <button type="button" class="themebtn" id="theme-reports" aria-label="Switch between light and dark">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g class="i-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></g>
+          <g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></g>
+        </svg>
+      </button>
     </nav>
   </div>
 </header>
@@ -312,5 +338,24 @@
   </div>
 </footer>
 
+<script>
+(function () {
+  var root = document.documentElement;
+  function stored() { try { return localStorage.getItem('theme'); } catch (e) { return null; } }
+  var saved = stored();
+  if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+  function currentlyDark() {
+    var t = root.getAttribute('data-theme');
+    return t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.themebtn'), function (b) {
+    b.addEventListener('click', function () {
+      var next = currentlyDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) { /* private mode */ }
+    });
+  });
+})();
+</script>
 </body>
 </html>

@@ -5,19 +5,27 @@
    ------------------------------------------------------------------ */
 
 :root {
-  --bg:        #E8E6DE;
-  --surface:   #F1EFE9;
-  --text:      #171A20;
-  --muted:     #585D66;
-  --faint:     #64686B;
-  --rule:      #C9C5BA;
-  --rule-soft: #D8D5CB;
+  --bg:        #EAE7DF;
+  --bg-deep:   #DFDBD1;
+  --surface:   #F5F3ED;
+  --surface-2: #FBFAF6;
+  --text:      #15181E;
+  --muted:     #565B64;
+  --faint:     #6B6F76;
+  --rule:      #C7C3B8;
+  --rule-soft: #D9D6CC;
   --accent:    #1F4B99;
   --accent-ink:#173A78;
-  --accent-wash: rgba(31,75,153,.09);
+  --accent-lift: #2E63BC;
+  --accent-wash: rgba(31,75,153,.085);
+  --accent-glow: rgba(31,75,153,.16);
   --flag:      #A8402F;
+  --flag-wash: rgba(168,64,47,.09);
   --ok:        #3F6B4F;
   --draft-bg:  rgba(168,64,47,.055);
+  --shadow:    0 1px 2px rgba(20,24,32,.05), 0 8px 24px -12px rgba(20,24,32,.14);
+  --shadow-lift: 0 2px 4px rgba(20,24,32,.06), 0 18px 44px -18px rgba(20,24,32,.22);
+  --ease: cubic-bezier(.22,.61,.36,1);
 
   --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","Hoefler Text",Georgia,serif;
   --sans: "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
@@ -28,24 +36,51 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg:#0F1319; --surface:#151A21; --text:#DEE2E7; --muted:#8B939E; --faint:#757E8A;
-    --rule:#262D36; --rule-soft:#1E242C; --accent:#7FA6E8; --accent-ink:#A6C2F0;
-    --accent-wash: rgba(127,166,232,.10); --flag:#D9705C; --ok:#6FA982;
-    --draft-bg: rgba(217,112,92,.07);
+  :root:not([data-theme="light"]) {
+  --bg:#0D1117; --bg-deep:#080B10; --surface:#141920; --surface-2:#1A2029;
+  --text:#E2E6EB; --muted:#939BA6; --faint:#7C858F;
+  --rule:#272E38; --rule-soft:#1D232B; --accent:#7FA6E8; --accent-ink:#A9C4F1;
+  --accent-lift:#9DBCF0; --accent-wash: rgba(127,166,232,.10);
+  --accent-glow: rgba(127,166,232,.20);
+  --flag:#E08472; --flag-wash: rgba(224,132,114,.11); --ok:#7CB68F;
+  --draft-bg: rgba(224,132,114,.07);
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  --shadow-lift: 0 2px 4px rgba(0,0,0,.45), 0 18px 44px -18px rgba(0,0,0,.75);
   }
 }
 :root[data-theme="dark"] {
-  --bg:#0F1319; --surface:#151A21; --text:#DEE2E7; --muted:#8B939E; --faint:#757E8A;
-  --rule:#262D36; --rule-soft:#1E242C; --accent:#7FA6E8; --accent-ink:#A6C2F0;
-  --accent-wash: rgba(127,166,232,.10); --flag:#D9705C; --ok:#6FA982;
-  --draft-bg: rgba(217,112,92,.07);
+  --bg:#0D1117; --bg-deep:#080B10; --surface:#141920; --surface-2:#1A2029;
+  --text:#E2E6EB; --muted:#939BA6; --faint:#7C858F;
+  --rule:#272E38; --rule-soft:#1D232B; --accent:#7FA6E8; --accent-ink:#A9C4F1;
+  --accent-lift:#9DBCF0; --accent-wash: rgba(127,166,232,.10);
+  --accent-glow: rgba(127,166,232,.20);
+  --flag:#E08472; --flag-wash: rgba(224,132,114,.11); --ok:#7CB68F;
+  --draft-bg: rgba(224,132,114,.07);
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  --shadow-lift: 0 2px 4px rgba(0,0,0,.45), 0 18px 44px -18px rgba(0,0,0,.75);
 }
 :root[data-theme="light"] {
-  --bg:#E8E6DE; --surface:#F1EFE9; --text:#171A20; --muted:#585D66; --faint:#64686B;
-  --rule:#C9C5BA; --rule-soft:#D8D5CB; --accent:#1F4B99; --accent-ink:#173A78;
-  --accent-wash: rgba(31,75,153,.09); --flag:#A8402F; --ok:#3F6B4F;
-  --draft-bg: rgba(168,64,47,.055);
+  --bg:        #EAE7DF;
+  --bg-deep:   #DFDBD1;
+  --surface:   #F5F3ED;
+  --surface-2: #FBFAF6;
+  --text:      #15181E;
+  --muted:     #565B64;
+  --faint:     #6B6F76;
+  --rule:      #C7C3B8;
+  --rule-soft: #D9D6CC;
+  --accent:    #1F4B99;
+  --accent-ink:#173A78;
+  --accent-lift: #2E63BC;
+  --accent-wash: rgba(31,75,153,.085);
+  --accent-glow: rgba(31,75,153,.16);
+  --flag:      #A8402F;
+  --flag-wash: rgba(168,64,47,.09);
+  --ok:        #3F6B4F;
+  --draft-bg:  rgba(168,64,47,.055);
+  --shadow:    0 1px 2px rgba(20,24,32,.05), 0 8px 24px -12px rgba(20,24,32,.14);
+  --shadow-lift: 0 2px 4px rgba(20,24,32,.06), 0 18px 44px -18px rgba(20,24,32,.22);
+  --ease: cubic-bezier(.22,.61,.36,1);
 }
 
 html { -webkit-text-size-adjust: 100%; }
@@ -112,9 +147,10 @@ code {
   grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
   gap: var(--s3);
   margin: 0;
-  padding: var(--s3) 0;
-  border-top: 1px solid var(--rule-soft);
-  border-bottom: 1px solid var(--rule-soft);
+  padding: var(--s3);
+  background: var(--surface-2);
+  border: 1px solid var(--rule-soft);
+  border-radius: 6px;
 }
 .figs > div { display: grid; gap: .15rem; }
 .figs dt {
@@ -150,3 +186,30 @@ footer.colophon p { margin: .5rem 0 0; color: var(--muted); font-size: .92rem; m
 footer.colophon a { color: var(--accent-ink); }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* ---------- theme toggle (shared with index.html) ---------- */
+.themebtn {
+  appearance: none; cursor: pointer;
+  display: inline-grid; place-items: center;
+  width: 30px; height: 30px; padding: 0;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  color: var(--muted);
+  transition: color .18s, border-color .18s, background .18s, transform .18s var(--ease);
+  flex: none;
+}
+.themebtn:hover {
+  color: var(--accent-ink); border-color: var(--accent);
+  background: var(--accent-wash); transform: rotate(-18deg);
+}
+.themebtn svg { width: 15px; height: 15px; display: block; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+.themebtn .i-sun { display: none; }
+.themebtn .i-moon { display: block; }
+:root[data-theme="dark"] .themebtn .i-sun { display: block; }
+:root[data-theme="dark"] .themebtn .i-moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .themebtn .i-sun { display: block; }
+  :root:not([data-theme="light"]) .themebtn .i-moon { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .themebtn:hover { transform: none; } }

@@ -350,6 +350,10 @@ catch (e) { /* private mode */ }</script>
   @media (max-width: 980px) {
     .layout { grid-template-columns: 1fr; gap: var(--s4); padding-block-start: var(--s4); }
   }
+  /* A grid item defaults to min-width:auto, so it refuses to shrink below the
+     intrinsic width of its contents. The index rail's longest entry was wider
+     than a phone, which pushed the whole page 14px sideways. */
+  .layout > * { min-width: 0; }
 
   /* ---------- index rail ---------- */
   .rail { position: sticky; top: var(--s4); display: grid; gap: var(--s4); }
@@ -542,6 +546,13 @@ catch (e) { /* private mode */ }</script>
     vertical-align: .08em;
     white-space: nowrap;
   }
+  /* The longest caption chip ("Screenshot - the dashboard with the backend up")
+     is 334px on one line. Held unbreakable it set the floor for the whole
+     records column, which pushed the page sideways on any phone narrower than
+     about 430px. Below that, let a chip wrap instead. */
+  @media (max-width: 430px) {
+    .chip { white-space: normal; }
+  }
   .plate-toggle {
     position: absolute; top: var(--s2); right: var(--s2);
     appearance: none; cursor: pointer;
@@ -559,7 +570,10 @@ catch (e) { /* private mode */ }</script>
 
   /* dense screenshots stay legible on a phone: let them pan instead of shrinking */
   @media (max-width: 760px) {
-    .plate-scroll { overflow-x: auto; overscroll-behavior-x: contain; }
+    /* The image is deliberately wider than the phone so the detail can be read
+       by scrolling the plate sideways. min-width:0 keeps that 660px from
+       propagating up through the record and shoving the whole page over. */
+    .plate-scroll { overflow-x: auto; overscroll-behavior-x: contain; min-width: 0; }
     .plate-scroll img { min-width: 660px; }
     .plate-scroll::-webkit-scrollbar { height: 6px; }
     .plate-scroll::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }

@@ -1126,10 +1126,21 @@ catch (e) { /* private mode */ }</script>
           <span class="chip">Screenshot &middot; a real scan</span>
           <b>A live scan, no account needed.</b> Paste a snippet and the engine scores it, flags each
           at-risk primitive with its line number, and names the FIPS 203/204 replacement. The same
-          engine runs against a whole repository or an uploaded <code>.zip</code>.
+          engine scans a whole repository or an uploaded <code>.zip</code> &mdash; from the CLI, or
+          from the hosted service when it's up (see below).
          <span class="plate-hint">Scroll it sideways to read the detail.</span>
         </figcaption>
       </figure>
+
+      <p class="caveat">
+        <b>Honest status:</b> the snippet scanner above runs entirely in your browser, so it works
+        whatever the hosting is doing &mdash; that is the scan in the screenshot. The hosted service
+        that scans a whole repository or an uploaded <code>.zip</code> is currently unreachable, and
+        rather than spin on a dead request the page times out and says so, pointing at the two paths
+        that still run the identical engine: <code>pip install quantumsafe-scan</code> locally, or the
+        GitHub Action in CI. A free-tier hosting problem, not a broken build &mdash; the engine itself
+        is covered by 102 tests in CI.
+      </p>
 
       <dl class="figs">
         <div><dt>Precision on labeled benchmark</dt><dd>100% <small>vs. 49.1% naive baseline</small></dd></div>

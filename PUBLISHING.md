@@ -98,3 +98,16 @@ suspended by its owner`, so its record carries a `tag warn` chip and an
 change that chip back to `tag live`, drop the `.caveat` paragraph, and re-shoot
 `tradeski-dashboard.webp` from the live `/app`.** Re-check the other five before
 any significant edit; the ledger claims all six resolve.
+
+QuantumSafe's hosted API (`quantumsafe-api.onrender.com`) does not answer
+either — it accepts the TCP connection and then never replies (measured at 62
+minutes, so it is a dead service rather than a cold start). Its record keeps the
+`tag live` chip, because quantumsafescan.com *is* live and the snippet scanner
+in the screenshot runs wholly in the browser; only the whole-repo/`.zip` path
+needs the backend. It carries a `.caveat` instead. **If that service is
+restored, drop the `.caveat` and restore the plain claim in the figcaption.**
+
+Both outages trace to the same cause: Render's 750 free instance-hours are per
+*workspace* per month, shared across all four backends, and running them out
+suspends every free service. See `Alphaglyph/.github/workflows/keepwarm.yml`,
+whose ping window was narrowed for exactly this reason.

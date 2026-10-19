@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neural Canvas — Technical Report — Dan Lichtenberger</title>
+<meta name="description" content="Hand tracking, the brush engine, and the attract-mode renderer.">
+<meta name="author" content="Dan Lichtenberger">
+<link rel="canonical" href="https://danny-397.github.io/reports/neural-canvas-technical-report.html">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dan Lichtenberger">
+<meta property="og:url" content="https://danny-397.github.io/reports/neural-canvas-technical-report.html">
+<meta property="og:title" content="Neural Canvas — Technical Report">
+<meta property="og:description" content="Hand tracking, the brush engine, and the attract-mode renderer.">
+<meta property="og:image" content="https://danny-397.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Neural Canvas — Technical Report — Dan Lichtenberger">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Neural Canvas — Technical Report">
+<meta name="twitter:description" content="Hand tracking, the brush engine, and the attract-mode renderer.">
+<meta name="twitter:image" content="https://danny-397.github.io/og-image.png">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1319'/><text x='50' y='54' font-size='58' font-family='Georgia,serif' fill='%237FA6E8' text-anchor='middle' dominant-baseline='central'>D</text></svg>">
+<script>document.documentElement.className += " js";
+/* Apply the saved theme before first paint, as index.html and reports.html do. */
+try { var savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light')
+        document.documentElement.setAttribute('data-theme', savedTheme); }
+catch (e) { /* private mode */ }</script>
+<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="../report.css">
+<script src="../analytics.js" defer></script>
+</head>
+<body>
+
+<a class="skip" href="#doc">Skip to the report</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="name" href="../index.html">Dan Lichtenberger</a>
+    <nav>
+      <a href="../index.html">Work</a>
+      <a href="../reports.html" aria-current="page">Reports</a>
+      <a href="https://github.com/Danny-397/Danny-397">GitHub</a>
+      <button type="button" class="themebtn" aria-label="Switch between light and dark">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g class="i-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></g>
+          <g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></g>
+        </svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="doc" class="wrap doc">
+  <p class="eyebrow">Neural Canvas &middot; technical report</p>
+  <h1>Neural Canvas — Technical Report</h1>
+  <p class="standfirst">Hand tracking, the brush engine, and the attract-mode renderer.</p>
+  <p class="doclinks">
+    <a class="doclink" href="https://github.com/Danny-397/neural-canvas/blob/main/docs/technical-report.md">Source markdown &nearr;</a>
+    <a class="doclink" href="Neural-Canvas-Technical-Report.pdf">PDF &darr;</a>
+  </p>
+  <nav class="toc" aria-label="Sections">
+    <p class="eyebrow">Sections</p>
+    <ol>
+      <li><a href="#summary">Summary</a></li>
+      <li><a href="#1-the-actual-problem">1. The actual problem</a></li>
+      <li><a href="#2-why-a-fixed-low-pass-filter-fails">2. Why a fixed low-pass filter fails</a></li>
+      <li><a href="#3-the-one-euro-filter">3. The one-euro filter</a></li>
+      <li><a href="#4-tracking-dropouts-and-stroke-continuity">4. Tracking dropouts and stroke continuity</a></li>
+      <li><a href="#5-gesture-vocabulary">5. Gesture vocabulary</a></li>
+      <li><a href="#6-symmetry">6. Symmetry</a></li>
+      <li><a href="#7-body-mode">7. Body mode</a></li>
+      <li><a href="#8-constraints-as-design">8. Constraints as design</a></li>
+      <li><a href="#9-limitations">9. Limitations</a></li>
+      <li><a href="#10-what-i-would-do-differently">10. What I would do differently</a></li>
+    </ol>
+  </nav>
+  <article class="prose-doc">
+<p><strong>Painting with bare hands in front of a webcam. The hard problem is not seeing the hand — it is turning a noisy estimate into a line that feels like a pen.</strong></p>
+<hr />
+<h2 id="summary">Summary<a class="anchor" href="#summary" aria-label="Link to this section">#</a></h2>
+<p>Neural Canvas is a browser application that turns a webcam into a brush. A neural network
+locates 21 three-dimensional landmarks on each hand roughly sixty times a second, entirely
+on-device; pinching thumb to index finger puts the pen down; the index fingertip draws.
+Gestures erase, change color, undo, and clear. Optional kaleidoscopic symmetry mirrors every
+stroke into a live mandala, and a body mode swaps the hand model for a full-body pose model
+so the whole body paints.</p>
+<p>It was built for Hack the Arts 2026, whose theme was art that would not exist without
+technology. The design consequence of that theme is that hand tracking is not a control
+scheme bolted onto a paint program — it is the medium, and every decision below follows from
+taking that literally.</p>
+<p>The entire application is one HTML file: no framework, no build step, no backend, no
+server-side anything. Nothing leaves the device.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model</td>
+<td>MediaPipe Tasks Vision — <code>GestureRecognizer</code> (hands), <code>PoseLandmarker</code> (body)</td>
+</tr>
+<tr>
+<td>Landmarks</td>
+<td>21 per hand in 3D, up to 2 hands; 33 for full-body pose</td>
+</tr>
+<tr>
+<td>Execution</td>
+<td>WebAssembly + GPU delegate, <code>runningMode: VIDEO</code>, in-browser</td>
+</tr>
+<tr>
+<td>Rendering</td>
+<td>Canvas 2D, additive blending, shadow-blur glow</td>
+</tr>
+<tr>
+<td>Smoothing</td>
+<td>One-euro adaptive filter, implemented from scratch</td>
+</tr>
+<tr>
+<td>Source</td>
+<td>One file, ~510 lines, zero dependencies beyond the model CDN</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="1-the-actual-problem">1. The actual problem<a class="anchor" href="#1-the-actual-problem" aria-label="Link to this section">#</a></h2>
+<p>Getting hand landmarks is a solved problem you can import. Within an hour of starting, the
+fingertip position is on screen and tracking works.</p>
+<p>Then you draw a line with it, and the line is unusable.</p>
+<p>Landmark estimates carry per-frame noise of a few pixels even when the hand is perfectly
+still. Drawn directly, a &quot;straight&quot; line comes out visibly furry, and a slow deliberate
+curve — exactly what someone does when signing their name or outlining a shape — is the
+worst case, because the jitter amplitude is comparable to the motion itself. The signal you
+want and the noise you don't are the same size.</p>
+<p>So the engineering problem is not detection. It is <strong>estimating intent from a noisy 60 Hz
+position signal in real time</strong>, and it is a signal-processing problem with a hard
+constraint: any smoothing you apply costs latency, and latency in a drawing tool is felt
+immediately. The stroke lags the finger, and the tool stops feeling like an extension of the
+hand.</p>
+<hr />
+<h2 id="2-why-a-fixed-low-pass-filter-fails">2. Why a fixed low-pass filter fails<a class="anchor" href="#2-why-a-fixed-low-pass-filter-fails" aria-label="Link to this section">#</a></h2>
+<p>The obvious fix is an exponential moving average over the fingertip position. It does not
+work, and the reason it does not work is instructive.</p>
+<p>A fixed-cutoff filter forces a single global choice:</p>
+<ul>
+<li><strong>Smooth heavily</strong> — clean lines when the hand is still, and unacceptable lag when it
+moves. The stroke trails visibly behind the fingertip.</li>
+<li><strong>Smooth lightly</strong> — responsive when moving, and visible jitter when holding still.</li>
+</ul>
+<p>Both failure modes are unacceptable, and they are unacceptable <em>at the same time</em>, because a
+single stroke contains both regimes: a slow careful start, a fast sweep, a pause at a corner.
+No constant is right for the whole stroke.</p>
+<p>The insight is that the correct amount of smoothing is not a constant — it is a function of
+speed. When the hand is nearly stationary, almost all measured variation is noise, so smooth
+hard. When the hand is moving fast, the motion dominates the noise and the user is
+prioritizing responsiveness over precision, so barely smooth at all.</p>
+<hr />
+<h2 id="3-the-one-euro-filter">3. The one-euro filter<a class="anchor" href="#3-the-one-euro-filter" aria-label="Link to this section">#</a></h2>
+<p>That is exactly what the one-euro filter does (Casiez, Roussel &amp; Vogel, 2012), and it is
+implemented here from scratch in nine lines:</p>
+<pre><code class="language-js">class OneEuro{
+  constructor(minCut=0.9, beta=0.04, dCut=1.0){ … }
+  a(cut,dt){const tau=1/(2*Math.PI*cut);return 1/(1+tau/dt);}
+  f(x,t){
+    const dx=(x-this.xP)/dt, aD=this.a(this.dc,dt), dxH=aD*dx+(1-aD)*this.dxP;
+    const cut=this.mc+this.beta*Math.abs(dxH), a=this.a(cut,dt), xH=a*x+(1-a)*this.xP;
+    …
+  }
+}
+</code></pre>
+<p>The mechanism is a low-pass filter whose cutoff frequency is itself derived from the
+smoothed velocity estimate:</p>
+<pre><code>cutoff = minCutoff + beta · |velocity|
+</code></pre>
+<p>At rest, velocity is near zero, cutoff falls to <code>minCutoff</code>, and the filter smooths
+aggressively — jitter disappears. During a fast sweep, the velocity term dominates, cutoff
+rises, the smoothing factor approaches 1, and the filter passes the signal through almost
+untouched — no perceptible lag. The velocity estimate is itself low-pass filtered at <code>dCut</code>,
+because a raw frame-to-frame derivative of a noisy signal is noisier than the signal.</p>
+<p>Crucially, <code>dt</code> is measured per frame from <code>performance.now()</code> rather than assumed. Frame
+intervals are not uniform — the browser drops frames, the model occasionally takes longer —
+and a filter that assumes a fixed timestep changes its effective cutoff whenever the frame
+rate wobbles, which is precisely when it is most visible.</p>
+<p><strong>Tuning was empirical and the history is in the commits.</strong> The filter shipped at
+<code>minCutoff 1.3, beta 0.05</code> and was retuned to <code>0.9 / 0.04</code> after testing on a real webcam
+(<code>6db79e7</code>) — smoother at rest, at the cost of slightly more lag during fast motion. That
+tradeoff is the entire design space of the filter, and there is no setting that escapes it.</p>
+<hr />
+<h2 id="4-tracking-dropouts-and-stroke-continuity">4. Tracking dropouts and stroke continuity<a class="anchor" href="#4-tracking-dropouts-and-stroke-continuity" aria-label="Link to this section">#</a></h2>
+<p>A second failure mode has nothing to do with noise. The detector occasionally loses the hand
+for one or two frames — a motion blur, an awkward angle, a hand crossing the frame edge.</p>
+<p>Handled naively, the stroke ends. The pen lifts and comes back down, and a continuous
+signature is chopped into pieces at random. This is far more destructive to the artwork than
+jitter, because the damage is structural rather than cosmetic.</p>
+<p>So the pen state carries a grace period: a hand that goes missing increments a counter, and
+the stroke is only terminated after <strong>more than five consecutive missed frames</strong> — roughly
+80 ms. Below that threshold the pen is held and the stroke survives the dropout.</p>
+<p>Relatedly, when only one hand is needed the model is configured with <code>numHands: 1</code> rather
+than 2. A single-hand model is measurably more stable, because the detector is not
+attempting to resolve a second hand from ambiguous evidence and occasionally flickering one
+into and out of existence.</p>
+<hr />
+<h2 id="5-gesture-vocabulary">5. Gesture vocabulary<a class="anchor" href="#5-gesture-vocabulary" aria-label="Link to this section">#</a></h2>
+<p>The theme argued for no UI chrome between the person and the drawing, so the primary
+controls are gestures, classified by the model's own gesture head rather than by hand-rolled
+landmark geometry:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Gesture</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pinch (thumb + index)</td>
+<td>Pen down — the fingertip draws</td>
+</tr>
+<tr>
+<td>✋ Open palm</td>
+<td>Erase under the palm</td>
+</tr>
+<tr>
+<td>✊ Closed fist</td>
+<td>Clear the canvas</td>
+</tr>
+<tr>
+<td>👍 Thumbs up</td>
+<td>Clean view — hide camera and overlays, pause painting</td>
+</tr>
+<tr>
+<td>✌️ Victory</td>
+<td>Next color</td>
+</tr>
+<tr>
+<td>👎 Thumbs down</td>
+<td>Undo</td>
+</tr>
+</tbody>
+</table></div>
+<p>Destructive gestures need debouncing, and the two thresholds are different on purpose.
+Clearing the canvas requires the fist to be held for <strong>14 consecutive frames</strong> <em>and</em> at
+least 1,500 ms since the last clear — a momentary misclassification cannot destroy the
+drawing, and the deliberate hold makes the intent unambiguous. Non-destructive gestures
+(color, undo, view) fire on a single classification with a one-shot latch, because a false
+positive there costs nothing and waiting would feel sluggish.</p>
+<p><strong>Clean view</strong> exists specifically for the demo and for unattended display: 👍 hides the
+camera feed, the skeleton overlay and all UI, and pauses painting so a stray hand in frame
+cannot damage the finished piece. It is the gesture that turns the tool into a gallery.</p>
+<hr />
+<h2 id="6-symmetry">6. Symmetry<a class="anchor" href="#6-symmetry" aria-label="Link to this section">#</a></h2>
+<p>Symmetry is applied as a set of coordinate transforms on the stroke path rather than as a
+post-process on the rendered image, so every brush effect — glow, taper, speed-dependent
+width — is preserved in every reflection.</p>
+<p>For N-fold symmetry the transform list contains, for each wedge <code>k</code>, a rotation by
+<code>2πk/N</code> and the same rotation composed with a vertical flip. That mirrored second copy is
+what makes the output a kaleidoscope rather than merely a rotation — adjacent wedges are
+reflections of each other, which is the defining property of the form. Mirror mode is the
+degenerate case: identity plus a horizontal flip about the canvas center.</p>
+<p>Five brushes — neon, ribbon, spray, comet, embers — differ in stroke-accumulation model
+rather than merely color, and stroke width responds to hand depth (the z coordinate of the
+landmark) and to drawing speed, so a fast sweep tapers the way a real brush does.</p>
+<hr />
+<h2 id="7-body-mode">7. Body mode<a class="anchor" href="#7-body-mode" aria-label="Link to this section">#</a></h2>
+<p>Body mode swaps the hand model for <code>PoseLandmarker</code> and paints from the wrists. Two design
+details carry it:</p>
+<p><strong>Pen-down needs a whole-body analogue of pinch.</strong> There is no pinch in a pose skeleton, so
+the condition is <em>wrist above the corresponding shoulder</em> — comparing landmark 15 against 11
+for the left side, 16 against 12 for the right. This is readable to an audience with no
+instruction, self-evident on camera, and physically comfortable to sustain.</p>
+<p><strong>Occluded joints must be rejected.</strong> Pose landmarks carry a visibility score, and an
+occluded wrist still reports a position — a confident-looking, completely wrong one. Any
+landmark below 0.35 visibility is discarded rather than drawn, which prevents phantom strokes
+when an arm passes behind the torso.</p>
+<hr />
+<h2 id="8-constraints-as-design">8. Constraints as design<a class="anchor" href="#8-constraints-as-design" aria-label="Link to this section">#</a></h2>
+<p>The whole application is one HTML file with no build step, no bundler, no framework and no
+backend. The model loads from a CDN and runs through WebAssembly with a GPU delegate.</p>
+<p>This is a real constraint, not an aesthetic pose, and it buys three things. Inference is
+on-device, so <strong>no video ever leaves the machine</strong> — the privacy property is architectural
+rather than a promise in a policy. There is no server to run, so the piece cannot break
+because something expired. And the source is one readable file, which for a hackathon
+submission means a judge can inspect the whole thing without a toolchain.</p>
+<p>The cost is real too: no module system, no type checking, and a 510-line file that is at the
+upper limit of what is comfortable to navigate.</p>
+<hr />
+<h2 id="9-limitations">9. Limitations<a class="anchor" href="#9-limitations" aria-label="Link to this section">#</a></h2>
+<p><strong>Latency is not measured.</strong> The tuning above is empirical and judged by feel on one
+machine and one webcam. There is no instrumented end-to-end measurement from photon to
+pixel, and &quot;~60 inferences per second&quot; is the model's target on the development machine, not
+a benchmarked figure across devices. On a low-end laptop without a usable GPU delegate the
+frame rate drops substantially and the filter — whose <code>dt</code> is measured, not assumed — smooths
+correctly but the whole experience degrades.</p>
+<p><strong>Gesture classification misfires.</strong> The model's gesture head is not perfectly reliable at
+odd angles or in poor lighting; the debouncing in §5 is a mitigation, not a fix. Clearing
+the canvas by accident is prevented; a color change firing unbidden is not.</p>
+<p><strong>Lighting is a hard dependency.</strong> Strong backlighting or a dim room degrades detection
+badly. There is no fallback input mode — if tracking fails, the application has nothing to
+offer.</p>
+<p><strong>No user study.</strong> Every claim about how the tool <em>feels</em> is my own judgment plus informal
+observation of people trying it. &quot;Feels like a pen&quot; is the design target and the evaluation
+criterion, and it has not been measured against anything.</p>
+<p><strong>Undo is shallow and bitmap-based.</strong> Snapshots are pushed at stroke start rather than
+maintaining a vector stroke list, which bounds how far back undo can go and makes it memory-
+hungry at high canvas resolutions.</p>
+<hr />
+<h2 id="10-what-i-would-do-differently">10. What I would do differently<a class="anchor" href="#10-what-i-would-do-differently" aria-label="Link to this section">#</a></h2>
+<p>Instrument the latency properly — a visible timestamp overlay and a high-frame-rate capture
+of hand and screen together would turn the filter tuning from a matter of taste into a
+measurement, and would let the <code>minCutoff</code> / <code>beta</code> tradeoff be chosen from data rather than
+from feel. Keep strokes as vectors rather than bitmap snapshots, which fixes undo and makes
+resolution-independent export possible. And add a pointer fallback so the piece still does
+something when the camera fails, since right now a failed detection is a dead end.</p>
+
+  </article>
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <p class="eyebrow">On this document</p>
+    <p>
+      Rendered from <a href="https://github.com/Danny-397/neural-canvas/blob/main/docs/technical-report.md"><code>docs/technical-report.md</code></a> in the
+      Neural Canvas repository, so this page, the PDF and the code stay in step.
+      <a href="../reports.html">All reports &rarr;</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  function currentlyDark() {
+    var t = root.getAttribute('data-theme');
+    return t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.themebtn'), function (b) {
+    b.addEventListener('click', function () {
+      var next = currentlyDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) { /* private mode */ }
+    });
+  });
+})();
+</script>
+</body>
+</html>

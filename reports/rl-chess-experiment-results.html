@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AlphaZero Chess — Experiment Results — Dan Lichtenberger</title>
+<meta name="description" content="What the engine learned, measured against fixed opponents.">
+<meta name="author" content="Dan Lichtenberger">
+<link rel="canonical" href="https://danny-397.github.io/reports/rl-chess-experiment-results.html">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dan Lichtenberger">
+<meta property="og:url" content="https://danny-397.github.io/reports/rl-chess-experiment-results.html">
+<meta property="og:title" content="AlphaZero Chess — Experiment Results">
+<meta property="og:description" content="What the engine learned, measured against fixed opponents.">
+<meta property="og:image" content="https://danny-397.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AlphaZero Chess — Experiment Results — Dan Lichtenberger">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AlphaZero Chess — Experiment Results">
+<meta name="twitter:description" content="What the engine learned, measured against fixed opponents.">
+<meta name="twitter:image" content="https://danny-397.github.io/og-image.png">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1319'/><text x='50' y='54' font-size='58' font-family='Georgia,serif' fill='%237FA6E8' text-anchor='middle' dominant-baseline='central'>D</text></svg>">
+<script>document.documentElement.className += " js";
+/* Apply the saved theme before first paint, as index.html and reports.html do. */
+try { var savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light')
+        document.documentElement.setAttribute('data-theme', savedTheme); }
+catch (e) { /* private mode */ }</script>
+<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="../report.css">
+<script src="../analytics.js" defer></script>
+</head>
+<body>
+
+<a class="skip" href="#doc">Skip to the report</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="name" href="../index.html">Dan Lichtenberger</a>
+    <nav>
+      <a href="../index.html">Work</a>
+      <a href="../reports.html" aria-current="page">Reports</a>
+      <a href="https://github.com/Danny-397/Danny-397">GitHub</a>
+      <button type="button" class="themebtn" aria-label="Switch between light and dark">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g class="i-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></g>
+          <g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></g>
+        </svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="doc" class="wrap doc">
+  <p class="eyebrow">RL-Chess-Engine &middot; technical report</p>
+  <h1>AlphaZero Chess — Experiment Results</h1>
+  <p class="standfirst">What the engine learned, measured against fixed opponents.</p>
+  <p class="doclinks">
+    <a class="doclink" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md">Source markdown &nearr;</a>
+    <a class="doclink" href="RL-Chess-Experiment-Results.pdf">PDF &darr;</a>
+  </p>
+  <nav class="toc" aria-label="Sections">
+    <p class="eyebrow">Sections</p>
+    <ol>
+      <li><a href="#run-configuration">Run configuration</a></li>
+      <li><a href="#headline-results">Headline results</a></li>
+      <li><a href="#a-per-iteration-self-play-termination">A. Per-iteration self-play termination</a></li>
+      <li><a href="#b-elo-vs-random-periodic-evaluation-checkpoints">B. Elo vs. random — periodic evaluation checkpoints</a></li>
+      <li><a href="#c-training-loss">C. Training loss</a></li>
+      <li><a href="#key-findings">Key findings</a></li>
+      <li><a href="#reproducibility">Reproducibility</a></li>
+    </ol>
+  </nav>
+  <article class="prose-doc">
+<p><strong>Hardware:</strong> Kaggle, 2× Tesla T4 (GPU) · <strong>Driver:</strong> <code>python run_experiment.py --device cuda</code>
+<strong>Date:</strong> 2026-07-14 · <strong>Training wall-clock:</strong> ~9.8 h (baseline 68.9 min + scaled 444.7 min + assisted 75.2 min)</p>
+<blockquote>
+<p><strong>Provenance.</strong> The Kaggle notebook's automatic <code>git push</code> failed with a 403 (its
+<code>GITHUB_TOKEN</code> secret lacked write scope), so every number in this file is
+transcribed directly from that run's captured stdout — the per-iteration
+self-play termination tables, the periodic evaluation lines, and the loss curve.
+Two things could <strong>not</strong> be recovered from the surviving logs and are marked where
+they appear: (1) the win/draw/loss split of each stage's <em>final</em> stand-alone
+50-game evaluation (only its Elo survived), and (2) a downloadable trained
+checkpoint, which was lost with the Kaggle session (re-run the driver to
+regenerate one). The figures below are plotted directly from the per-iteration
+numbers transcribed in this file.</p>
+</blockquote>
+<p><img src="../assets/draw_cycle.png" alt="The draw cycle — non-decisive rate and Elo vs. random across the three stages" /></p>
+<h2 id="run-configuration">Run configuration<a class="anchor" href="#run-configuration" aria-label="Link to this section">#</a></h2>
+<p>All three stages share the identical code and network (4 residual blocks, 64
+channels); they differ only in the variable under test.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Iterations</th>
+<th>Games/iter</th>
+<th>Total games</th>
+<th>Sims/move</th>
+<th>Self-play material w</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td>10</td>
+<td>10</td>
+<td>100</td>
+<td>100</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>scaled</td>
+<td>25</td>
+<td>40</td>
+<td>1,000</td>
+<td>160</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>assisted</td>
+<td>10</td>
+<td>10</td>
+<td>100</td>
+<td>100</td>
+<td>0.30</td>
+</tr>
+</tbody>
+</table></div>
+<p>Evaluation at each checkpoint is 50 games vs. <code>RandomAgent</code> at 50 sims/move.</p>
+<hr />
+<h2 id="headline-results">Headline results<a class="anchor" href="#headline-results" aria-label="Link to this section">#</a></h2>
+<p>The driver's two headline metrics are the self-play <strong>non-decisive rate</strong> (fraction
+of games <em>not</em> ending in checkmate) and <strong>Elo vs. random</strong>. &quot;Non-decisive rate&quot;
+below is the <strong>final iteration's</strong> rate (the end-of-training state); the aggregate
+over <em>all</em> of a stage's games is given alongside because for the baseline the two
+differ sharply (see §A).</p>
+<h3 id="experiment-a-compute-scaling-material-w-0-in-both">Experiment A — compute scaling (material w = 0 in both)<a class="anchor" href="#experiment-a-compute-scaling-material-w-0-in-both" aria-label="Link to this section">#</a></h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Total games</th>
+<th>Sims/move</th>
+<th>Non-decisive (final iter / all games)</th>
+<th>Elo vs random</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td>100</td>
+<td>100</td>
+<td>100% / 92%</td>
+<td>−21</td>
+</tr>
+<tr>
+<td>scaled</td>
+<td>1,000</td>
+<td>160</td>
+<td>92% / 88%</td>
+<td>−7</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Result.</strong> 10× the self-play raises Elo (−21 → −7) and produces more checkmates in
+aggregate (8/100 = 8% → 120/1000 = 12%), but the cycle is not broken: the network
+still cannot reliably convert, and Elo stays negative.</p>
+<h3 id="experiment-b-self-play-signal-at-fixed-compute-same-budget-as-baseline">Experiment B — self-play signal at fixed compute (same budget as baseline)<a class="anchor" href="#experiment-b-self-play-signal-at-fixed-compute-same-budget-as-baseline" aria-label="Link to this section">#</a></h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Total games</th>
+<th>Sims/move</th>
+<th>Material w</th>
+<th>Non-decisive (final iter / all games)</th>
+<th>Elo vs random</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td>100</td>
+<td>100</td>
+<td>0.00</td>
+<td>100% / 92%</td>
+<td>−21</td>
+</tr>
+<tr>
+<td>assisted</td>
+<td>100</td>
+<td>100</td>
+<td>0.30</td>
+<td>70% / 81%</td>
+<td>+28</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Result.</strong> Blending a 0.30 material term into self-play leaf evaluation — at the
+<em>same</em> compute as the baseline — drops the final-iteration non-decisive rate to 70%,
+raises the aggregate checkmate count to 19/100, and flips Elo from −21 to <strong>+28</strong>.
+The engine now beats random. This is the more cost-effective lever.</p>
+<h3 id="reading-the-two-together">Reading the two together<a class="anchor" href="#reading-the-two-together" aria-label="Link to this section">#</a></h3>
+<p>Both levers move the metrics, so the plateau is driven by <strong>both</strong> limited compute
+<em>and</em> an impoverished self-play signal (the &quot;yes | yes&quot; row of the §5.3 reading
+matrix) — but the signal lever does more per unit of compute.</p>
+<hr />
+<h2 id="a-per-iteration-self-play-termination">A. Per-iteration self-play termination<a class="anchor" href="#a-per-iteration-self-play-termination" aria-label="Link to this section">#</a></h2>
+<p>Counts are games ending by each reason. <strong>CM</strong> checkmate · <strong>ST</strong> stalemate ·
+<strong>INSUF</strong> insufficient material · <strong>REP</strong> threefold repetition · <strong>50M</strong> fifty-move ·
+<strong>CAP</strong> hit the <code>max_moves = 200</code> cap. &quot;Non-dec %&quot; = fraction not won by checkmate.</p>
+<h3 id="baseline-10-iters-10-games-100-sims-mat-w-000">Baseline — 10 iters × 10 games, 100 sims, mat-w 0.00<a class="anchor" href="#baseline-10-iters-10-games-100-sims-mat-w-000" aria-label="Link to this section">#</a></h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Iter</th>
+<th>CM</th>
+<th>ST</th>
+<th>INSUF</th>
+<th>REP</th>
+<th>50M</th>
+<th>CAP</th>
+<th>Non-dec %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>4</td>
+<td>40%</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>80%</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>9</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td><strong>ALL</strong></td>
+<td><strong>8</strong></td>
+<td>0</td>
+<td>0</td>
+<td><strong>88</strong></td>
+<td>0</td>
+<td><strong>4</strong></td>
+<td><strong>92%</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><em>The draw cycle forming in real time: the early, near-random network scores a few
+accidental checkmates (8 in iters 1–2), then collapses into pure threefold
+repetition from iter 3 onward — zero checkmates for the last 80 games. Draws are
+driven by <strong>repetition</strong>, not the fifty-move rule.</em></p>
+<h3 id="scaled-25-iters-40-games-160-sims-mat-w-000">Scaled — 25 iters × 40 games, 160 sims, mat-w 0.00<a class="anchor" href="#scaled-25-iters-40-games-160-sims-mat-w-000" aria-label="Link to this section">#</a></h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Iter</th>
+<th>CM</th>
+<th>ST</th>
+<th>INSUF</th>
+<th>REP</th>
+<th>50M</th>
+<th>CAP</th>
+<th>Non-dec %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>29</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>11</td>
+<td>27.5%</td>
+</tr>
+<tr>
+<td>2</td>
+<td>11</td>
+<td>0</td>
+<td>0</td>
+<td>29</td>
+<td>0</td>
+<td>0</td>
+<td>72.5%</td>
+</tr>
+<tr>
+<td>3</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>30</td>
+<td>0</td>
+<td>0</td>
+<td>75.0%</td>
+</tr>
+<tr>
+<td>4</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>34</td>
+<td>0</td>
+<td>1</td>
+<td>87.5%</td>
+</tr>
+<tr>
+<td>5</td>
+<td>9</td>
+<td>0</td>
+<td>0</td>
+<td>31</td>
+<td>0</td>
+<td>0</td>
+<td>77.5%</td>
+</tr>
+<tr>
+<td>6</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>36</td>
+<td>0</td>
+<td>0</td>
+<td>90.0%</td>
+</tr>
+<tr>
+<td>7</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>36</td>
+<td>0</td>
+<td>0</td>
+<td>90.0%</td>
+</tr>
+<tr>
+<td>8</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>37</td>
+<td>0</td>
+<td>0</td>
+<td>92.5%</td>
+</tr>
+<tr>
+<td>9</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>35</td>
+<td>0</td>
+<td>1</td>
+<td>90.0%</td>
+</tr>
+<tr>
+<td>10</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>38</td>
+<td>0</td>
+<td>0</td>
+<td>95.0%</td>
+</tr>
+<tr>
+<td>11</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>35</td>
+<td>0</td>
+<td>0</td>
+<td>87.5%</td>
+</tr>
+<tr>
+<td>12</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>36</td>
+<td>0</td>
+<td>0</td>
+<td>90.0%</td>
+</tr>
+<tr>
+<td>13</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>36</td>
+<td>0</td>
+<td>0</td>
+<td>90.0%</td>
+</tr>
+<tr>
+<td>14</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>39</td>
+<td>0</td>
+<td>1</td>
+<td>100.0%</td>
+</tr>
+<tr>
+<td>15</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>38</td>
+<td>0</td>
+<td>0</td>
+<td>95.0%</td>
+</tr>
+<tr>
+<td>16</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>39</td>
+<td>0</td>
+<td>0</td>
+<td>97.5%</td>
+</tr>
+<tr>
+<td>17</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>36</td>
+<td>0</td>
+<td>0</td>
+<td>90.0%</td>
+</tr>
+<tr>
+<td>18</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>36</td>
+<td>0</td>
+<td>0</td>
+<td>90.0%</td>
+</tr>
+<tr>
+<td>19</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>39</td>
+<td>0</td>
+<td>0</td>
+<td>97.5%</td>
+</tr>
+<tr>
+<td>20</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>37</td>
+<td>0</td>
+<td>0</td>
+<td>92.5%</td>
+</tr>
+<tr>
+<td>21</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>38</td>
+<td>0</td>
+<td>0</td>
+<td>95.0%</td>
+</tr>
+<tr>
+<td>22</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>35</td>
+<td>0</td>
+<td>0</td>
+<td>87.5%</td>
+</tr>
+<tr>
+<td>23</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>39</td>
+<td>0</td>
+<td>0</td>
+<td>97.5%</td>
+</tr>
+<tr>
+<td>24</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>40</td>
+<td>0</td>
+<td>0</td>
+<td>100.0%</td>
+</tr>
+<tr>
+<td>25</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>37</td>
+<td>0</td>
+<td>0</td>
+<td>92.5%</td>
+</tr>
+<tr>
+<td><strong>ALL</strong></td>
+<td><strong>120</strong></td>
+<td>0</td>
+<td>0</td>
+<td><strong>866</strong></td>
+<td>0</td>
+<td><strong>14</strong></td>
+<td><strong>88%</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><em>Same pattern at scale: iter 1's untrained net delivers 29 accidental mates, then
+the rate settles into the high-80s/90s% non-decisive band for the rest of training.
+More compute keeps a <em>residual</em> trickle of checkmates alive (120/1000 aggregate vs.
+the baseline's 8/100) but does not escape the plateau.</em></p>
+<h3 id="assisted-10-iters-10-games-100-sims-mat-w-030">Assisted — 10 iters × 10 games, 100 sims, mat-w 0.30<a class="anchor" href="#assisted-10-iters-10-games-100-sims-mat-w-030" aria-label="Link to this section">#</a></h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Iter</th>
+<th>CM</th>
+<th>ST</th>
+<th>INSUF</th>
+<th>REP</th>
+<th>50M</th>
+<th>CAP</th>
+<th>Non-dec %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>5</td>
+<td>0</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+<td>2</td>
+<td>50%</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>7</td>
+<td>0</td>
+<td>1</td>
+<td>80%</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>0</td>
+<td>0</td>
+<td>90%</td>
+</tr>
+<tr>
+<td>4</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>0</td>
+<td>0</td>
+<td>90%</td>
+</tr>
+<tr>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>80%</td>
+</tr>
+<tr>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>7</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>7</td>
+<td>0</td>
+<td>1</td>
+<td>80%</td>
+</tr>
+<tr>
+<td>8</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>7</td>
+<td>0</td>
+<td>1</td>
+<td>80%</td>
+</tr>
+<tr>
+<td>9</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>0</td>
+<td>0</td>
+<td>90%</td>
+</tr>
+<tr>
+<td>10</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+<td>70%</td>
+</tr>
+<tr>
+<td><strong>ALL</strong></td>
+<td><strong>19</strong></td>
+<td>0</td>
+<td><strong>2</strong></td>
+<td><strong>74</strong></td>
+<td>0</td>
+<td><strong>5</strong></td>
+<td><strong>81%</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><em>With the material assist, checkmates keep appearing throughout training instead of
+dying out — 19/100 aggregate, and the final iteration hits 30% checkmate (70%
+non-decisive), the best of any stage. Decisive games give the value head a real
+signal to learn from.</em></p>
+<hr />
+<h2 id="b-elo-vs-random-periodic-evaluation-checkpoints">B. Elo vs. random — periodic evaluation checkpoints<a class="anchor" href="#b-elo-vs-random-periodic-evaluation-checkpoints" aria-label="Link to this section">#</a></h2>
+<p>Each row is an independent 50-game match vs. <code>RandomAgent</code> (50 sims/move), logged
+during training at the stage's <code>eval_every</code> interval. W/D/L are the raw counts.</p>
+<h3 id="baseline-every-2-iters">Baseline (every 2 iters)<a class="anchor" href="#baseline-every-2-iters" aria-label="Link to this section">#</a></h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Iter</th>
+<th>W</th>
+<th>D</th>
+<th>L</th>
+<th>Score</th>
+<th>Elo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>43</td>
+<td>5</td>
+<td>47.0%</td>
+<td>−21</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0</td>
+<td>44</td>
+<td>6</td>
+<td>44.0%</td>
+<td>−42</td>
+</tr>
+<tr>
+<td>6</td>
+<td>3</td>
+<td>42</td>
+<td>5</td>
+<td>48.0%</td>
+<td>−14</td>
+</tr>
+<tr>
+<td>8</td>
+<td>1</td>
+<td>45</td>
+<td>4</td>
+<td>47.0%</td>
+<td>−21</td>
+</tr>
+<tr>
+<td>10</td>
+<td>2</td>
+<td>44</td>
+<td>4</td>
+<td>48.0%</td>
+<td>−14</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="scaled-every-5-iters">Scaled (every 5 iters)<a class="anchor" href="#scaled-every-5-iters" aria-label="Link to this section">#</a></h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Iter</th>
+<th>W</th>
+<th>D</th>
+<th>L</th>
+<th>Score</th>
+<th>Elo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td>8</td>
+<td>40</td>
+<td>2</td>
+<td>56.0%</td>
+<td>+42</td>
+</tr>
+<tr>
+<td>10</td>
+<td>8</td>
+<td>39</td>
+<td>3</td>
+<td>55.0%</td>
+<td>+35</td>
+</tr>
+<tr>
+<td>15</td>
+<td>0</td>
+<td>47</td>
+<td>3</td>
+<td>47.0%</td>
+<td>−21</td>
+</tr>
+<tr>
+<td>20</td>
+<td>6</td>
+<td>40</td>
+<td>4</td>
+<td>52.0%</td>
+<td>+14</td>
+</tr>
+<tr>
+<td>25</td>
+<td>3</td>
+<td>41</td>
+<td>6</td>
+<td>47.0%</td>
+<td>−21</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="assisted-every-2-iters">Assisted (every 2 iters)<a class="anchor" href="#assisted-every-2-iters" aria-label="Link to this section">#</a></h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Iter</th>
+<th>W</th>
+<th>D</th>
+<th>L</th>
+<th>Score</th>
+<th>Elo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>6</td>
+<td>39</td>
+<td>5</td>
+<td>51.0%</td>
+<td>+7</td>
+</tr>
+<tr>
+<td>4</td>
+<td>6</td>
+<td>40</td>
+<td>4</td>
+<td>52.0%</td>
+<td>+14</td>
+</tr>
+<tr>
+<td>6</td>
+<td>5</td>
+<td>42</td>
+<td>3</td>
+<td>52.0%</td>
+<td>+14</td>
+</tr>
+<tr>
+<td>8</td>
+<td>7</td>
+<td>40</td>
+<td>3</td>
+<td>54.0%</td>
+<td>+28</td>
+</tr>
+<tr>
+<td>10</td>
+<td>10</td>
+<td>36</td>
+<td>4</td>
+<td>56.0%</td>
+<td>+42</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Final stand-alone evaluation</strong> (a separate 50-game match after training; only the
+Elo survives in the logs — the W/D/L split was not captured):
+baseline <strong>−21</strong>, scaled <strong>−7</strong>, assisted <strong>+28</strong>. These are the headline Elo
+figures above. Note they differ from each stage's <em>last periodic</em> checkpoint (e.g.
+scaled's iter-25 checkpoint read −21 but its final match read −7) — independent
+50-game samples of a near-even engine are noisy, which is itself worth reporting.</p>
+<hr />
+<h2 id="c-training-loss">C. Training loss<a class="anchor" href="#c-training-loss" aria-label="Link to this section">#</a></h2>
+<p><img src="../assets/training_progress.png" alt="Training dynamics of the scaled run — policy, value, and total loss" /></p>
+<p>Total loss = policy cross-entropy + value MSE. Start (iter 1) → end (final iter):</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Policy loss (start → end)</th>
+<th>Value loss (start → end)</th>
+<th>Total (start → end)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td>4.54 → 0.81</td>
+<td>0.092 → 0.006</td>
+<td>4.63 → 0.81</td>
+</tr>
+<tr>
+<td>scaled</td>
+<td>4.02 → 0.96</td>
+<td>0.164 → 0.012</td>
+<td>4.19 → 0.97</td>
+</tr>
+<tr>
+<td>assisted</td>
+<td>4.37 → 0.69</td>
+<td>0.101 → 0.023</td>
+<td>4.47 → 0.71</td>
+</tr>
+</tbody>
+</table></div>
+<p><em>Policy loss falls sharply in every stage — the network readily learns to imitate
+its own MCTS visit distribution. The <strong>value loss is tiny from the start and shrinks
+toward ≈0.01</strong>: with almost every game drawn, the outcome target <code>z ≈ 0</code> nearly
+everywhere, so the value head has almost nothing to fit. That collapse is the
+draw-cycle signature (technical report §6), not a training success.</em></p>
+<hr />
+<h2 id="key-findings">Key findings<a class="anchor" href="#key-findings" aria-label="Link to this section">#</a></h2>
+<ol>
+<li><strong>The draw cycle is real and self-reinforcing.</strong> At baseline compute the
+near-random network scores a few accidental mates in iters 1–2, then collapses to
+100% repetition draws from iter 3 on — the value target flattens to ≈0 and the
+cycle locks in.</li>
+<li><strong>Compute helps, but does not break it.</strong> 10× the self-play (100 → 1,000 games)
+lifts Elo (−21 → −7) and keeps a residual checkmate rate alive (8% → 12%
+aggregate), yet Elo stays negative and the non-decisive rate stays in the high
+80s/90s%.</li>
+<li><strong>Signal quality is the more efficient lever.</strong> <code>material_weight = 0.30</code> in
+self-play — at the <em>same</em> baseline compute — drops the final-iteration
+non-decisive rate to 70%, keeps checkmates appearing throughout training
+(19/100 aggregate), and flips Elo to <strong>+28</strong>. The engine beats random.</li>
+<li><strong>Both effects compound</strong> (&quot;yes | yes&quot; in the §5.3 reading matrix): compute helps
+<em>and</em> signal helps. A combined scaled-plus-assisted run is the natural next step.</li>
+<li><strong><code>material_weight = 0.30</code> is the recommended self-play default</strong>, now set via
+<code>MCTSConfig.material_weight</code> and exposed as <code>run_experiment.py --assist-weight</code>.</li>
+</ol>
+<hr />
+<h2 id="reproducibility">Reproducibility<a class="anchor" href="#reproducibility" aria-label="Link to this section">#</a></h2>
+<pre><code class="language-bash"># All three stages on a GPU (this run):
+python run_experiment.py --device cuda
+
+# Fast pipeline check on CPU (~1–2 min, results not meaningful):
+python run_experiment.py --quick
+</code></pre>
+<p>Config used (from <code>config.py</code>; stages differ only in iterations/games/sims and the
+self-play material weight noted above):</p>
+<ul>
+<li>Network: <code>num_residual_blocks = 4</code>, <code>num_channels = 64</code></li>
+<li>Search: <code>c_puct = 1.5</code>, <code>dirichlet_alpha = 0.3</code>, <code>dirichlet_epsilon = 0.25</code></li>
+<li>Self-play: <code>temperature_moves = 15</code>, <code>max_moves = 200</code></li>
+<li>Training: <code>epochs_per_iteration = 4</code>, <code>batch_size = 64</code>,
+<code>learning_rate = 1e-3</code>, <code>weight_decay = 1e-4</code>, <code>replay_buffer_size = 20 000</code></li>
+</ul>
+
+  </article>
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <p class="eyebrow">On this document</p>
+    <p>
+      Rendered from <a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md"><code>docs/experiment-results.md</code></a> in the
+      RL-Chess-Engine repository, so this page, the PDF and the code stay in step.
+      <a href="../reports.html">All reports &rarr;</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  function currentlyDark() {
+    var t = root.getAttribute('data-theme');
+    return t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.themebtn'), function (b) {
+    b.addEventListener('click', function () {
+      var next = currentlyDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) { /* private mode */ }
+    });
+  });
+})();
+</script>
+</body>
+</html>

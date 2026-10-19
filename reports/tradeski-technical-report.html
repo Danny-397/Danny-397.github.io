@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tradeski — Technical Report — Dan Lichtenberger</title>
+<meta name="description" content="Streaming architecture, indicator maths on raw NumPy, and the screener.">
+<meta name="author" content="Dan Lichtenberger">
+<link rel="canonical" href="https://danny-397.github.io/reports/tradeski-technical-report.html">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dan Lichtenberger">
+<meta property="og:url" content="https://danny-397.github.io/reports/tradeski-technical-report.html">
+<meta property="og:title" content="Tradeski — Technical Report">
+<meta property="og:description" content="Streaming architecture, indicator maths on raw NumPy, and the screener.">
+<meta property="og:image" content="https://danny-397.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Tradeski — Technical Report — Dan Lichtenberger">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tradeski — Technical Report">
+<meta name="twitter:description" content="Streaming architecture, indicator maths on raw NumPy, and the screener.">
+<meta name="twitter:image" content="https://danny-397.github.io/og-image.png">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1319'/><text x='50' y='54' font-size='58' font-family='Georgia,serif' fill='%237FA6E8' text-anchor='middle' dominant-baseline='central'>D</text></svg>">
+<script>document.documentElement.className += " js";
+/* Apply the saved theme before first paint, as index.html and reports.html do. */
+try { var savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light')
+        document.documentElement.setAttribute('data-theme', savedTheme); }
+catch (e) { /* private mode */ }</script>
+<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="../report.css">
+<script src="../analytics.js" defer></script>
+</head>
+<body>
+
+<a class="skip" href="#doc">Skip to the report</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="name" href="../index.html">Dan Lichtenberger</a>
+    <nav>
+      <a href="../index.html">Work</a>
+      <a href="../reports.html" aria-current="page">Reports</a>
+      <a href="https://github.com/Danny-397/Danny-397">GitHub</a>
+      <button type="button" class="themebtn" aria-label="Switch between light and dark">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g class="i-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></g>
+          <g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></g>
+        </svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="doc" class="wrap doc">
+  <p class="eyebrow">Tradeski &middot; technical report</p>
+  <h1>Tradeski — Technical Report</h1>
+  <p class="standfirst">Streaming architecture, indicator maths on raw NumPy, and the screener.</p>
+  <p class="doclinks">
+    <a class="doclink" href="https://github.com/Danny-397/Tradeski/blob/main/docs/technical-report.md">Source markdown &nearr;</a>
+    <a class="doclink" href="Tradeski-Technical-Report.pdf">PDF &darr;</a>
+  </p>
+  <nav class="toc" aria-label="Sections">
+    <p class="eyebrow">Sections</p>
+    <ol>
+      <li><a href="#summary">Summary</a></li>
+      <li><a href="#1-the-problem-a-dashboard-is-a-rate-limit-budget">1. The problem: a dashboard is a rate-limit budget</a></li>
+      <li><a href="#2-architecture">2. Architecture</a></li>
+      <li><a href="#3-indicators-from-first-principles">3. Indicators from first principles</a></li>
+      <li><a href="#4-portfolio-risk-metrics">4. Portfolio risk metrics</a></li>
+      <li><a href="#5-news-sentiment-why-general-purpose-scoring-fails-here">5. News sentiment: why general-purpose scoring fails here</a></li>
+      <li><a href="#6-security">6. Security</a></li>
+      <li><a href="#7-the-assistant-and-what-grounded-means">7. The assistant, and what &quot;grounded&quot; means</a></li>
+      <li><a href="#8-testing">8. Testing</a></li>
+      <li><a href="#9-limitations">9. Limitations</a></li>
+      <li><a href="#10-what-i-would-do-differently">10. What I would do differently</a></li>
+    </ol>
+  </nav>
+  <article class="prose-doc">
+<p><strong>A real-time market dashboard where the interesting engineering is everything except the charts.</strong></p>
+<hr />
+<h2 id="summary">Summary<a class="anchor" href="#summary" aria-label="Link to this section">#</a></h2>
+<p>Tradeski streams live prices, macroeconomic series, and scored news into a single browser
+dashboard, and answers questions about the user's own portfolio rather than the market in
+general. Plotting a price series is a solved problem. The parts that took real work are the
+ones a screenshot doesn't show: staying inside third-party API rate limits, computing
+indicators that are correct at their boundary conditions, and grounding a language model in
+a specific user's holdings so its answers are about them.</p>
+<p>This report describes the architecture as built, the decisions worth defending, and — in
+§9 — the things it does not do and the places I would build it differently.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Backend</td>
+<td>Python 3.12, Flask + Flask-SocketIO on gevent, 25 HTTP endpoints</td>
+</tr>
+<tr>
+<td>Frontend</td>
+<td>Static HTML/CSS/JS, 2,299 lines, Plotly.js, no framework and no build step</td>
+</tr>
+<tr>
+<td>Indicators</td>
+<td>10, hand-implemented on NumPy arrays — no TA-Lib, no pandas</td>
+</tr>
+<tr>
+<td>Tests</td>
+<td>75, across 11 files, run in GitHub Actions with flake8</td>
+</tr>
+<tr>
+<td>Deployment</td>
+<td>Backend on Render (gunicorn + gevent), frontend static, Postgres</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="1-the-problem-a-dashboard-is-a-rate-limit-budget">1. The problem: a dashboard is a rate-limit budget<a class="anchor" href="#1-the-problem-a-dashboard-is-a-rate-limit-budget" aria-label="Link to this section">#</a></h2>
+<p>A market dashboard looks like a data-visualization problem and is actually an API-quota
+problem. Every panel wants fresh data; every upstream provider meters requests; and the
+naive implementation — fetch on every page load — exhausts a free-tier news or macro quota
+within an hour of a handful of users arriving.</p>
+<p>So the real design question is not <em>how do I draw this</em> but <em>how stale is each number
+allowed to be</em>, and the answer differs per data source by three orders of magnitude. A
+price can be a minute old. An unemployment rate cannot meaningfully change within a month.
+Treating those identically is the mistake.</p>
+<p>Tradeski assigns every data source its own time-to-live, chosen from how fast the
+underlying quantity actually moves:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>TTL</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Price history / stats</td>
+<td>5 min</td>
+<td>Intraday movement matters; a minute of staleness does not</td>
+</tr>
+<tr>
+<td>Screener fundamentals</td>
+<td>10 min</td>
+<td>Ratios update on filings, not ticks</td>
+</tr>
+<tr>
+<td>News + sentiment</td>
+<td>30 min</td>
+<td>Headline flow is slow; scoring is the expensive part</td>
+</tr>
+<tr>
+<td>FRED macro series</td>
+<td>1 hour</td>
+<td>Most series are monthly or quarterly</td>
+</tr>
+<tr>
+<td>Correlation matrix</td>
+<td>1 hour</td>
+<td>Computed over 90 days; a fresh day barely moves it</td>
+</tr>
+</tbody>
+</table></div>
+<p>The cache itself is deliberately unremarkable — a dict of <code>(value, expires_at)</code> with lazy
+eviction on read (<a href="../Plotly%20dashboard/cache.py"><code>cache.py</code></a>). Its limitations are real and
+are discussed in §9. What matters is that the TTL is a per-source decision rather than a
+global constant, and that per-route rate limiting sits in front of the expensive endpoints:
+registration at 10/hour, login at 10/minute, the assistant at 20/hour and 50/day.</p>
+<p>The screener fans out across a 29-symbol universe — 27 stocks spanning technology,
+financials, healthcare, energy and consumer staples, plus SPY and QQQ — through an
+eight-worker thread pool, so 29 sequential network round-trips become roughly four waves.</p>
+<hr />
+<h2 id="2-architecture">2. Architecture<a class="anchor" href="#2-architecture" aria-label="Link to this section">#</a></h2>
+<pre><code>browser (static HTML/JS, Plotly.js)
+    │
+    ├── HTTP  ──►  Flask app  ──►  SimpleCache  ──►  upstream APIs
+    │                  │                             (prices, FRED, NewsAPI)
+    │                  ├── Postgres  (users, portfolios, alerts, price history)
+    │                  └── Anthropic API  (assistant, grounded — §7)
+    │
+    └── Socket.IO  ◄──  background tracker task (price_update events)
+</code></pre>
+<p>The frontend holds all UI state and is served as static files; the backend is a pure JSON
+and event layer with no templating. That split is what allows the frontend to deploy
+independently of the backend, and it keeps the server free of rendering concerns entirely.</p>
+<p>Two entry-point details are load-bearing. <code>wsgi.py</code> calls <code>gevent.monkey.patch_all()</code> as
+its literal first statement, before any other import — patching the standard library's
+sockets after <code>requests</code> has already bound them produces a server that appears to work and
+then deadlocks under concurrency. And because the backend package directory contains a
+space in its name (<code>Plotly dashboard/</code>), it cannot be imported as a module; <code>wsgi.py</code>
+inserts it onto <code>sys.path</code> explicitly so the process works regardless of working directory.</p>
+<hr />
+<h2 id="3-indicators-from-first-principles">3. Indicators from first principles<a class="anchor" href="#3-indicators-from-first-principles" aria-label="Link to this section">#</a></h2>
+<p>Every technical indicator is implemented directly on NumPy arrays rather than pulled from
+TA-Lib or pandas: SMA, EMA, RSI with Wilder smoothing, MACD, Bollinger Bands, ATR, the
+Stochastic Oscillator, rolling Z-score, rolling volatility, and a least-squares linear
+regression forecast (<a href="../tracker/analyzer.py"><code>analyzer.py</code></a>).</p>
+<p>The point of writing them by hand is not that the libraries are wrong. It is that the
+boundary conditions are where indicators are actually wrong, and you only meet them if you
+write the code.</p>
+<p><strong>RSI when there are no losses.</strong> Relative Strength is <code>avg_gain / avg_loss</code>. When the
+average loss is zero, RS diverges and the standard formula divides by zero. The common
+shortcut is to set <code>rs = 0</code>, which inverts the meaning: a window of pure gains — maximally
+overbought — reports RSI 0, maximally <em>oversold</em>. Tradeski handles the case explicitly:
+RSI is 100 when there were gains and no losses, and a neutral 50 for a perfectly flat
+window where both averages are zero.</p>
+<p><strong>The Stochastic Oscillator needs highs and lows.</strong> %K is defined against the intraday high
+and low of the lookback window. The real-time tracker stores closing prices only. Feeding
+the close in as all three of high, low and close makes the formula degenerate — the
+numerator and denominator collapse to the same quantity and %K pins to a constant. Rather
+than emit a plausible-looking number, <code>analyze_series</code> returns <code>stoch_k</code> and <code>stoch_d</code> as
+<code>None</code> when highs and lows were not supplied, and the dashboard omits the panel. A missing
+indicator is honest; a fabricated one is not.</p>
+<hr />
+<h2 id="4-portfolio-risk-metrics">4. Portfolio risk metrics<a class="anchor" href="#4-portfolio-risk-metrics" aria-label="Link to this section">#</a></h2>
+<p>Risk metrics are computed on the user's actual holdings, weighted by current market value,
+from a year of daily returns.</p>
+<p>The portfolio return series is built as the value-weighted sum of each holding's daily
+returns, aligned to a common length so that a symbol with a shorter history does not
+silently shift the series. From that: annualized volatility as the daily standard deviation
+scaled by <code>√252</code>; the Sharpe ratio against a 4.5% annual risk-free rate converted to a daily
+figure; and beta as <code>cov(portfolio, SPY) / var(SPY)</code>.</p>
+<p>Two guards matter. A portfolio with zero return variance — a single holding entered today,
+or an untraded position — makes the Sharpe denominator zero, so the endpoint reports that
+it cannot be computed rather than dividing. And beta falls back to 1.0 if SPY's variance is
+degenerate. Both return an explicit reason to the client instead of a number.</p>
+<p>The 90-day correlation heatmap covers 11 tracked symbols, computed as Pearson correlation
+across their aligned daily return series — not price levels, which would report near-1.0
+correlation for any two assets that both drift upward.</p>
+<hr />
+<h2 id="5-news-sentiment-why-general-purpose-scoring-fails-here">5. News sentiment: why general-purpose scoring fails here<a class="anchor" href="#5-news-sentiment-why-general-purpose-scoring-fails-here" aria-label="Link to this section">#</a></h2>
+<p>Sentiment is VADER, extended with roughly 45 finance-specific terms
+(<a href="../tracker/news.py"><code>news.py</code></a>).</p>
+<p>The extension is not decoration. VADER is tuned on social-media English, and financial
+headlines use a register it has no entries for. &quot;Apple beats expectations&quot; scores 0.0 out of
+the box — <em>beats</em> is not in the lexicon in its financial sense, and the headline reads as
+neutral. Likewise &quot;misses&quot;, &quot;downgrade&quot;, &quot;buyback&quot;, &quot;record high&quot;. The single most important
+event type in equity news is invisible to the default model.</p>
+<p>So the lexicon adds the vocabulary with hand-assigned polarities: <code>beats +2.0</code>,
+<code>all-time high +2.2</code>, <code>downgrade −1.8</code>, <code>bankruptcy −3.0</code>, <code>tariffs −1.2</code>. Headlines are
+scored on title plus description, aggregated to a mean compound score with bullish /
+neutral / bearish counts at a ±0.05 threshold.</p>
+<p>Query construction matters too. NewsAPI searched for the bare ticker <code>META</code> returns
+articles about metadata and metaphysics; searching <code>&quot;Meta stock&quot;</code> does not. Each tracked
+symbol carries an explicit descriptive query string rather than its ticker.</p>
+<p><strong>This is a hand-tuned heuristic, not a validated model.</strong> The polarities are my judgment,
+not fitted values, and there is no labeled financial-headline set here measuring whether
+the extended lexicon actually beats the default. It plainly fixes the specific failures
+above; the general claim is untested, and §9 says so.</p>
+<hr />
+<h2 id="6-security">6. Security<a class="anchor" href="#6-security" aria-label="Link to this section">#</a></h2>
+<p>Passwords are hashed with PBKDF2 via werkzeug. Sessions are signed bearer tokens issued
+with <code>itsdangerous</code> under a versioned salt, so tokens can be invalidated as a class by
+rotating it. Every portfolio, alert, and watchlist query is scoped by <code>user_id</code> at the
+database layer rather than filtered after retrieval — the difference between a bug that
+returns nothing and a bug that returns another user's holdings. CORS is restricted to an
+explicit origin allowlist from the environment rather than a wildcard.</p>
+<hr />
+<h2 id="7-the-assistant-and-what-grounded-means">7. The assistant, and what &quot;grounded&quot; means<a class="anchor" href="#7-the-assistant-and-what-grounded-means" aria-label="Link to this section">#</a></h2>
+<p>The dashboard includes Ski, a Q&amp;A assistant backed by Claude. The engineering that makes it
+useful is not the prompt; it is what goes into the context window before the prompt.</p>
+<p>A general financial chatbot can explain what a P/E ratio is. That is worth very little
+inside a dashboard, because the user is looking at their own screen and their question is
+about <em>their</em> position. So each request assembles a context block first: the user's current
+holdings with market values, the live macro snapshot from FRED, and the scored news
+headlines for the relevant symbols — each formatted by a dedicated <code>format_*_context</code>
+function. Only then is the model called.</p>
+<p>The result is that &quot;am I overexposed to tech?&quot; is answered against the user's actual
+allocation. The model is doing language work; the application is doing the retrieval.</p>
+<hr />
+<h2 id="8-testing">8. Testing<a class="anchor" href="#8-testing" aria-label="Link to this section">#</a></h2>
+<p>75 tests across 11 files run on every push through GitHub Actions, alongside flake8 linting.
+Coverage is weighted toward the code where correctness is checkable rather than the code
+that is merely tedious: indicator boundary conditions, authentication and token handling,
+database access and user scoping, the FRED and news clients against recorded payloads, the
+screener, and portfolio math.</p>
+<p>Network-dependent modules are tested against fixtures, not live APIs. A test suite that
+fails because a third-party service is down teaches you nothing and trains you to ignore it.</p>
+<p>That style of testing has a blind spot, and it cost this project its headline feature. The
+background tracker emitted <code>price_update</code> on the <code>/stream</code> namespace while the browser
+connected to the default namespace and listened there. Each half was correct read on its
+own; the socket connected, the UI reported a healthy connection, and no tick ever arrived —
+prices moved only on the 60-second polling refresh. Every test passed the entire time,
+because every test exercised a pure function in isolation. A contract <em>between</em> two
+components is invisible to that.</p>
+<p><code>tests/test_stream_contract.py</code> now parses <code>app.py</code> and <code>dashboard.js</code> and asserts that
+every event the client subscribes to is emitted on the namespace the client is actually on.
+Worth recording that the first version of that test also passed with the bug present: it
+compared the <em>set</em> of namespaces each event was emitted on, and a dead code path that
+emitted <code>price_update</code> correctly on the default namespace masked the live one that did not.
+Checking each emit site individually, rather than unioning them per event, is the whole
+difference between a test that catches this and a test that looks like it does.</p>
+<hr />
+<h2 id="9-limitations">9. Limitations<a class="anchor" href="#9-limitations" aria-label="Link to this section">#</a></h2>
+<p>Stated plainly, because a report that lists only strengths is marketing.</p>
+<p><strong>The cache is per-process and in-memory.</strong> It does not survive a restart, and under
+multiple gunicorn workers each holds an independent copy — so the effective upstream request
+rate is the intended rate multiplied by the worker count, and two users can see figures that
+differ by one TTL. Correct for a single-worker deployment, which is what runs; wrong the
+moment it scales horizontally. Redis is the obvious fix and is not implemented.</p>
+<p><strong>The risk-free rate is hardcoded at 4.5%.</strong> It should come from the FRED series the
+application is already fetching. Every Sharpe ratio is therefore slightly wrong in a
+direction that changes with the rate environment.</p>
+<p><strong>Sentiment is unvalidated.</strong> See §5. The lexicon extension is a fix for named failures,
+not a measured improvement.</p>
+<p><strong>There is no backtesting and no strategy evaluation.</strong> Tradeski shows you the present. The
+question of whether any indicator on the screen predicts anything is deliberately out of
+scope here — that question is the entire subject of
+<a href="https://github.com/Danny-397/Alphaglyph">AlphaGlyph</a>, and the honest answer it arrives at
+is mostly &quot;no&quot;. Reading the two projects together is the intended experience: this one
+displays the indicators, that one measures whether displaying them means anything.</p>
+<p><strong><code>tracker/main.py</code> is dead code.</strong> It is a legacy standalone CLI tracker from before the
+web dashboard existed, and it no longer imports — it references a <code>dashboard</code> module that
+does not exist under that name. It is 467 lines of the repository that no execution path
+reaches, and it should be deleted rather than left to imply it runs.</p>
+<p><strong>The linear-regression &quot;prediction&quot; is a trend extrapolation, not a forecast.</strong> It fits a
+least-squares line to the recent window and reads off the next point. It is labeled as a
+prediction in the UI, which oversells it; it carries no error bars and no evaluation of
+whether it beats the naive &quot;tomorrow equals today&quot; baseline. It almost certainly does not.</p>
+<hr />
+<h2 id="10-what-i-would-do-differently">10. What I would do differently<a class="anchor" href="#10-what-i-would-do-differently" aria-label="Link to this section">#</a></h2>
+<p>Move the cache to Redis and make TTLs configuration rather than constants. Pull the
+risk-free rate from FRED. Delete <code>tracker/main.py</code>. Either validate the sentiment lexicon
+against a labeled set or relabel the panel as a heuristic. And either give the regression
+forecast an honest error estimate or remove it — of everything on the dashboard it is the
+element that most looks like a claim and least is one.</p>
+
+  </article>
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <p class="eyebrow">On this document</p>
+    <p>
+      Rendered from <a href="https://github.com/Danny-397/Tradeski/blob/main/docs/technical-report.md"><code>docs/technical-report.md</code></a> in the
+      Tradeski repository, so this page, the PDF and the code stay in step.
+      <a href="../reports.html">All reports &rarr;</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  function currentlyDark() {
+    var t = root.getAttribute('data-theme');
+    return t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.themebtn'), function (b) {
+    b.addEventListener('click', function () {
+      var next = currentlyDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) { /* private mode */ }
+    });
+  });
+})();
+</script>
+</body>
+</html>

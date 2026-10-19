@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QuantumSafe — Technical Report — Dan Lichtenberger</title>
+<meta name="description" content="What the scanner is, how the hybrid engine works, and how well it scores.">
+<meta name="author" content="Dan Lichtenberger">
+<link rel="canonical" href="https://danny-397.github.io/reports/quantumsafe-technical-report.html">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dan Lichtenberger">
+<meta property="og:url" content="https://danny-397.github.io/reports/quantumsafe-technical-report.html">
+<meta property="og:title" content="QuantumSafe — Technical Report">
+<meta property="og:description" content="What the scanner is, how the hybrid engine works, and how well it scores.">
+<meta property="og:image" content="https://danny-397.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="QuantumSafe — Technical Report — Dan Lichtenberger">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="QuantumSafe — Technical Report">
+<meta name="twitter:description" content="What the scanner is, how the hybrid engine works, and how well it scores.">
+<meta name="twitter:image" content="https://danny-397.github.io/og-image.png">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1319'/><text x='50' y='54' font-size='58' font-family='Georgia,serif' fill='%237FA6E8' text-anchor='middle' dominant-baseline='central'>D</text></svg>">
+<script>document.documentElement.className += " js";
+/* Apply the saved theme before first paint, as index.html and reports.html do. */
+try { var savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light')
+        document.documentElement.setAttribute('data-theme', savedTheme); }
+catch (e) { /* private mode */ }</script>
+<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="../report.css">
+<script src="../analytics.js" defer></script>
+</head>
+<body>
+
+<a class="skip" href="#doc">Skip to the report</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="name" href="../index.html">Dan Lichtenberger</a>
+    <nav>
+      <a href="../index.html">Work</a>
+      <a href="../reports.html" aria-current="page">Reports</a>
+      <a href="https://github.com/Danny-397/Danny-397">GitHub</a>
+      <button type="button" class="themebtn" aria-label="Switch between light and dark">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g class="i-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></g>
+          <g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></g>
+        </svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="doc" class="wrap doc">
+  <p class="eyebrow">QuantumSafe Scan &middot; technical report</p>
+  <h1>QuantumSafe — Technical Report</h1>
+  <p class="standfirst">What the scanner is, how the hybrid engine works, and how well it scores.</p>
+  <p class="doclinks">
+    <a class="doclink" href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/docs/TECHNICAL_REPORT.md">Source markdown &nearr;</a>
+    <a class="doclink" href="QuantumSafe-Technical-Report.pdf">PDF &darr;</a>
+  </p>
+  <nav class="toc" aria-label="Sections">
+    <p class="eyebrow">Sections</p>
+    <ol>
+      <li><a href="#1-the-problem-in-one-paragraph">1. The problem in one paragraph</a></li>
+      <li><a href="#2-what-it-is-three-layers-over-one-engine">2. What it is: three layers over one engine</a></li>
+      <li><a href="#3-the-detection-engine">3. The detection engine</a></li>
+      <li><a href="#4-does-it-actually-work-measured-not-asserted">4. Does it actually work? (measured, not asserted)</a></li>
+      <li><a href="#5-the-post-quantum-fix-implemented">5. The post-quantum fix, implemented</a></li>
+      <li><a href="#6-engineering">6. Engineering</a></li>
+      <li><a href="#7-honest-limitations">7. Honest limitations</a></li>
+      <li><a href="#8-whats-next">8. What&#x27;s next</a></li>
+    </ol>
+  </nav>
+  <article class="prose-doc">
+<p><em>A concise, current technical account of what QuantumSafe is, how it works, and how
+well it works. For the long-form treatment (full threat model, algorithm math, and
+references) see <a href="quantumsafe-whitepaper.html">WHITEPAPER.md</a>; for the module/data-flow breakdown see
+<a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/ARCHITECTURE.md">ARCHITECTURE.md</a>.</em></p>
+<hr />
+<h2 id="1-the-problem-in-one-paragraph">1. The problem in one paragraph<a class="anchor" href="#1-the-problem-in-one-paragraph" aria-label="Link to this section">#</a></h2>
+<p>A cryptographically-relevant quantum computer breaks the public-key cryptography that
+secures almost everything online. <strong>Shor's algorithm</strong> reduces integer factorization
+and discrete logarithms to efficient quantum order-finding, defeating RSA,
+Diffie–Hellman, and elliptic-curve schemes <em>at any key size</em>. <strong>Grover's algorithm</strong>
+gives a quadratic speedup against symmetric primitives, halving their effective
+strength. No such machine exists yet — but an adversary can <strong>record ciphertext today
+and decrypt it later</strong> (&quot;harvest now, decrypt later&quot;), and migrating cryptography
+across a large codebase takes years. That is why NIST finalized the post-quantum
+standards (FIPS 203/204/205) in 2024, and why the transition is a present-day
+engineering problem. QuantumSafe is a tool for doing that transition: <strong>find</strong> the
+vulnerable crypto, <strong>understand</strong> why it's vulnerable, and <strong>adopt</strong> the replacement.</p>
+<h2 id="2-what-it-is-three-layers-over-one-engine">2. What it is: three layers over one engine<a class="anchor" href="#2-what-it-is-three-layers-over-one-engine" aria-label="Link to this section">#</a></h2>
+<p>QuantumSafe covers the full arc of the post-quantum problem rather than only naming it:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Module</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Attack</strong></td>
+<td><code>quantum/</code></td>
+<td>Shor's and Grover's algorithms in <strong>Qiskit</strong>, run on a simulator. Shor factors <code>N = 15</code> via quantum phase estimation + inverse QFT and reconstructs a toy RSA key — an <em>educational</em> demonstration of why RSA/ECC are rated HIGH, not a break of real key sizes. Grover recovers a hidden <em>k</em>-bit key in ≈√(2ᵏ) steps, motivating the LOW rating for symmetric crypto.</td>
+</tr>
+<tr>
+<td><strong>Detection</strong></td>
+<td><code>cli/</code></td>
+<td>A hybrid <strong>AST + regex</strong> static-analysis engine across 11 languages, with cross-language usage-awareness, dependency + lockfile scanning, reachability ranking, and call-site remediation. Scores risk 0–100 and emits a NIST-aligned migration plan. This is the core of the product.</td>
+</tr>
+<tr>
+<td><strong>Fix</strong></td>
+<td><code>pqc/</code></td>
+<td>A from-scratch <strong>Learning-With-Errors (LWE) key-encapsulation mechanism</strong> — the math behind CRYSTALS-Kyber / ML-KEM (FIPS 203) — so the recommended replacement is runnable, not just named.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The detection engine is consumed by three surfaces that all share <strong>one</strong> code path: a
+free <strong>CLI</strong> (<code>pip install quantumsafe-scan</code>), a <strong>Flask REST API</strong>, and a <strong>web
+dashboard</strong>. Because there is a single engine, advice never drifts between surfaces.</p>
+<h2 id="3-the-detection-engine">3. The detection engine<a class="anchor" href="#3-the-detection-engine" aria-label="Link to this section">#</a></h2>
+<p><strong>Hybrid AST + regex.</strong> Python source is parsed with the standard-library <code>ast</code> module,
+so detection resolves real imports and call expressions instead of matching raw text.
+The remaining ten languages (JavaScript/TypeScript, Java, Go, Ruby, C#, PHP, Rust,
+C/C++, Kotlin, Swift) use a curated set of anchored regular expressions. Every finding
+is tagged with a <strong>family</strong> (<code>rsa</code>, <code>ecc</code>, <code>dsa</code>, <code>dh</code>, <code>md5</code>, <code>sha1</code>, <code>tls_old</code>,
+<code>3des</code>, <code>rc4</code>, <code>sha256</code>, <code>aes128</code>, <code>tls12</code>); the family is the key used to look up both
+severity and the migration recommendation.</p>
+<p><strong>Usage-awareness is the core design decision.</strong> In security tooling, <em>precision is the
+product</em> — a scanner that cries wolf gets turned off. So the engine deliberately
+distinguishes <em>code that uses</em> a primitive from <em>text that merely names it</em>, and — as of
+0.2.0 — it does so in <strong>every</strong> supported language, not just Python:</p>
+<ul>
+<li><strong>Python</strong> masks string, docstring, and comment content precisely with the
+<code>tokenize</code> module before the regex pass, while the AST engine runs on the original
+source (so <code>hashlib.new(&quot;md5&quot;)</code> is still caught).</li>
+<li><strong>Every other language</strong> is handled by a small <strong>lexer-style state machine</strong> that
+blanks the content of comments (line, trailing, and multi-line block) and string
+literals. Go is import-aware — it masks strings <em>except</em> on <code>import</code> lines, because
+Go's import paths (<code>&quot;crypto/dsa&quot;</code>) are the detection signal.</li>
+<li>Because masking would hide algorithm names that legitimately live <em>inside</em> a string
+argument (<code>MessageDigest.getInstance(&quot;SHA-1&quot;)</code>, <code>createCipheriv(&quot;aes-128-gcm&quot;, …)</code>),
+a <strong>string-argument recovery pass</strong> re-detects those, but only when the callee is a
+known crypto factory and the argument normalizes to a real algorithm — the
+cross-language analogue of the Python AST engine.</li>
+<li>Anchored patterns / word boundaries defuse traps like <code>md5sumLabel</code> or <code>dsaCount</code>; an
+inline <code># quantumsafe: ignore</code> suppresses a line; matches are de-duplicated per
+<code>(file, line, family)</code> so one line can't inflate the score.</li>
+</ul>
+<p><strong>Dependency + lockfile scanning.</strong> Most real exposure arrives through third-party
+libraries, so the scanner also parses dependency manifests <strong>and lockfiles</strong> across
+pip/npm/go/maven/gem (<code>requirements.txt</code>, <code>pyproject.toml</code>, <code>package.json</code>, <code>go.mod</code>,
+<code>pom.xml</code>, <code>Gemfile</code>, plus <code>package-lock.json</code>, <code>yarn.lock</code>, <code>poetry.lock</code>,
+<code>Pipfile.lock</code>, <code>Gemfile.lock</code>, <code>go.sum</code>). Known quantum-vulnerable crypto packages are
+flagged with a <strong>purl</strong> and <strong>direct/transitive scope</strong>, and rendered in the CBOM as
+<code>library</code> components linked to the crypto assets they provide. These findings are marked
+<code>origin=&quot;dependency&quot;</code>, <code>confidence=&quot;medium&quot;</code> — capability exposure, not proof a call
+site is exercised.</p>
+<p><strong>Reachability ranking.</strong> A finding in dead code or an example is not the same risk as
+one on a live path, so a Python call-graph pass labels each source finding <code>reachable</code>
+(module-level, or inside a referenced/decorated/entrypoint function), <code>test/example</code>
+(under a test or docs path), or <code>unreferenced</code> (a top-level function whose name never
+appears anywhere else — dead code, conservatively defined). Reports rank exploitable
+findings first. The signal only ever <em>demotes</em> in ranking; it never drops a finding.</p>
+<p><strong>Call-site remediation.</strong> Each finding carries a concrete fix, not just a family-level
+recommendation: a before/after for drop-ins (MD5/SHA-1 → SHA-256, 3DES/RC4 →
+AES-256-GCM, AES-128 → AES-256, TLS 1.0/1.1/1.2 → 1.3) or, for asymmetric families where
+no like-for-like swap exists, the target PQC scheme plus a language-appropriate library
+(liboqs, BouncyCastle PQC, Cloudflare CIRCL) and an honest note that it is a design
+change. Fixes appear in JSON, HTML, and the SARIF rule help text.</p>
+<p><strong>Optional interprocedural taint analysis (<code>--taint</code>).</strong> A direct scan flags
+<code>hashlib.md5(...)</code> but is blind to a wrapper that hides it:</p>
+<pre><code class="language-python">def _legacy_digest(data):        # wraps MD5
+    return hashlib.md5(data).hexdigest()
+def sign_request(payload):       # re-exposes it one hop up
+    return _legacy_digest(payload)
+token = sign_request(body)       # the real blast radius — no &quot;md5&quot; in sight
+</code></pre>
+<p>The taint pass builds a <strong>call graph</strong> and propagates taint to a <strong>fixpoint</strong>: any
+function that <em>transitively</em> reaches a trusted (AST-detected) primitive becomes tainted,
+and its call sites are reported as <strong>indirect</strong> findings with the wrapper chain attached.
+This works <strong>across files</strong>, not just within one: <code>cli/callgraph.py</code> builds a
+<em>whole-program</em> call graph by resolving imports (absolute, relative, and unique-suffix)
+to qualified <code>module.func</code> symbols, so a wrapper defined in <code>crypto/legacy.py</code> and called
+from <code>api/handlers.py</code> — with no crypto keyword at the call site — is still caught, and
+its provenance names the resolving module. A call edge is only created when it resolves
+to an indexed function, so an unrelated same-named function can't create a phantom edge.
+The pass is opt-in (<code>--taint</code>) and strictly <em>additive</em> (it never emits where the direct
+scan already fired), so it extends coverage without ever regressing precision.</p>
+<p><strong>Risk score (computed from findings, never hardcoded):</strong></p>
+<pre><code>score = min(100, 15·HIGH + 5·MEDIUM + 1·LOW)
+</code></pre>
+<p>HIGH (Shor-breakable: RSA/ECC/DSA/DH, MD5/SHA-1) is weighted 15× LOW (Grover-weakened
+but still secure: SHA-256, AES-128) because the two threats are qualitatively different
+— one is catastrophic, the other a sizing concern. Bands: 0–30 Low · 31–60 Medium ·
+61–80 High · 81–100 Critical.</p>
+<p><strong>Six export formats:</strong> terminal table, JSON, <strong>SARIF</strong> (validated against the OASIS
+2.1.0 JSON Schema in the test suite, so GitHub code-scanning ingests it), <strong>CycloneDX
+CBOM</strong> (validated against the 1.6 crypto structure), HTML, and an embeddable SVG badge.</p>
+<h2 id="4-does-it-actually-work-measured-not-asserted">4. Does it actually work? (measured, not asserted)<a class="anchor" href="#4-does-it-actually-work-measured-not-asserted" aria-label="Link to this section">#</a></h2>
+<p><strong>Labeled benchmark — precision under adversarial pressure.</strong> A hand-labeled corpus of
+<strong>18 files across 9 languages (26 findings)</strong> includes adversarial decoys: crypto names
+inside comments, docstrings, log strings, exception messages, trailing and block
+comments, plus word-boundary traps. <code>evaluate.py</code> runs the scanner <strong>twice</strong> so the
+effect of usage-awareness is <em>measured against a baseline</em>, not claimed:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th style="text-align:right">TP</th>
+<th style="text-align:right">FP</th>
+<th style="text-align:right">FN</th>
+<th style="text-align:right">Precision</th>
+<th style="text-align:right">Recall</th>
+<th style="text-align:right">F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Naive line-regex baseline</td>
+<td style="text-align:right">26</td>
+<td style="text-align:right">27</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">49.1%</td>
+<td style="text-align:right">100%</td>
+<td style="text-align:right">65.8%</td>
+</tr>
+<tr>
+<td><strong>QuantumSafe (usage-aware)</strong></td>
+<td style="text-align:right"><strong>26</strong></td>
+<td style="text-align:right"><strong>0</strong></td>
+<td style="text-align:right"><strong>0</strong></td>
+<td style="text-align:right"><strong>100%</strong></td>
+<td style="text-align:right"><strong>100%</strong></td>
+<td style="text-align:right"><strong>100%</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Usage-awareness removes <strong>27 false positives</strong> — crypto keywords in docstrings, logs,
+exception strings, and comments — <strong>without losing a single true positive</strong>, and now
+across <em>all</em> languages (13 of the 27 come from Java/JS/Go decoys). Thresholds are
+enforced by <code>tests/test_benchmark.py</code>, so a regression fails CI.</p>
+<p><strong>Seeded benchmark — recall with ground truth by construction.</strong> A small labeled corpus
+measures precision well but says little about <em>recall</em> at scale, so <code>seeded.py</code> runs a
+<strong>mutation benchmark</strong>: it embeds real quantum-vulnerable API calls (many idiomatic
+variants per family, 7 languages) into host files and asserts each is detected, then
+embeds the <em>same algorithm name</em> only in a comment and a string and asserts it is not.
+Because every case is a real call, a miss is unambiguously a false negative.</p>
+<ul>
+<li><strong>50 seeded positive cases → 100% recall</strong>;</li>
+<li><strong>50 negative mutations → 0 false positives (100% mutation precision)</strong>.</li>
+</ul>
+<p>Enforced by <code>tests/test_seeded.py</code>. This building of the harness also <em>found and fixed</em> a
+real bug — 7 Go false positives where crypto names in ordinary Go strings leaked through,
+resolved by import-aware masking — which is the whole reason to measure yourself.</p>
+<p><strong>Head-to-head vs. a generic scanner.</strong> <code>comparison.py</code> scores each installed tool
+against the same 26 labeled <code>(file, family)</code> pairs. The point it makes is structural:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th style="text-align:right">Caught / 26</th>
+<th style="text-align:right">Recall</th>
+<th>Families found</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>QuantumSafe</strong></td>
+<td style="text-align:right"><strong>26</strong></td>
+<td style="text-align:right"><strong>100%</strong></td>
+<td>all 11 families, 9 languages</td>
+</tr>
+<tr>
+<td>Bandit 1.8</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">8%</td>
+<td>md5, sha1 only</td>
+</tr>
+</tbody>
+</table></div>
+<p>Bandit is an excellent <em>classical</em> Python linter doing its job — it flags MD5/SHA-1 and
+says nothing about RSA/ECC/DSA/DH because those are not classical vulnerabilities. Its
+2/26 is the thesis in one number: <strong>quantum readiness needs a quantum-aware tool.</strong> Full
+methodology and a capability matrix vs. Semgrep/SonarQube/CBOM tools in
+<a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/../benchmark/COMPARISON.md">benchmark/COMPARISON.md</a>.</p>
+<p><strong>Real-world scale — discoveries, not a labeled corpus.</strong> <code>realworld.py</code> pulls the
+latest sdist of <strong>37 of the most-downloaded PyPI packages</strong> straight from the PyPI JSON
+API and scans them (nothing is built or executed):</p>
+<ul>
+<li><strong>32 of 37 (86%)</strong> contained ≥1 finding; <strong>10,938</strong> Python files analyzed;</li>
+<li><strong>5,512</strong> total findings, <strong>4,083 HIGH-risk</strong>;</li>
+<li>every finding is a concrete <code>file:line</code> an auditor can open — e.g. Diffie–Hellman in
+<code>twisted/conch/ssh/transport.py</code>, MD5 in <code>requests/auth.py</code> (HTTP Digest).</li>
+</ul>
+<p>The paramiko case shows why usage-awareness matters at scale: a naive line-regex reports
+<strong>451 raw matches</strong>, most of them the same algorithms repeated in docstrings and SSH
+protocol-name strings; focusing on real code brings it to <strong>110</strong> findings — a ~4× noise
+reduction. <em>(Honest caveat: some of the 37 packages are cryptography libraries that
+implement RSA/ECC on purpose, so their large counts are expected; the telling signal is
+the application/infrastructure code — <code>django</code>, <code>botocore</code>, <code>requests</code>, <code>scrapy</code> — still
+reaching for quantum-vulnerable primitives.)</em></p>
+<p><strong>Empirical study.</strong> Across <strong>8</strong> widely-used projects (<code>study/</code>), <strong>88%</strong> contained a
+HIGH-risk (Shor-breakable) usage, at an average Quantum Risk Score of <strong>61.4/100</strong>.</p>
+<h2 id="5-the-post-quantum-fix-implemented">5. The post-quantum fix, implemented<a class="anchor" href="#5-the-post-quantum-fix-implemented" aria-label="Link to this section">#</a></h2>
+<p><code>pqc/lwe_kem.py</code> is a key-encapsulation mechanism on the <strong>LWE</strong> problem. Key generation
+publishes <code>(A, b = A·s + e mod q)</code> for a small error <code>e</code>; recovering the secret <code>s</code> is
+LWE, provably as hard as worst-case lattice problems. With <code>(n=256, m=512, q=4093)</code> the
+accumulated error stays well below <code>q/4</code>, so decapsulation is reliable — <strong>verified over
+200+ exchanges with zero failures.</strong> A quantum computer can't shortcut it because LWE has
+<strong>no periodic / hidden-subgroup structure</strong> for Shor to exploit — which is exactly why
+NIST standardized lattice schemes. <em>(Honest scope: this is a faithful teaching
+implementation of plain LWE, not the constant-time Module-LWE + NTT + Fujisaki–Okamoto
+construction of production Kyber; real systems should use vetted ML-KEM such as <code>liboqs</code>.)</em></p>
+<h2 id="6-engineering">6. Engineering<a class="anchor" href="#6-engineering" aria-label="Link to this section">#</a></h2>
+<p>One shared engine behind CLI + API + dashboard; <strong>97 automated tests</strong>; CI; Docker and
+<code>docker-compose</code>; a reusable <strong>GitHub Action</strong> (<code>action.yml</code>) that fails a build over a
+risk threshold; multi-service deploy configs; and a published PyPI package
+(<code>pip install quantumsafe-scan</code>, v0.2.0). The benchmark, real-world study, seeded recall
+harness, comparison, and every chart are <strong>reproducible from scripts</strong> and generated
+from live scanner output, not hand-drawn.</p>
+<h2 id="7-honest-limitations">7. Honest limitations<a class="anchor" href="#7-honest-limitations" aria-label="Link to this section">#</a></h2>
+<ul>
+<li><strong>Heuristic, not a proof.</strong> It detects <em>usage patterns</em>; reachability is a conservative
+ranking signal, not a proof that a primitive is exploitable or live.</li>
+<li><strong>AST precision is Python-only.</strong> The other ten languages use usage-aware masking plus
+string-argument recovery — a large improvement over naive regex — but still lack full
+AST resolution, so an algorithm name passed through an <em>unrecognized</em> wrapper can be a
+false negative.</li>
+<li><strong>Dependency findings are capability-level.</strong> A flagged library ships quantum-vulnerable
+crypto; that is not proof a given call path is exercised (hence <code>confidence=&quot;medium&quot;</code>).
+Detection uses a curated catalog of known crypto packages, so an obscure library may be
+missed.</li>
+<li><strong>Reachability is intra-project and Python-focused.</strong> Cross-file import resolution is
+not modeled; non-Python findings get the path-based signal only.</li>
+<li><strong>Benchmark scale.</strong> 18 files / 26 labeled findings is a <em>precision</em> regression set;
+the seeded harness adds 50 constructed recall cases. Neither is a claim of 100% on
+arbitrary real-world code.</li>
+<li><strong>Demonstration scale.</strong> Shor runs on <code>N = 15</code>; the LWE KEM is teaching-grade.</li>
+</ul>
+<h2 id="8-whats-next">8. What's next<a class="anchor" href="#8-whats-next" aria-label="Link to this section">#</a></h2>
+<p>Tree-sitter AST parsing to bring non-Python languages up to AST-level precision;
+import-resolving reachability (the taint pass is already cross-file); a larger hand-labeled real-world
+corpus to complement the seeded recall benchmark; per-protocol hybrid (classical + PQC)
+migration recipes; and an optional binding to production ML-KEM alongside the teaching
+implementation.</p>
+<hr />
+<p><em>Every figure in this report is reproducible: <code>python benchmark/evaluate.py</code>
+(precision), <code>python benchmark/seeded.py</code> (recall), <code>python benchmark/comparison.py</code>
+(vs. other tools), <code>python benchmark/realworld.py</code> (the 37-package study), and <code>python study/run_study.py</code> (the 8-project study).</em></p>
+
+  </article>
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <p class="eyebrow">On this document</p>
+    <p>
+      Rendered from <a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/docs/TECHNICAL_REPORT.md"><code>docs/TECHNICAL_REPORT.md</code></a> in the
+      QuantumSafe Scan repository, so this page, the PDF and the code stay in step.
+      <a href="../reports.html">All reports &rarr;</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  function currentlyDark() {
+    var t = root.getAttribute('data-theme');
+    return t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.themebtn'), function (b) {
+    b.addEventListener('click', function () {
+      var next = currentlyDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) { /* private mode */ }
+    });
+  });
+})();
+</script>
+</body>
+</html>

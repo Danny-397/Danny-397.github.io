@@ -1,0 +1,223 @@
+/* ------------------------------------------------------------------
+   report.css — the long-form reading page for a technical report.
+
+   Loaded after site.css, which supplies the palette tokens, the spacing
+   scale, the .bar header chrome and the .eyebrow/.wrap primitives. Every
+   colour here is a token, so light and dark both follow from site.css and
+   there is nothing to keep in sync.
+
+   Generated pages come from tools/build_reports.py.
+   ------------------------------------------------------------------ */
+
+/* Keyboard users land here first. */
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--surface);
+  color: var(--text);
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--rule);
+  border-radius: 0 0 6px 0;
+  z-index: 10;
+}
+.skip:focus { left: 0; }
+
+/* ---------- the document column ---------- */
+.doc {
+  padding: var(--s5) 0 var(--s6);
+}
+.doc > h1 {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 1.2rem + 2.4vw, 2.9rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  margin: var(--s2) 0 var(--s3);
+  max-width: 24em;
+}
+.doc .standfirst {
+  font-family: var(--serif);
+  font-size: 1.12rem;
+  line-height: 1.55;
+  color: var(--muted);
+  max-width: var(--measure);
+  margin: 0 0 var(--s4);
+}
+
+/* ---------- source / PDF links ---------- */
+.doclinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+  margin: 0 0 var(--s5);
+  padding-bottom: var(--s4);
+  border-bottom: 1px solid var(--rule);
+}
+.doclink {
+  font-family: var(--mono);
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--accent-ink);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: .45rem var(--s3);
+  transition: background .25s var(--ease), border-color .25s var(--ease);
+}
+.doclink:hover { background: var(--accent-wash); border-color: var(--accent); }
+
+/* ---------- table of contents ---------- */
+.toc {
+  background: var(--surface);
+  border: 1px solid var(--rule-soft);
+  border-radius: 8px;
+  padding: var(--s3) var(--s4);
+  margin: 0 0 var(--s5);
+  max-width: var(--measure);
+}
+.toc ol {
+  margin: var(--s2) 0 0;
+  padding-left: 1.4em;
+  columns: 2;
+  column-gap: var(--s4);
+}
+.toc li { margin: .3rem 0; break-inside: avoid; }
+.toc a { color: var(--muted); text-decoration: none; border-bottom: 1px solid transparent; }
+.toc a:hover { color: var(--accent-ink); border-bottom-color: var(--accent); }
+@media (max-width: 640px) { .toc ol { columns: 1; } }
+
+/* ---------- the prose itself ---------- */
+.prose-doc {
+  font-family: var(--serif);
+  font-size: 1.04rem;
+  line-height: 1.68;
+  color: var(--text);
+}
+.prose-doc > * { max-width: var(--measure); }
+
+.prose-doc h2,
+.prose-doc h3 {
+  font-family: var(--sans);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  scroll-margin-top: var(--s4);
+}
+.prose-doc h2 {
+  font-size: 1.42rem;
+  margin: var(--s5) 0 var(--s3);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--rule-soft);
+}
+.prose-doc h3 {
+  font-size: 1.1rem;
+  margin: var(--s4) 0 var(--s2);
+  color: var(--accent-ink);
+}
+.prose-doc h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+
+/* The anchor stays out of the way until the heading is hovered. */
+.anchor {
+  margin-left: .45em;
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: .72em;
+  color: var(--faint);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity .2s var(--ease);
+}
+h2:hover .anchor, h3:hover .anchor, .anchor:focus { opacity: 1; }
+
+.prose-doc p { margin: 0 0 var(--s3); }
+.prose-doc ul, .prose-doc ol { margin: 0 0 var(--s3); padding-left: 1.5em; }
+.prose-doc li { margin: .35rem 0; }
+.prose-doc li > ul, .prose-doc li > ol { margin: .35rem 0; }
+
+.prose-doc a { color: var(--accent-ink); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.prose-doc a:hover { background: var(--accent-wash); border-bottom-color: var(--accent); }
+
+.prose-doc strong { font-weight: 650; }
+.prose-doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: var(--s5) 0; }
+
+.prose-doc blockquote {
+  margin: 0 0 var(--s3);
+  padding: var(--s2) var(--s3);
+  border-left: 3px solid var(--rule);
+  background: var(--surface-2);
+  border-radius: 0 6px 6px 0;
+  color: var(--muted);
+}
+.prose-doc blockquote p:last-child { margin-bottom: 0; }
+
+/* ---------- code ---------- */
+.prose-doc pre {
+  font-family: var(--mono);
+  font-size: .82rem;
+  line-height: 1.6;
+  background: var(--surface-2);
+  border: 1px solid var(--rule-soft);
+  border-radius: 8px;
+  padding: var(--s3);
+  margin: 0 0 var(--s3);
+  overflow-x: auto;          /* code may be wider than the column */
+  max-width: 100%;
+}
+.prose-doc pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* ---------- tables ---------- */
+/* Tables are the other thing allowed to exceed the reading column, so each
+   one scrolls inside its own box rather than widening the page. */
+.tablewrap {
+  overflow-x: auto;
+  margin: 0 0 var(--s4);
+  max-width: 100%;
+  border: 1px solid var(--rule-soft);
+  border-radius: 8px;
+}
+.prose-doc table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--sans);
+  font-size: .88rem;
+  line-height: 1.5;
+}
+.prose-doc thead th {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 500;
+  background: var(--surface);
+  padding: var(--s2) var(--s3);
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+.prose-doc tbody td {
+  padding: var(--s2) var(--s3);
+  border-bottom: 1px solid var(--rule-soft);
+  vertical-align: top;
+}
+.prose-doc tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- colophon ---------- */
+.colophon {
+  border-top: 1px solid var(--rule);
+  padding: var(--s4) 0 var(--s5);
+  color: var(--muted);
+  font-size: .92rem;
+}
+.colophon p { max-width: var(--measure); margin: var(--s2) 0 0; }
+.colophon a { color: var(--accent-ink); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.colophon a:hover { border-bottom-color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .doclink, .anchor { transition: none; }
+}

@@ -137,7 +137,8 @@ catch (e) { /* private mode */ }</script>
     <p class="note">
       Roughly 59 pages in total, or one page if you only read the summary. Each report is
       generated from the markdown source committed
-      in its own repository, so the document and the code cannot drift apart. Every figure is
+      in its own repository, so the document and the code cannot drift apart, and reads in the
+      browser as well as in the PDF. Every figure is
       reproduced from that project's test suite, experiment log, or results file.
     </p>
   </div>
@@ -153,7 +154,7 @@ catch (e) { /* private mode */ }</script>
         <span class="proj">All six</span>
       </div>
       <div>
-        <h2><a href="reports/Research-Summary.pdf">Research Summary</a></h2>
+        <h2><a href="reports/research-summary.html">Research Summary</a></h2>
         <p class="pull">
           Start here. Six projects and the honest result of each, on one page &mdash;
           including the three whose central idea did not work.
@@ -164,7 +165,8 @@ catch (e) { /* private mode */ }</script>
           numbers and one unreproducible one were caught.
         </p>
         <div class="links">
-          <a href="reports/Research-Summary.pdf">Read the summary &rarr;</a>
+          <a href="reports/research-summary.html">Read the summary &rarr;</a>
+          <a class="secondary" href="reports/Research-Summary.pdf">PDF</a>
         </div>
       </div>
     </article>
@@ -209,7 +211,7 @@ catch (e) { /* private mode */ }</script>
         <span class="proj">AlphaZero Chess Engine</span>
       </div>
       <div>
-        <h2><a href="reports/RL-Chess-Technical-Report.pdf">An AlphaZero-Style Chess Engine, Built From Scratch</a></h2>
+        <h2><a href="reports/rl-chess-technical-report.html">An AlphaZero-Style Chess Engine, Built From Scratch</a></h2>
         <p class="pull">
           Scaling self-play 10&times; bought 14 Elo. The diagnosis is that this is a self-play
           <em>signal</em> problem, not a compute ceiling &mdash; draw-heavy self-play starves the
@@ -221,10 +223,11 @@ catch (e) { /* private mode */ }</script>
           engine built as a control to confirm the evaluation harness itself was sound.
         </p>
         <div class="links">
-          <a href="reports/RL-Chess-Technical-Report.pdf">Read the report &rarr;</a>
-          <a class="secondary" href="reports/RL-Chess-Experiment-Results.pdf">Experiment log (7 pp)</a>
+          <a href="reports/rl-chess-technical-report.html">Read the report &rarr;</a>
+          <a class="secondary" href="reports/rl-chess-experiment-results.html">Experiment log (7 pp)</a>
           <a class="secondary" href="https://rlchess.xyz">Play it</a>
           <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine">Source</a>
+          <a class="secondary" href="reports/RL-Chess-Technical-Report.pdf">PDF</a>
         </div>
       </div>
     </article>
@@ -238,7 +241,7 @@ catch (e) { /* private mode */ }</script>
         <span class="proj">AlphaGlyph</span>
       </div>
       <div>
-        <h2><a href="reports/AlphaGlyph-Technical-Report.pdf">A Backtesting Laboratory That Measures Its Own Credibility</a></h2>
+        <h2><a href="reports/alphaglyph-technical-report.html">A Backtesting Laboratory That Measures Its Own Credibility</a></h2>
         <p class="pull">
           72% probability of backtest overfitting on its own strategy grid. An earlier run of
           identical code on a different window said 63% &mdash; and the instability is itself
@@ -250,9 +253,10 @@ catch (e) { /* private mode */ }</script>
           purged cross-validation to quantify how much of the result is selection bias.
         </p>
         <div class="links">
-          <a href="reports/AlphaGlyph-Technical-Report.pdf">Read the report &rarr;</a>
+          <a href="reports/alphaglyph-technical-report.html">Read the report &rarr;</a>
           <a class="secondary" href="https://alphaglyph.org">Run a backtest</a>
           <a class="secondary" href="https://github.com/Danny-397/Alphaglyph">Source</a>
+          <a class="secondary" href="reports/AlphaGlyph-Technical-Report.pdf">PDF</a>
         </div>
       </div>
     </article>
@@ -266,7 +270,7 @@ catch (e) { /* private mode */ }</script>
         <span class="proj">QuantumSafe Scan</span>
       </div>
       <div>
-        <h2><a href="reports/QuantumSafe-Technical-Report.pdf">Detecting Quantum-Vulnerable Cryptography</a></h2>
+        <h2><a href="reports/quantumsafe-technical-report.html">Detecting Quantum-Vulnerable Cryptography</a></h2>
         <p class="pull">
           The interesting problem isn't matching the string <code>RSA</code> &mdash; it's not
           matching it inside a comment, a docstring, or a code path nothing ever calls.
@@ -279,10 +283,11 @@ catch (e) { /* private mode */ }</script>
           written from scratch.
         </p>
         <div class="links">
-          <a href="reports/QuantumSafe-Technical-Report.pdf">Read the report &rarr;</a>
-          <a class="secondary" href="reports/QuantumSafe-Whitepaper.pdf">Whitepaper (8 pp)</a>
+          <a href="reports/quantumsafe-technical-report.html">Read the report &rarr;</a>
+          <a class="secondary" href="reports/quantumsafe-whitepaper.html">Whitepaper (8 pp)</a>
           <a class="secondary" href="https://quantumsafescan.com">Open the scanner</a>
           <a class="secondary" href="https://github.com/Danny-397/Quantum-Safe-Scan">Source</a>
+          <a class="secondary" href="reports/QuantumSafe-Technical-Report.pdf">PDF</a>
         </div>
       </div>
     </article>
@@ -296,7 +301,7 @@ catch (e) { /* private mode */ }</script>
         <span class="proj">Tradeski</span>
       </div>
       <div>
-        <h2><a href="reports/Tradeski-Technical-Report.pdf">A Real-Time Market Dashboard</a></h2>
+        <h2><a href="reports/tradeski-technical-report.html">A Real-Time Market Dashboard</a></h2>
         <p class="pull">
           A market dashboard looks like a data-visualization problem and is actually an
           API-quota problem. The design question is not how to draw it &mdash; it's how stale
@@ -309,9 +314,10 @@ catch (e) { /* private mode */ }</script>
           before it is called. The limitations section is unusually long on purpose.
         </p>
         <div class="links">
-          <a href="reports/Tradeski-Technical-Report.pdf">Read the report &rarr;</a>
+          <a href="reports/tradeski-technical-report.html">Read the report &rarr;</a>
           <a class="secondary" href="https://www.tradeski.dev/">Open the dashboard</a>
           <a class="secondary" href="https://github.com/Danny-397/Tradeski">Source</a>
+          <a class="secondary" href="reports/Tradeski-Technical-Report.pdf">PDF</a>
         </div>
       </div>
     </article>
@@ -325,7 +331,7 @@ catch (e) { /* private mode */ }</script>
         <span class="proj">Neural Canvas</span>
       </div>
       <div>
-        <h2><a href="reports/Neural-Canvas-Technical-Report.pdf">Painting With Bare Hands</a></h2>
+        <h2><a href="reports/neural-canvas-technical-report.html">Painting With Bare Hands</a></h2>
         <p class="pull">
           Getting hand landmarks is a solved problem you can import. Then you draw a line with
           it, and the line is unusable &mdash; the jitter and the signal are the same size.
@@ -337,9 +343,10 @@ catch (e) { /* private mode */ }</script>
           periods, gesture debouncing, and kaleidoscopic symmetry as a stroke-path transform.
         </p>
         <div class="links">
-          <a href="reports/Neural-Canvas-Technical-Report.pdf">Read the report &rarr;</a>
+          <a href="reports/neural-canvas-technical-report.html">Read the report &rarr;</a>
           <a class="secondary" href="https://danny-397.github.io/neural-canvas/">Paint with your hands</a>
           <a class="secondary" href="https://github.com/Danny-397/neural-canvas">Source</a>
+          <a class="secondary" href="reports/Neural-Canvas-Technical-Report.pdf">PDF</a>
         </div>
       </div>
     </article>
@@ -351,8 +358,10 @@ catch (e) { /* private mode */ }</script>
   <div class="wrap">
     <p class="eyebrow">On these documents</p>
     <p>
-      Each PDF is rendered from the markdown committed in its project's own repository, so
-      the report and the code stay in step. Where a project failed to beat its baseline, the
+      Each report is rendered from the markdown committed in its project's own repository, so
+      the page, the PDF and the code stay in step. Read any of them in the browser &mdash;
+      every section has its own link, so you can be sent straight to the part that matters.
+      The PDF sits beside it. Where a project failed to beat its baseline, the
       report says so and reports the confidence interval.
       <a href="index.html">Back to the work &rarr;</a>
     </p>

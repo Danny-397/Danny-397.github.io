@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QuantumSafe — Whitepaper — Dan Lichtenberger</title>
+<meta name="description" content="The long form: threat model, algorithm math, and references.">
+<meta name="author" content="Dan Lichtenberger">
+<link rel="canonical" href="https://danny-397.github.io/reports/quantumsafe-whitepaper.html">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dan Lichtenberger">
+<meta property="og:url" content="https://danny-397.github.io/reports/quantumsafe-whitepaper.html">
+<meta property="og:title" content="QuantumSafe — Whitepaper">
+<meta property="og:description" content="The long form: threat model, algorithm math, and references.">
+<meta property="og:image" content="https://danny-397.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="QuantumSafe — Whitepaper — Dan Lichtenberger">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="QuantumSafe — Whitepaper">
+<meta name="twitter:description" content="The long form: threat model, algorithm math, and references.">
+<meta name="twitter:image" content="https://danny-397.github.io/og-image.png">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1319'/><text x='50' y='54' font-size='58' font-family='Georgia,serif' fill='%237FA6E8' text-anchor='middle' dominant-baseline='central'>D</text></svg>">
+<script>document.documentElement.className += " js";
+/* Apply the saved theme before first paint, as index.html and reports.html do. */
+try { var savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light')
+        document.documentElement.setAttribute('data-theme', savedTheme); }
+catch (e) { /* private mode */ }</script>
+<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="../report.css">
+<script src="../analytics.js" defer></script>
+</head>
+<body>
+
+<a class="skip" href="#doc">Skip to the report</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="name" href="../index.html">Dan Lichtenberger</a>
+    <nav>
+      <a href="../index.html">Work</a>
+      <a href="../reports.html" aria-current="page">Reports</a>
+      <a href="https://github.com/Danny-397/Danny-397">GitHub</a>
+      <button type="button" class="themebtn" aria-label="Switch between light and dark">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g class="i-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></g>
+          <g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></g>
+        </svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="doc" class="wrap doc">
+  <p class="eyebrow">QuantumSafe Scan &middot; technical report</p>
+  <h1>QuantumSafe — Whitepaper</h1>
+  <p class="standfirst">The long form: threat model, algorithm math, and references.</p>
+  <p class="doclinks">
+    <a class="doclink" href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/docs/WHITEPAPER.md">Source markdown &nearr;</a>
+    <a class="doclink" href="QuantumSafe-Whitepaper.pdf">PDF &darr;</a>
+  </p>
+  <nav class="toc" aria-label="Sections">
+    <p class="eyebrow">Sections</p>
+    <ol>
+      <li><a href="#abstract">Abstract</a></li>
+      <li><a href="#1-problem-why-quantum-breaks-rsa-and-ecc">1. Problem: why quantum breaks RSA and ECC</a></li>
+      <li><a href="#2-threat-model">2. Threat model</a></li>
+      <li><a href="#3-system-architecture-overview">3. System architecture overview</a></li>
+      <li><a href="#4-detection-engine-design-ast-regex-hybrid">4. Detection engine design (AST + regex hybrid)</a></li>
+      <li><a href="#5-risk-scoring-model-0100">5. Risk scoring model (0–100)</a></li>
+      <li><a href="#6-quantum-attack-module-shor-grover">6. Quantum attack module (Shor + Grover)</a></li>
+      <li><a href="#7-post-quantum-module-lwe-kyber-style">7. Post-quantum module (LWE / Kyber-style)</a></li>
+      <li><a href="#8-benchmark-methodology-and-results">8. Benchmark methodology and results</a></li>
+      <li><a href="#9-limitations">9. Limitations</a></li>
+      <li><a href="#10-future-work">10. Future work</a></li>
+      <li><a href="#references">References</a></li>
+    </ol>
+  </nav>
+  <article class="prose-doc">
+<p><strong>A technical whitepaper</strong></p>
+<hr />
+<h2 id="abstract">Abstract<a class="anchor" href="#abstract" aria-label="Link to this section">#</a></h2>
+<p>The eventual arrival of a cryptographically-relevant quantum computer (CRQC) will
+break the public-key cryptography that secures the modern internet. Shor's
+algorithm reduces integer factorization and discrete logarithms to efficient
+quantum order-finding, defeating RSA, Diffie-Hellman, and elliptic-curve schemes
+outright; Grover's algorithm provides a quadratic speedup against symmetric
+primitives and hash functions, halving their effective security. Because
+encrypted data can be recorded today and decrypted later (&quot;harvest now, decrypt
+later&quot;), and because cryptographic migration across a large codebase takes years,
+the transition to post-quantum cryptography (PQC) is a present-day engineering
+problem rather than a future one.</p>
+<p>QuantumSafe is an end-to-end platform that addresses three questions in sequence:
+<em>Why is classical cryptography vulnerable?</em> (an executable quantum-attack module),
+<em>Where is the vulnerable cryptography in my code?</em> (a hybrid AST/regex static
+analysis engine spanning 11 languages, with a 0–100 risk model), and <em>What do I
+replace it with?</em> (a from-scratch lattice-based key-encapsulation mechanism and a
+NIST-aligned migration plan). The detector is evaluated on a hand-labeled corpus
+with adversarial decoys, achieving 100% precision and recall on that corpus, and
+an empirical study over eight widely-used open-source projects found that 88%
+contained at least one Shor-breakable primitive. This paper documents the threat
+model, system design, scoring methodology, evaluation, and the honest limits of a
+static, pattern-based approach.</p>
+<hr />
+<h2 id="1-problem-why-quantum-breaks-rsa-and-ecc">1. Problem: why quantum breaks RSA and ECC<a class="anchor" href="#1-problem-why-quantum-breaks-rsa-and-ecc" aria-label="Link to this section">#</a></h2>
+<h3 id="11-the-classical-hardness-assumptions">1.1 The classical hardness assumptions<a class="anchor" href="#11-the-classical-hardness-assumptions" aria-label="Link to this section">#</a></h3>
+<p>Public-key cryptography rests on problems believed hard for classical computers:</p>
+<ul>
+<li><strong>RSA</strong> — security reduces to the difficulty of factoring a large semiprime
+<code>N = p·q</code>.</li>
+<li><strong>Diffie-Hellman / DSA</strong> — security reduces to the discrete logarithm problem in
+a finite field.</li>
+<li><strong>Elliptic-curve cryptography (ECDH, ECDSA)</strong> — security reduces to the discrete
+logarithm problem over an elliptic-curve group.</li>
+</ul>
+<p>All three are instances of the <strong>hidden-subgroup problem</strong> over abelian groups.</p>
+<h3 id="12-shors-algorithm-breaks-public-key-crypto">1.2 Shor's algorithm (breaks public-key crypto)<a class="anchor" href="#12-shors-algorithm-breaks-public-key-crypto" aria-label="Link to this section">#</a></h3>
+<p>Shor's algorithm factors <code>N = p·q</code> by reducing factoring to <strong>order-finding</strong>:
+for a random <code>a</code> coprime to <code>N</code>, find the period <code>r</code> of <code>f(x) = aˣ mod N</code>.
+Classically the period is exponentially hard to find; quantumly it is recovered
+efficiently using <strong>Quantum Phase Estimation (QPE)</strong> over a modular-exponentiation
+operator, followed by an inverse <strong>Quantum Fourier Transform (QFT)</strong>. Measurement
+yields an approximation of <code>s/r</code>; <strong>continued fractions</strong> recover <code>r</code>. If <code>r</code> is
+even and <code>a^(r/2) ≢ −1 (mod N)</code>, then <code>gcd(a^(r/2) ± 1, N)</code> are non-trivial
+factors. With <code>p</code> and <code>q</code> known, the RSA private exponent <code>d ≡ e⁻¹ (mod φ(N))</code>
+follows immediately. The identical machinery solves discrete logarithms, so DH,
+DSA, and ECC fall as well — <strong>at any key size</strong>. Larger keys do not help; they
+only add a polynomial number of qubits and gates.</p>
+<h3 id="13-grovers-algorithm-weakens-symmetric-crypto">1.3 Grover's algorithm (weakens symmetric crypto)<a class="anchor" href="#13-grovers-algorithm-weakens-symmetric-crypto" aria-label="Link to this section">#</a></h3>
+<p>Grover's algorithm finds a marked element in an unstructured space of size <code>N</code> in
+<code>≈ (π/4)√N</code> queries via amplitude amplification (an oracle reflection plus a
+diffuser). For a <code>k</code>-bit symmetric key, brute-force search drops from <code>2^k</code> to
+roughly <code>2^(k/2)</code> — a <strong>quadratic</strong>, not exponential, speedup. The practical
+consequence is that effective key strength is <em>halved</em>: AES-128 retains ~64 bits
+of quantum security (insufficient for long-lived data), while AES-256 retains
+~128 bits (still infeasible). The mitigation is to <strong>double sizes</strong> rather than
+replace the primitive: AES-128 → AES-256, SHA-256 → SHA-384/512.</p>
+<h3 id="14-hardware-reality-and-the-harvest-now-decrypt-later-threat">1.4 Hardware reality and the &quot;harvest now, decrypt later&quot; threat<a class="anchor" href="#14-hardware-reality-and-the-harvest-now-decrypt-later-threat" aria-label="Link to this section">#</a></h3>
+<p>No CRQC exists today. End-to-end Shor has only been demonstrated on tiny
+semiprimes (e.g. <code>N = 15</code>), and estimates for RSA-2048 require on the order of
+millions of noisy physical qubits with error correction (Gidney &amp; Ekerå, 2021).
+This gap is precisely why migration is urgent rather than premature: an adversary
+can <strong>record ciphertext today</strong> and decrypt it once hardware matures. Any secret
+that must remain confidential for 5–15 years is effectively exposed now.</p>
+<hr />
+<h2 id="2-threat-model">2. Threat model<a class="anchor" href="#2-threat-model" aria-label="Link to this section">#</a></h2>
+<p><strong>Assets.</strong> Long-lived confidential data, authentication keys, code-signing keys,
+and the integrity of TLS/PKI trust chains.</p>
+<p><strong>Adversary.</strong> A future adversary with access to a CRQC capable of running Shor at
+scale, who is <em>also</em> assumed to be capturing and archiving ciphertext in the
+present (a passive network adversary today, an active decryptor later).</p>
+<p><strong>In scope for QuantumSafe.</strong> Detecting source-level <em>usage</em> of quantum-vulnerable
+cryptographic primitives, ranking the resulting risk, and recommending NIST-PQC
+replacements. The platform also <em>demonstrates</em> the underlying attack (Shor/Grover
+on a simulator) and <em>implements</em> the defensive primitive (LWE-based KEM).</p>
+<p><strong>Out of scope.</strong> QuantumSafe is a security-awareness and triage tool. It does
+<strong>not</strong> perform runtime cryptographic analysis, key-management auditing,
+side-channel assessment, protocol verification, or certificate-chain inspection,
+and it is not a substitute for a professional cryptographic audit. Findings are
+heuristic; false positives and false negatives are possible (see §9).</p>
+<hr />
+<h2 id="3-system-architecture-overview">3. System architecture overview<a class="anchor" href="#3-system-architecture-overview" aria-label="Link to this section">#</a></h2>
+<p>QuantumSafe is organized as three conceptual layers over one shared detection
+engine:</p>
+<ol>
+<li><strong>Attack layer</strong> (<code>quantum/</code>) — Shor's and Grover's algorithms implemented in
+Qiskit and executed on a quantum simulator (Aer). This layer <em>justifies</em> the
+risk ratings the scanner assigns.</li>
+<li><strong>Detection layer</strong> (<code>cli/</code>, shared by the CLI and the API) — the static
+analysis engine: scanner → risk scorer → NIST recommender → multi-format
+reporter.</li>
+<li><strong>Defense layer</strong> (<code>pqc/</code>) — a from-scratch Learning-With-Errors (LWE) key
+encapsulation mechanism, the mathematical basis of CRYSTALS-Kyber / ML-KEM.</li>
+</ol>
+<p>These are delivered through three product surfaces that all consume the same
+detection engine: a <strong>CLI</strong> (<code>pip install quantumsafe-scan</code>), a <strong>Flask REST API</strong>, and
+a <strong>static web dashboard</strong>. A detailed component and data-flow description is in
+<a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/ARCHITECTURE.md">ARCHITECTURE.md</a>.</p>
+<hr />
+<h2 id="4-detection-engine-design-ast-regex-hybrid">4. Detection engine design (AST + regex hybrid)<a class="anchor" href="#4-detection-engine-design-ast-regex-hybrid" aria-label="Link to this section">#</a></h2>
+<p>The engine combines two complementary strategies to balance precision and
+language coverage:</p>
+<ul>
+<li><strong>AST analysis (Python).</strong> Python source is parsed with the standard-library
+<code>ast</code> module, allowing detection to resolve imports and call expressions rather
+than matching raw text. This yields high precision and reduces false positives
+from incidental substrings.</li>
+<li><strong>Regex analysis (all languages).</strong> For the remaining languages, the engine
+applies a curated set of anchored regular expressions. The same regex layer also
+backs Python as a secondary signal.</li>
+</ul>
+<p><strong>Supported languages (11).</strong> Python (AST + regex), JavaScript/TypeScript
+(incl. JSX/TSX/MJS/CJS), Java, Go, Ruby, C#, PHP, Rust, C/C++, Kotlin, Swift.</p>
+<p><strong>Detection families.</strong> Each rule belongs to a <em>family</em> — <code>rsa</code>, <code>ecc</code>, <code>dsa</code>,
+<code>dh</code>, <code>md5</code>, <code>sha1</code>, <code>tls_old</code>, <code>3des</code>, <code>rc4</code>, <code>sha256</code>, <code>aes128</code>, <code>tls12</code> — which
+is the key used to look up both the severity and the migration recommendation, so
+advice stays consistent across the CLI, API, and dashboard.</p>
+<p><strong>Precision controls.</strong></p>
+<ul>
+<li><strong>Comment-only lines are skipped</strong>, so crypto names mentioned in documentation
+do not produce findings.</li>
+<li><strong>Inline suppression</strong>: a <code># quantumsafe: ignore</code> comment (any comment syntax)
+on a line suppresses that line's findings.</li>
+<li><strong>Per-line / per-family de-duplication</strong>: multiple matches of the same family on
+the same line collapse to a single finding, ranked by severity, so totals are
+not inflated.</li>
+<li><strong>Anchored patterns / word boundaries</strong> prevent traps such as <code>md5sumLabel</code> or
+<code>dsaCount</code> from matching.</li>
+<li><strong>Size and directory guards</strong>: large/minified files (&gt;2 MB) and vendor
+directories (<code>node_modules</code>, <code>venv</code>, <code>dist</code>, …) are skipped.</li>
+</ul>
+<p><strong>Inputs.</strong> A local path, a single file, a public GitHub repository (shallow-cloned
+to a temporary directory and cleaned up), or an uploaded archive (via the API).</p>
+<hr />
+<h2 id="5-risk-scoring-model-0100">5. Risk scoring model (0–100)<a class="anchor" href="#5-risk-scoring-model-0100" aria-label="Link to this section">#</a></h2>
+<p>Each finding carries a severity (<code>HIGH</code>, <code>MEDIUM</code>, <code>LOW</code>). The aggregate <strong>Quantum
+Risk Score</strong> is computed directly from findings — never hardcoded:</p>
+<pre><code>score = min(100, 15·HIGH + 5·MEDIUM + 1·LOW)
+</code></pre>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Score</th>
+<th>Band</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0–30</td>
+<td>Low</td>
+<td>Good quantum hygiene</td>
+</tr>
+<tr>
+<td>31–60</td>
+<td>Medium</td>
+<td>Plan migration</td>
+</tr>
+<tr>
+<td>61–80</td>
+<td>High</td>
+<td>Prioritize migration</td>
+</tr>
+<tr>
+<td>81–100</td>
+<td>Critical</td>
+<td>Immediate action required</td>
+</tr>
+</tbody>
+</table></div>
+<p>The weighting reflects the qualitative difference between the two quantum threats:
+a HIGH finding (Shor-breakable; e.g. RSA, ECC) is weighted 15× a LOW finding
+(Grover-weakened but still secure; e.g. SHA-256, AES-128), because the former is
+catastrophic and the latter is a sizing concern. The cap at 100 keeps the score
+interpretable as a bounded severity index rather than an unbounded count.</p>
+<hr />
+<h2 id="6-quantum-attack-module-shor-grover">6. Quantum attack module (Shor + Grover)<a class="anchor" href="#6-quantum-attack-module-shor-grover" aria-label="Link to this section">#</a></h2>
+<p>The <code>quantum/</code> module runs the algorithms that <em>motivate</em> every HIGH and LOW
+rating, on a real quantum simulator (Qiskit Aer; the same circuits run on IBM
+Quantum hardware with a token).</p>
+<ul>
+<li><strong><code>shor.py</code></strong> implements quantum order-finding via QPE over modular
+exponentiation and an inverse QFT, factors <code>N = 15</code>, reconstructs the
+corresponding RSA private key, and decrypts a message — a concrete,
+end-to-end demonstration of why RSA/ECC are rated HIGH.</li>
+<li><strong><code>grover.py</code></strong> implements amplitude amplification to recover a hidden <code>k</code>-bit
+key in <code>≈ √(2^k)</code> iterations, demonstrating the quadratic speedup behind the
+LOW rating for symmetric primitives.</li>
+<li><strong><code>resources.py</code></strong> transpiles the circuits and reports qubit counts, circuit
+depth, and gate counts, contextualized against published RSA-2048 resource
+estimates.</li>
+</ul>
+<p><strong>Honest scope.</strong> These run at small scale (factoring 15), which is the genuine
+state of the art for end-to-end Shor. The gap to RSA-2048 is the entire reason
+post-quantum migration is a future-proofing exercise.</p>
+<hr />
+<h2 id="7-post-quantum-module-lwe-kyber-style">7. Post-quantum module (LWE / Kyber-style)<a class="anchor" href="#7-post-quantum-module-lwe-kyber-style" aria-label="Link to this section">#</a></h2>
+<p>The <code>pqc/</code> module implements the defensive primitive the scanner recommends, so
+the advice is runnable rather than merely named.</p>
+<p><code>lwe_kem.py</code> is a key-encapsulation mechanism built on the <strong>Learning With Errors
+(LWE)</strong> problem — the hardness assumption underlying CRYSTALS-Kyber / ML-KEM
+(FIPS 203):</p>
+<ul>
+<li><strong>Key generation.</strong> Secret <code>s ∈ Z_q^n</code>; public key <code>(A, b)</code> with <code>A</code> random and
+<code>b = A·s + e (mod q)</code> for a small error <code>e</code>. Recovering <code>s</code> is the LWE problem,
+provably as hard as worst-case lattice problems.</li>
+<li><strong>Encapsulation.</strong> To send a bit <code>μ</code>, choose a random 0/1 selector <code>r</code> and send
+<code>u = Aᵀr</code>, <code>v = bᵀr + μ·⌊q/2⌋</code>. A shared secret is many such bits, hashed with
+SHA-256.</li>
+<li><strong>Decapsulation.</strong> Compute <code>v − sᵀu = eᵀr + μ·⌊q/2⌋</code>; because <code>eᵀr</code> is small, the
+high bit recovers <code>μ</code>. With parameters <code>(n=256, m=512, q=4093)</code> the error stays
+far below <code>q/4</code>, so decryption is reliable — verified over 200+ exchanges with
+zero failures.</li>
+</ul>
+<p><strong>Why quantum computers do not break it.</strong> LWE has <strong>no periodic / hidden-subgroup
+structure</strong> for Shor to exploit; the best known quantum attacks give only modest
+speedups over classical lattice reduction, so the problem remains exponentially
+hard. This is exactly why NIST standardized lattice schemes (ML-KEM, ML-DSA).</p>
+<p><strong>Honest scope.</strong> This is a faithful teaching implementation of plain LWE — not
+constant-time or side-channel-hardened, and not the optimized Module-LWE + NTT +
+Fujisaki–Okamoto construction of production Kyber. Production systems should use
+vetted ML-KEM (e.g. <code>liboqs</code>). <code>benchmark.py</code> reports measured latency and
+key/ciphertext sizes against standardized RSA-2048 and ML-KEM-768 for context.</p>
+<hr />
+<h2 id="8-benchmark-methodology-and-results">8. Benchmark methodology and results<a class="anchor" href="#8-benchmark-methodology-and-results" aria-label="Link to this section">#</a></h2>
+<h3 id="81-corpus-design">8.1 Corpus design<a class="anchor" href="#81-corpus-design" aria-label="Link to this section">#</a></h3>
+<p>Detection quality is measured on a hand-labeled corpus rather than asserted.
+Ground truth (<code>benchmark/labels.json</code>) is defined at <strong>(file, detection-family)</strong>
+granularity:</p>
+<ul>
+<li><strong><code>benchmark/positive/</code></strong> — nine known-vulnerable files spanning nine languages
+(Python, Java, JavaScript, Go, C#, PHP, Swift, Rust, Ruby).</li>
+<li><strong><code>benchmark/negative/</code></strong> — three files of safe code plus <strong>adversarial
+decoys</strong>: crypto names that appear only in <em>comments</em>, and <strong>word-boundary
+traps</strong> (<code>md5sumLabel</code>, <code>rc4legacyName</code>, <code>dsaCount</code>) that must <em>not</em> match.</li>
+</ul>
+<h3 id="82-metric-definitions">8.2 Metric definitions<a class="anchor" href="#82-metric-definitions" aria-label="Link to this section">#</a></h3>
+<p>For the set of expected <code>(file, family)</code> pairs and the set the scanner detects:</p>
+<ul>
+<li><strong>Precision</strong> = TP / (TP + FP) — of what the scanner flagged, how much was real.</li>
+<li><strong>Recall</strong> = TP / (TP + FN) — of what was real, how much the scanner found.</li>
+<li><strong>F1</strong> = harmonic mean of precision and recall.</li>
+</ul>
+<p><code>benchmark/evaluate.py</code> runs the real scanner and prints the exact false
+positives and false negatives, so the numbers are auditable. The thresholds are
+enforced by <code>tests/test_benchmark.py</code>.</p>
+<h3 id="83-results-current-corpus">8.3 Results (current corpus)<a class="anchor" href="#83-results-current-corpus" aria-label="Link to this section">#</a></h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Files</td>
+<td>12 (9 positive, 3 negative/decoy)</td>
+</tr>
+<tr>
+<td>Languages</td>
+<td>9 (engine supports 11)</td>
+</tr>
+<tr>
+<td>Labeled findings</td>
+<td>24</td>
+</tr>
+<tr>
+<td>True positives</td>
+<td>24</td>
+</tr>
+<tr>
+<td>False positives</td>
+<td>0</td>
+</tr>
+<tr>
+<td>False negatives</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>Precision</strong></td>
+<td><strong>100%</strong></td>
+</tr>
+<tr>
+<td><strong>Recall</strong></td>
+<td><strong>100%</strong></td>
+</tr>
+<tr>
+<td><strong>F1</strong></td>
+<td><strong>100%</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>The comment decoys yield zero false positives because the engine skips
+comment-only lines; the word-boundary traps are excluded by anchored patterns.
+Per-family and severity distributions, plus reproducible charts, are in
+<a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/../benchmark/RESULTS.md">../benchmark/RESULTS.md</a>.</p>
+<h3 id="84-empirical-study">8.4 Empirical study<a class="anchor" href="#84-empirical-study" aria-label="Link to this section">#</a></h3>
+<p>Scanning eight widely-used open-source projects (<code>study/</code>, reproducible via
+<code>python study/run_study.py</code>) found <strong>88%</strong> contained at least one HIGH-risk
+(Shor-breakable) primitive, with an average Quantum Risk Score of <strong>72.9/100</strong>.
+The most common quantum-vulnerable primitives were RSA, ECC, legacy TLS, and
+MD5/SHA-1.</p>
+<hr />
+<h2 id="9-limitations">9. Limitations<a class="anchor" href="#9-limitations" aria-label="Link to this section">#</a></h2>
+<p>These are the genuine edges of a static, pattern-based approach and are stated
+plainly:</p>
+<ul>
+<li><strong>Heuristic, not a proof.</strong> QuantumSafe detects <em>usage patterns</em>; it does not
+prove a primitive is reachable, exploitable, or even live code.</li>
+<li><strong>Regex outside Python.</strong> Only Python receives AST-level precision. Other
+languages are regex-based, so unconventional crypto wrappers, aliasing, or
+dynamic dispatch can produce false negatives.</li>
+<li><strong>Comments and string literals.</strong> Comment-<em>only</em> lines are skipped, but a crypto
+name in a <em>trailing</em> comment or inside a string literal can still false-positive;
+block comments are only partially handled.</li>
+<li><strong>No dependency / transitive analysis.</strong> Cryptography invoked indirectly through
+third-party libraries (rather than named in the scanned source) is not detected
+— which is also why a clean scan is not a guarantee of safety.</li>
+<li><strong>Benchmark scale.</strong> The labeled corpus (12 files, 24 findings) is a regression
+benchmark, not a large-scale field study; 100% on it is not a claim of 100% on
+arbitrary code.</li>
+<li><strong>Demonstration scale.</strong> Shor runs on <code>N = 15</code> and Grover on small key spaces —
+the real-world state of the art, not production attacks.</li>
+<li><strong>Teaching-grade PQC.</strong> The LWE KEM demonstrates the mathematics; it is not
+production-hardened cryptography.</li>
+</ul>
+<hr />
+<h2 id="10-future-work">10. Future work<a class="anchor" href="#10-future-work" aria-label="Link to this section">#</a></h2>
+<ul>
+<li><strong>Tree-sitter / multi-language AST.</strong> Replace regex for non-Python languages
+with concrete-syntax-tree parsing to recover AST-level precision across the
+board.</li>
+<li><strong>Dependency-aware detection.</strong> Resolve cryptographic usage through imported
+libraries and package manifests, not only first-party source.</li>
+<li><strong>Data-flow and reachability.</strong> Distinguish live, reachable cryptographic calls
+from dead code and test fixtures to sharpen the risk score.</li>
+<li><strong>Hybrid-PQC guidance.</strong> Emit concrete hybrid (classical + PQC) migration
+recipes per protocol context (TLS, SSH, code signing).</li>
+<li><strong>Production KEM binding.</strong> Offer an optional binding to vetted ML-KEM
+(<code>liboqs</code>) alongside the teaching implementation.</li>
+<li><strong>Expanded corpus and field study.</strong> Grow the labeled benchmark and run a
+larger, statistically framed study across more ecosystems.</li>
+</ul>
+<hr />
+<h2 id="references">References<a class="anchor" href="#references" aria-label="Link to this section">#</a></h2>
+<ol>
+<li>P. W. Shor, &quot;Polynomial-Time Algorithms for Prime Factorization and Discrete
+Logarithms on a Quantum Computer,&quot; <em>SIAM J. Computing</em>, 1997.</li>
+<li>L. K. Grover, &quot;A fast quantum mechanical algorithm for database search,&quot;
+<em>STOC</em>, 1996.</li>
+<li>O. Regev, &quot;On lattices, learning with errors, random linear codes, and
+cryptography,&quot; <em>J. ACM</em>, 2009.</li>
+<li>J. Bos et al., &quot;CRYSTALS-Kyber: a CCA-secure module-lattice-based KEM,&quot;
+<em>IEEE EuroS&amp;P</em>, 2018.</li>
+<li>C. Gidney and M. Ekerå, &quot;How to factor 2048-bit RSA integers in 8 hours using
+20 million noisy qubits,&quot; <em>Quantum</em>, 2021.</li>
+<li>NIST, <strong>FIPS 203</strong> (ML-KEM), <strong>FIPS 204</strong> (ML-DSA), <strong>FIPS 205</strong> (SLH-DSA),
+Post-Quantum Cryptography Standards, 2024.</li>
+<li>NIST <strong>IR 8547</strong>, Transition to Post-Quantum Cryptography Standards.</li>
+</ol>
+
+  </article>
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <p class="eyebrow">On this document</p>
+    <p>
+      Rendered from <a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/docs/WHITEPAPER.md"><code>docs/WHITEPAPER.md</code></a> in the
+      QuantumSafe Scan repository, so this page, the PDF and the code stay in step.
+      <a href="../reports.html">All reports &rarr;</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  function currentlyDark() {
+    var t = root.getAttribute('data-theme');
+    return t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.themebtn'), function (b) {
+    b.addEventListener('click', function () {
+      var next = currentlyDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) { /* private mode */ }
+    });
+  });
+})();
+</script>
+</body>
+</html>

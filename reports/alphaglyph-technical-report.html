@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AlphaGlyph — Technical Report — Dan Lichtenberger</title>
+<meta name="description" content="Signal generation, the risk layer, and the live trading loop.">
+<meta name="author" content="Dan Lichtenberger">
+<link rel="canonical" href="https://danny-397.github.io/reports/alphaglyph-technical-report.html">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dan Lichtenberger">
+<meta property="og:url" content="https://danny-397.github.io/reports/alphaglyph-technical-report.html">
+<meta property="og:title" content="AlphaGlyph — Technical Report">
+<meta property="og:description" content="Signal generation, the risk layer, and the live trading loop.">
+<meta property="og:image" content="https://danny-397.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AlphaGlyph — Technical Report — Dan Lichtenberger">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AlphaGlyph — Technical Report">
+<meta name="twitter:description" content="Signal generation, the risk layer, and the live trading loop.">
+<meta name="twitter:image" content="https://danny-397.github.io/og-image.png">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1319'/><text x='50' y='54' font-size='58' font-family='Georgia,serif' fill='%237FA6E8' text-anchor='middle' dominant-baseline='central'>D</text></svg>">
+<script>document.documentElement.className += " js";
+/* Apply the saved theme before first paint, as index.html and reports.html do. */
+try { var savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light')
+        document.documentElement.setAttribute('data-theme', savedTheme); }
+catch (e) { /* private mode */ }</script>
+<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="../report.css">
+<script src="../analytics.js" defer></script>
+</head>
+<body>
+
+<a class="skip" href="#doc">Skip to the report</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="name" href="../index.html">Dan Lichtenberger</a>
+    <nav>
+      <a href="../index.html">Work</a>
+      <a href="../reports.html" aria-current="page">Reports</a>
+      <a href="https://github.com/Danny-397/Danny-397">GitHub</a>
+      <button type="button" class="themebtn" aria-label="Switch between light and dark">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g class="i-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></g>
+          <g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></g>
+        </svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="doc" class="wrap doc">
+  <p class="eyebrow">AlphaGlyph &middot; technical report</p>
+  <h1>AlphaGlyph — Technical Report</h1>
+  <p class="standfirst">Signal generation, the risk layer, and the live trading loop.</p>
+  <p class="doclinks">
+    <a class="doclink" href="https://github.com/Danny-397/Alphaglyph/blob/main/docs/technical-report.md">Source markdown &nearr;</a>
+    <a class="doclink" href="AlphaGlyph-Technical-Report.pdf">PDF &darr;</a>
+  </p>
+  <nav class="toc" aria-label="Sections">
+    <p class="eyebrow">Sections</p>
+    <ol>
+      <li><a href="#summary">Summary</a></li>
+      <li><a href="#1-the-problem-a-backtest-is-a-contaminated-experiment">1. The problem: a backtest is a contaminated experiment</a></li>
+      <li><a href="#2-the-demonstration-the-data-mining-lab">2. The demonstration: the Data-Mining Lab</a></li>
+      <li><a href="#3-probabilistic-and-deflated-sharpe-ratios">3. Probabilistic and Deflated Sharpe Ratios</a></li>
+      <li><a href="#4-cpcv-and-the-probability-of-backtest-overfitting">4. CPCV and the Probability of Backtest Overfitting</a></li>
+      <li><a href="#5-factor-decomposition">5. Factor decomposition</a></li>
+      <li><a href="#6-calibration-and-the-forward-ledger">6. Calibration and the forward ledger</a></li>
+      <li><a href="#7-results">7. Results</a></li>
+      <li><a href="#8-limitations">8. Limitations</a></li>
+      <li><a href="#9-reproducing">9. Reproducing</a></li>
+      <li><a href="#10-references">10. References</a></li>
+    </ol>
+  </nav>
+  <article class="prose-doc">
+<p><strong>A backtesting laboratory built to measure how much its own results should be believed.</strong></p>
+<hr />
+<h2 id="summary">Summary<a class="anchor" href="#summary" aria-label="Link to this section">#</a></h2>
+<p>Any strategy that looks good in a backtest looks good for one of two reasons: it
+found something real, or it was the luckiest of the many variants that were tried.
+The backtest itself cannot tell you which. That ambiguity is not a detail — it is
+the central problem of quantitative finance, and most tooling ignores it entirely.</p>
+<p>AlphaGlyph is a backtesting engine with the second question built in. It simulates
+strategies on real historical prices, then subjects every result to the statistical
+tests that quantify selection bias: the Probabilistic and Deflated Sharpe Ratios,
+Combinatorially-Symmetric Cross-Validation for the Probability of Backtest
+Overfitting, Fama-French factor decomposition, and a forward-only prediction ledger
+that cannot be retroactively edited.</p>
+<p>Pointed at its own strategy grid, the system reports a <strong>72% probability of backtest
+overfitting</strong> (SPY, run 2026-08-01) — the in-sample winner lands in the bottom half
+out-of-sample more often than not. That is the headline result, and it is a negative
+one.</p>
+<ul>
+<li>15 REST endpoints, 169 automated tests in CI</li>
+<li>Indicators implemented from first principles (SMA, EMA, RSI, MACD, ADX, Bollinger)</li>
+<li>Live at <a href="https://alphaglyph.org">alphaglyph.org</a></li>
+</ul>
+<hr />
+<h2 id="1-the-problem-a-backtest-is-a-contaminated-experiment">1. The problem: a backtest is a contaminated experiment<a class="anchor" href="#1-the-problem-a-backtest-is-a-contaminated-experiment" aria-label="Link to this section">#</a></h2>
+<p>A backtest looks like an experiment, but it usually violates the rule that makes
+experiments meaningful: the hypothesis is chosen after seeing the data.</p>
+<p>The mechanism is simple. Suppose you test 42 variants of a moving-average strategy
+and keep the one with the best Sharpe ratio. Even if none of the 42 has any genuine
+edge, the <em>maximum</em> of 42 noisy estimates is systematically above zero. You will
+always find a winner. Its in-sample Sharpe is not an estimate of its true
+performance — it is an estimate of true performance <em>plus a selection premium</em>, and
+nothing in the backtest separates the two.</p>
+<p>The standard response is to report the winner's Sharpe ratio and move on. AlphaGlyph
+treats that as the bug, and the rest of this report describes the instrumentation
+built to measure it.</p>
+<hr />
+<h2 id="2-the-demonstration-the-data-mining-lab">2. The demonstration: the Data-Mining Lab<a class="anchor" href="#2-the-demonstration-the-data-mining-lab" aria-label="Link to this section">#</a></h2>
+<p>Before arguing that selection bias is severe, the system demonstrates it on
+strategies that are <em>known</em> to have no edge.</p>
+<p><code>backend/datamining.py</code> generates N random long/flat timing strategies on a real
+price series. Each goes long on a random ~50% of days. By construction, none of them
+contains any information about future prices — every one is a coin flip.</p>
+<p>The lab then backtests all N, keeps the single best Sharpe ratio, and reports two
+verdicts side by side:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Verdict</th>
+<th>What it assumes</th>
+<th>Typical result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Naive PSR</strong></td>
+<td>the winner was the only strategy tried</td>
+<td>often &quot;significant&quot;</td>
+</tr>
+<tr>
+<td><strong>Deflated Sharpe</strong></td>
+<td>N strategies were tried; corrects for it</td>
+<td>&quot;not significant&quot;</td>
+</tr>
+</tbody>
+</table></div>
+<p>The gap between those two numbers is the entire lesson. The winning strategy is
+100% luck — this is guaranteed by how it was generated — yet naive statistics
+frequently call it significant. The expected maximum Sharpe of N noise strategies
+is drawn on the histogram, and the winner sits exactly where chance predicts.</p>
+<p>This is the argument the rest of the system is built to act on: <strong>a Sharpe ratio is
+meaningless without knowing how many were tried to find it.</strong></p>
+<hr />
+<h2 id="3-probabilistic-and-deflated-sharpe-ratios">3. Probabilistic and Deflated Sharpe Ratios<a class="anchor" href="#3-probabilistic-and-deflated-sharpe-ratios" aria-label="Link to this section">#</a></h2>
+<p>Implemented in <code>backend/stats.py</code>, following López de Prado (2014).</p>
+<h3 id="31-psr">3.1 PSR<a class="anchor" href="#31-psr" aria-label="Link to this section">#</a></h3>
+<p>The naive Sharpe ratio assumes returns are normal and the sample is large. Financial
+returns are neither — they are skewed and fat-tailed, which makes the Sharpe estimate
+noisier than it appears. PSR returns the probability that the <em>true</em> Sharpe exceeds a
+benchmark, correcting for both:</p>
+<pre><code>PSR(SR*) = Φ[ (SR̂ − SR*) · √(T−1) / √(1 − γ₃·SR̂ + (γ₄−1)/4 · SR̂²) ]
+</code></pre>
+<p>where γ₃ is skewness and γ₄ raw kurtosis. Since SciPy reports <em>excess</em> kurtosis,
+the implementation uses <code>(excess + 2)/4</code>, which is the same quantity. All Sharpe
+values are held in daily units internally and converted only at the boundary — a
+detail that is easy to get wrong and silently changes the answer.</p>
+<h3 id="32-dsr">3.2 DSR<a class="anchor" href="#32-dsr" aria-label="Link to this section">#</a></h3>
+<p>The Deflated Sharpe Ratio is PSR with the benchmark raised to the Sharpe you would
+expect from the luckiest of N independent trials:</p>
+<pre><code>SR*_annual = E[max Z_k] · √(252 / T)
+</code></pre>
+<p><code>E[max Z_k]</code> uses the standard Euler-Mascheroni approximation to the expected maximum
+of N unit normals.</p>
+<p>The <code>√(252/T)</code> scaling matters and is frequently omitted in third-party
+implementations. The expected maximum is expressed in units of the <em>sampling
+distribution</em> of the Sharpe estimate, whose width depends on how many observations
+you have. Without rescaling for T, the deflation is applied at the wrong magnitude and
+the test is miscalibrated. With <code>n_strategies = 1</code>, DSR reduces exactly to PSR against
+a zero benchmark, which is the correct degenerate case and is asserted in the tests.</p>
+<hr />
+<h2 id="4-cpcv-and-the-probability-of-backtest-overfitting">4. CPCV and the Probability of Backtest Overfitting<a class="anchor" href="#4-cpcv-and-the-probability-of-backtest-overfitting" aria-label="Link to this section">#</a></h2>
+<p><code>backend/cpcv.py</code>. Method from Bailey, Borwein, López de Prado &amp; Zhu (2017), via
+Combinatorially-Symmetric Cross-Validation.</p>
+<h3 id="41-the-strategy-grid">4.1 The strategy grid<a class="anchor" href="#41-the-strategy-grid" aria-label="Link to this section">#</a></h3>
+<p>The grid is deliberately made of strategies people actually tune, not strawmen:</p>
+<ul>
+<li><strong>Trend-following</strong> — long when fast SMA &gt; slow SMA, else flat. Fast ∈ {5, 10, 15,
+20, 30, 40}, slow ∈ {50, 80, 100, 150, 200}, keeping only fast &lt; slow → 30 variants.</li>
+<li><strong>Mean-reversion</strong> — stateful RSI entry/exit: enter below a buy threshold, exit
+above 55. Period ∈ {7, 14, 21}, threshold ∈ {25, 30, 35, 40} → 12 variants.</li>
+</ul>
+<p><strong>42 variants total.</strong> Positions are shifted one day, so a decision made on the close
+of day <em>t</em> is held over <em>t → t+1</em>. There is no look-ahead. The first 205 rows are
+dropped to clear the longest indicator's warm-up.</p>
+<h3 id="42-the-procedure">4.2 The procedure<a class="anchor" href="#42-the-procedure" aria-label="Link to this section">#</a></h3>
+<ol>
+<li>Build a T×N matrix of per-period returns, one column per variant.</li>
+<li>Split the T rows into S contiguous groups (S even, clamped to 6–12; C(12,6) = 924
+combinations is the computational ceiling).</li>
+<li>For every way of choosing S/2 groups as in-sample:
+<ul>
+<li>pick the variant with the best in-sample Sharpe, <code>n*</code></li>
+<li>find <code>n*</code>'s <strong>rank</strong> among all variants out-of-sample</li>
+<li>ω = rank / (N+1); logit λ = ln(ω / (1−ω))</li>
+</ul>
+</li>
+<li><strong>PBO</strong> = the fraction of splits where λ ≤ 0 — i.e. the in-sample champion lands in
+the bottom half out-of-sample.</li>
+</ol>
+<p>A PBO near 0.5 means selection told you nothing at all.</p>
+<h3 id="43-purging-and-embargo">4.3 Purging and embargo<a class="anchor" href="#43-purging-and-embargo" aria-label="Link to this section">#</a></h3>
+<p>Financial returns are serially correlated, so an in-sample block sitting immediately
+adjacent to an out-of-sample block can leak its edge straight across the seam. The
+implementation trims <code>embargo</code> rows from each end of every in-sample block — and
+critically, <strong>only</strong> from the in-sample side. Trimming both would discard
+out-of-sample data that is legitimately available and bias the result optimistically.</p>
+<h3 id="44-degenerate-columns">4.4 Degenerate columns<a class="anchor" href="#44-degenerate-columns" aria-label="Link to this section">#</a></h3>
+<p>A variant that stays flat across an entire block has zero variance and therefore an
+undefined Sharpe. These are assigned <code>-inf</code> so they can never be selected as the
+in-sample champion, and are filtered out before the degradation regression, medians
+and scatter. Silently letting a no-trade outcome count as a performance figure would
+distort every downstream statistic — this is the kind of edge case that turns a
+correct method into a wrong number.</p>
+<h3 id="45-what-it-also-reports">4.5 What it also reports<a class="anchor" href="#45-what-it-also-reports" aria-label="Link to this section">#</a></h3>
+<ul>
+<li><strong>Performance degradation</strong> — OLS of OOS Sharpe on IS Sharpe. A slope well below 1
+means the in-sample edge mostly evaporates.</li>
+<li><strong>Probability of OOS loss</strong> — how often the selected strategy actually loses money.</li>
+<li>Logit histogram, IS-vs-OOS scatter, and a split diagram for the interface.</li>
+</ul>
+<hr />
+<h2 id="5-factor-decomposition">5. Factor decomposition<a class="anchor" href="#5-factor-decomposition" aria-label="Link to this section">#</a></h2>
+<p>A strategy can post real returns and still have no alpha, if it is merely capturing
+well-known risk premia that a passive factor ETF sells for a few basis points.
+<code>fama_french_decomposition</code> regresses daily excess returns on the three Fama-French
+factors:</p>
+<pre><code>R_p − R_f = α + β_mkt(R_m − R_f) + β_smb·SMB + β_hml·HML + ε
+</code></pre>
+<p>and reports Jensen's alpha annualised, factor loadings, R², and per-coefficient
+t-statistics. Factors are the real daily series from Ken French's data library, not
+a proxy.</p>
+<p><strong>An engineering note worth recording:</strong> this test kept intermittently reporting
+&quot;n/a&quot; in production. Two causes, both environmental rather than statistical — Ken
+French had moved the file from <code>/data_library/</code> to <code>/ftp/</code>, and Dartmouth blocks the
+default <code>python-requests</code> user agent from some cloud IPs. The fix was a browser-like
+UA, both URLs tried in order, retries with backoff, and a disk cache of the last good
+copy as an offline fallback. A statistical test is only as reliable as its data
+pipeline, and this one was failing for reasons that had nothing to do with
+statistics.</p>
+<hr />
+<h2 id="6-calibration-and-the-forward-ledger">6. Calibration and the forward ledger<a class="anchor" href="#6-calibration-and-the-forward-ledger" aria-label="Link to this section">#</a></h2>
+<p>Two components address a claim the backtest cannot make: whether the forecaster's
+<em>probabilities</em> are honest.</p>
+<p><strong><code>calibration.py</code></strong> — the model emits statements like &quot;~58% chance of an up move.&quot;
+A forecaster is well-calibrated when, across every day it said 60%, the market
+actually rose about 60% of the time. Predictions are binned into deciles to produce a
+reliability diagram and scored with Brier score and log loss, each against a
+&quot;always predict the base rate&quot; baseline so the number means something.</p>
+<p><strong><code>ledger.py</code></strong> — the harder test. Every directional call is written to an
+append-only table <em>at the moment it is made</em>, with price, p_up, direction and horizon.
+Once the horizon elapses, the row is graded against what actually happened. <strong>Nothing
+is ever edited or deleted.</strong> The resulting hit rate and Brier score are a genuine
+forward record that cannot be retro-fitted.</p>
+<p>Calibration measures the model on historical out-of-sample data already in hand; the
+ledger measures it on the future, one real day at a time. Grading is lazy — a plain
+GET matures any elapsed rows, so the record stays current without a cron job.</p>
+<hr />
+<h2 id="7-results">7. Results<a class="anchor" href="#7-results" aria-label="Link to this section">#</a></h2>
+<blockquote>
+<p><strong>Reproduce before citing.</strong> CPCV runs live against a rolling window of fetched
+price data, so PBO is a function of the window it was run on. Every figure below
+carries the date it was produced.</p>
+</blockquote>
+<p><strong>CPCV on SPY — 42 variants, 10 groups, 252 splits, 1,050 rows after warm-up,
+embargo 5. Run 2026-08-01:</strong></p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+<th>Reading</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Probability of backtest overfitting</td>
+<td><strong>72%</strong></td>
+<td>selection is worse than a coin flip</td>
+</tr>
+<tr>
+<td>Median in-sample Sharpe</td>
+<td><strong>1.26</strong></td>
+<td>looks like a good strategy</td>
+</tr>
+<tr>
+<td>Median out-of-sample Sharpe</td>
+<td><strong>0.65</strong></td>
+<td>~52% of the edge survives</td>
+</tr>
+<tr>
+<td>IS→OOS degradation slope</td>
+<td><strong>−0.59</strong></td>
+<td>see below</td>
+</tr>
+<tr>
+<td>Probability of OOS loss</td>
+<td><strong>5%</strong></td>
+<td>it rarely <em>loses</em> money</td>
+</tr>
+<tr>
+<td>ML forecaster test AUC</td>
+<td><strong>≈0.51</strong></td>
+<td>a coin flip on next-week direction</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="the-window-dependence-is-itself-a-result">The window-dependence is itself a result<a class="anchor" href="#the-window-dependence-is-itself-a-result" aria-label="Link to this section">#</a></h3>
+<p>An earlier run of the identical procedure reported <strong>PBO 63%</strong> with <strong>~38%</strong> Sharpe
+retention. This run reports <strong>72%</strong> and <strong>~52%</strong>. Same code, same grid, same ticker —
+a different rolling window.</p>
+<p>That instability is not a defect in the measurement; it is the measurement working.
+A single PBO number is a statement about one window, and anyone quoting it as a fixed
+property of a strategy has made the same category error the metric exists to catch.
+This report therefore dates every figure.</p>
+<h3 id="the-degradation-slope-is-negative">The degradation slope is negative<a class="anchor" href="#the-degradation-slope-is-negative" aria-label="Link to this section">#</a></h3>
+<p>The regression of out-of-sample Sharpe on in-sample Sharpe has a slope of <strong>−0.59</strong>.
+A slope near 1 would mean in-sample performance predicts out-of-sample performance; a
+slope near 0 would mean it predicts nothing.</p>
+<p>A <em>negative</em> slope means the relationship is inverted — across these splits, the
+variants that looked best in-sample tended to do <strong>worse</strong> out-of-sample. Selecting
+on in-sample Sharpe was actively worse than selecting at random.</p>
+<h3 id="what-the-5-oos-loss-rate-means">What the 5% OOS-loss rate means<a class="anchor" href="#what-the-5-oos-loss-rate-means" aria-label="Link to this section">#</a></h3>
+<p>Worth stating precisely, because it is easy to over-claim. The selected strategy loses
+money out-of-sample only about 5% of the time. The failure is not that these
+strategies are ruinous — it is that <strong>choosing among them on in-sample performance
+does not identify the good ones.</strong> The money is mostly fine; the selection procedure
+is what's worthless.</p>
+<p><strong>The one clean positive:</strong> a dip-buying strategy on AAPL/MSFT over 2021–2024 in
+ranging markets returned <strong>+21.8%</strong> against SPY's <strong>+5.6%</strong> — an excess of +16.3
+percentage points. Reported with the regime condition attached, because the condition
+is load-bearing: it is not a claim that the strategy works in general.</p>
+<p>The AUC of 0.51 is worth stating plainly. The machine-learning forecaster, which took
+the most work to build, cannot predict next-week direction. It is reported at 0.51
+rather than quietly dropped, because a system whose entire premise is honest
+measurement does not get to hide its own null results.</p>
+<hr />
+<h2 id="8-limitations">8. Limitations<a class="anchor" href="#8-limitations" aria-label="Link to this section">#</a></h2>
+<ul>
+<li><strong>PBO is window-dependent.</strong> A single PBO figure describes one data window and one
+grid. It is not a universal constant.</li>
+<li><strong>The grid is only two strategy families.</strong> Trend and mean-reversion are
+representative of what retail practitioners tune, but a wider grid could produce a
+different number.</li>
+<li><strong>CSCV assumes reasonably comparable variants.</strong> With a grid mixing wildly different
+exposure profiles, rank-based comparison is less meaningful.</li>
+<li><strong>Transaction costs are modelled, not measured.</strong> Real fills, slippage and market
+impact are not simulated.</li>
+<li><strong>The forward ledger is young.</strong> A track record is only as good as its length, and
+this one accrues one day at a time.</li>
+</ul>
+<hr />
+<h2 id="9-reproducing">9. Reproducing<a class="anchor" href="#9-reproducing" aria-label="Link to this section">#</a></h2>
+<pre><code class="language-bash">git clone https://github.com/Danny-397/Alphaglyph
+cd Alphaglyph/backend
+pip install -r requirements.txt
+pytest                     # 169 tests
+python app.py              # http://localhost:5000
+</code></pre>
+<p>Architecture: the browser holds all UI state and the backend is a stateless compute
+layer; the ML model is trained offline and shipped as a portable ONNX artifact. Data
+resolves through a three-stage cascade — Tiingo, then yfinance, then Stooq — so a
+single upstream outage does not take the system down.</p>
+<hr />
+<h2 id="10-references">10. References<a class="anchor" href="#10-references" aria-label="Link to this section">#</a></h2>
+<ol>
+<li>Bailey, D. H., Borwein, J. M., López de Prado, M., &amp; Zhu, Q. J. <em>The Probability of
+Backtest Overfitting.</em> <strong>Journal of Computational Finance, 20(4), 39–70 (2017).</strong>
+Circulated as an SSRN working paper from 2014; the 2014 date commonly cited refers
+to that preprint, not the journal publication.</li>
+<li>Bailey, D. H., &amp; López de Prado, M. (2014). <em>The Deflated Sharpe Ratio: Correcting
+for Selection Bias, Backtest Overfitting and Non-Normality.</em> <strong>Journal of Portfolio
+Management, 40(5), 94–107.</strong></li>
+<li>Fama, E. F., &amp; French, K. R. (1993). <em>Common Risk Factors in the Returns on Stocks
+and Bonds.</em> <strong>Journal of Financial Economics, 33(1), 3–56.</strong></li>
+</ol>
+<p><em>Citations verified against publication records on 2026-08-01.</em></p>
+
+  </article>
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <p class="eyebrow">On this document</p>
+    <p>
+      Rendered from <a href="https://github.com/Danny-397/Alphaglyph/blob/main/docs/technical-report.md"><code>docs/technical-report.md</code></a> in the
+      AlphaGlyph repository, so this page, the PDF and the code stay in step.
+      <a href="../reports.html">All reports &rarr;</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  function currentlyDark() {
+    var t = root.getAttribute('data-theme');
+    return t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.themebtn'), function (b) {
+    b.addEventListener('click', function () {
+      var next = currentlyDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) { /* private mode */ }
+    });
+  });
+})();
+</script>
+</body>
+</html>

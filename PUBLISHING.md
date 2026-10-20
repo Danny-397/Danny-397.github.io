@@ -128,10 +128,17 @@ and so on), so this runs locally and the output HTML is committed — exactly ho
 the PDFs are already handled. There is no build step on GitHub Pages. Re-run it
 after editing any report's markdown, or the committed HTML goes stale.
 
-Eight of the nine documents are built this way. **RL-Trader's paper is not**: its
-source is LaTeX (`paper/rl_trader.tex`), which needs different tooling and a
-lossier conversion, so that one stays PDF-only and `reports.html` still links the
-PDF directly for it.
+All nine documents are built this way, including RL-Trader's paper. That one's
+source is LaTeX, so it goes through an extra step first: run
+`python tools/paper_to_markdown.py` in the RL-for-Crypto repo to produce
+`paper/rl_trader.md`, then build here as usual. That script exists because
+pandoc alone drops the abstract, every citation and the figure path — see its
+docstring. Re-run it whenever the .tex changes.
+
+A report may also declare `assets` in the manifest (relative paths its markdown
+references, e.g. `figures/fig_ablation.png`). Those are copied into `reports/`
+keeping the same relative path, so the `<img>` resolves without rewriting the
+markdown.
 
 Each page links the PDF beside it, and every `##` section gets an `id` and a
 hover anchor, so a reader can be sent straight to a limitations section instead

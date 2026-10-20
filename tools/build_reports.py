@@ -45,7 +45,7 @@ GITHUB = "https://github.com/Danny-397"
 class Report:
     """One report: where its markdown lives, and how to present it."""
 
-    def __init__(self, slug, title, project, repo, source, pdf, blurb):
+    def __init__(self, slug, title, project, repo, source, pdf, blurb, assets=()):
         self.slug = slug
         self.title = title
         self.project = project
@@ -53,6 +53,10 @@ class Report:
         self.source = source      # path within the repo
         self.pdf = pdf            # filename in reports/
         self.blurb = blurb
+        # Files the markdown references by relative path (figures). Copied into
+        # reports/ alongside the page, keeping the same relative path, so the
+        # <img> resolves without rewriting the source.
+        self.assets = tuple(assets)
 
     @property
     def src_path(self) -> Path:
@@ -68,6 +72,11 @@ class Report:
 
 # Order matches reports.html.
 REPORTS = [
+    Report("rl-trader-paper", "Generalization and Evaluation Rigor in Deep RL", "RL-Trader",
+           "RL-for-Crypto-and-stocks-", "paper/rl_trader.md", "RL-Trader-Paper.pdf",
+           "The full paper: PPO from scratch, domain randomization, and a multi-seed "
+           "protocol whose headline result is negative.",
+           assets=("figures/fig_ablation.png",)),
     Report("research-summary", "Research Summary", "All six projects",
            ".", "research-summary.md", "Research-Summary.pdf",
            "One page across all six projects: what each claimed, and what the numbers said."),
@@ -340,6 +349,16 @@ def main() -> int:
         out = OUT_DIR / f"{r.slug}.html"
         out.write_text(build(r, built, renderer), encoding="utf-8", newline="")
         print(f"  {out.relative_to(SITE)}  ({out.stat().st_size // 1024} KB)")
+
+        for rel in r.assets:
+            src = r.src_path.parent / rel
+            dst = OUT_DIR / rel
+            if not src.exists():
+                print(f"    MISSING ASSET  {src}", file=sys.stderr)
+                continue
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_bytes(src.read_bytes())
+            print(f"    + {dst.relative_to(SITE)}  ({dst.stat().st_size // 1024} KB)")
 
     print(f"built {len(built)} report page(s)")
     return 1 if missing else 0

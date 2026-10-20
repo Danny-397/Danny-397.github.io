@@ -91,23 +91,21 @@ first frame of any Neural Canvas capture before committing it.
 
 ## Service status
 
-`index.html` tags each project with its real status. Tradeski's backend
-(`tradeski.onrender.com`) currently answers `503 — This service has been
-suspended by its owner`, so its record carries a `tag warn` chip and an
-"Honest status" note instead of a green live dot. **If the backend is restored,
-change that chip back to `tag live`, drop the `.caveat` paragraph, and re-shoot
-`tradeski-dashboard.webp` from the live `/app`.** Re-check the other five before
-any significant edit; the ledger claims all six resolve.
+`index.html` tags each project with its real status.
 
-QuantumSafe's hosted API (`quantumsafe-api.onrender.com`) does not answer
-either — it accepts the TCP connection and then never replies (measured at 62
-minutes, so it is a dead service rather than a cold start). Its record keeps the
-`tag live` chip, because quantumsafescan.com *is* live and the snippet scanner
-in the screenshot runs wholly in the browser; only the whole-repo/`.zip` path
-needs the backend. It carries a `.caveat` instead. **If that service is
-restored, drop the `.caveat` and restore the plain claim in the figcaption.**
+As of 2026-10-20 all six resolve and all four Render backends answer, so every
+record carries a plain `tag live` chip and there are no `.caveat` paragraphs.
+Tradeski and QuantumSafe were both down earlier in October -- Tradeski suspended,
+QuantumSafe's API accepting connections and never replying -- and each carried an
+honest-status note until the service came back.
 
-Both outages trace to the same cause: Render's 750 free instance-hours are per
+If one goes down again: give that record a `tag warn` chip and a `.caveat`
+paragraph saying what still works and what does not, rather than leaving a `live`
+chip on a dead link. Tradeski's dashboard falls back to a recorded snapshot
+(`frontend/demo-snapshot.js`) and QuantumSafe's home page keeps its in-browser
+snippet scanner, so in both cases something real remains to point at.
+
+Both outages traced to the same cause: Render's 750 free instance-hours are per
 *workspace* per month, shared across all four backends, and running them out
 suspends every free service. See `Alphaglyph/.github/workflows/keepwarm.yml`,
 whose ping window was narrowed for exactly this reason.

@@ -546,9 +546,9 @@ catch (e) { /* private mode */ }</script>
     vertical-align: .08em;
     white-space: nowrap;
   }
-  /* The longest caption chip ("Screenshot - the dashboard with the backend up")
-     is 334px on one line. Held unbreakable it set the floor for the whole
-     records column, which pushed the page sideways on any phone narrower than
+  /* A caption chip is white-space:nowrap, and the longest one once measured
+     334px on a single line. Held unbreakable it set the floor for the whole
+     records column and pushed the page sideways on any phone narrower than
      about 430px. Below that, let a chip wrap instead. */
   @media (max-width: 430px) {
     .chip { white-space: normal; }
@@ -1140,21 +1140,11 @@ catch (e) { /* private mode */ }</script>
           <span class="chip">Screenshot &middot; a real scan</span>
           <b>A live scan, no account needed.</b> Paste a snippet and the engine scores it, flags each
           at-risk primitive with its line number, and names the FIPS 203/204 replacement. The same
-          engine scans a whole repository or an uploaded <code>.zip</code> &mdash; from the CLI, or
-          from the hosted service when it's up (see below).
+          engine runs against a whole repository or an uploaded <code>.zip</code>.
          <span class="plate-hint">Scroll it sideways to read the detail.</span>
         </figcaption>
       </figure>
 
-      <p class="caveat">
-        <b>Honest status:</b> the snippet scanner above runs entirely in your browser, so it works
-        whatever the hosting is doing &mdash; that is the scan in the screenshot. The hosted service
-        that scans a whole repository or an uploaded <code>.zip</code> is currently unreachable, and
-        rather than spin on a dead request the page times out and says so, pointing at the two paths
-        that still run the identical engine: <code>pip install quantumsafe-scan</code> locally, or the
-        GitHub Action in CI. A free-tier hosting problem, not a broken build &mdash; the engine itself
-        is covered by 102 tests in CI.
-      </p>
 
       <dl class="figs">
         <div><dt>Precision on labeled benchmark</dt><dd>100% <small>vs. 49.1% naive baseline</small></dd></div>
@@ -1419,7 +1409,7 @@ catch (e) { /* private mode */ }</script>
         <div class="tags">
           <span class="tag type">Live system</span>
           <span class="tag">Real-time infrastructure</span>
-          <span class="tag warn">Backend paused &middot; dashboard runs on snapshot data</span>
+          <span class="tag live">tradeski.dev</span>
         </div>
         <h3>Tradeski</h3>
         <p class="lede">
@@ -1437,7 +1427,7 @@ catch (e) { /* private mode */ }</script>
           </a>
         </div>
         <figcaption>
-          <span class="chip">Screenshot &middot; the dashboard with the backend up</span>
+          <span class="chip">Screenshot &middot; the live dashboard</span>
           <b>The terminal in normal operation.</b> Streaming ticker strip, seven FRED macro series,
           candlesticks with hand-rolled overlays, and a live indicator panel &mdash; every quantitative
           figure computed on raw NumPy arrays rather than a TA library.
@@ -1445,14 +1435,6 @@ catch (e) { /* private mode */ }</script>
         </figcaption>
       </figure>
 
-      <p class="caveat">
-        <b>Honest status:</b> the data backend is paused, so nothing here is streaming live. Rather than
-        let the dashboard render fetch errors, it now detects an unreachable backend and replays a
-        recorded snapshot of <em>real</em> market data &mdash; charts, indicators, the screener and the
-        macro strip are genuine values, and a banner says so and dates them. Live streaming, news and
-        accounts still need the backend. The fallback is read-only by construction: a failed write is
-        never faked. This is a hosting-cost decision, not a broken build.
-      </p>
 
       <dl class="figs">
         <div><dt>Symbols tracked live</dt><dd>11 <small>ticker + correlation matrix</small></dd></div>

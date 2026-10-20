@@ -320,7 +320,7 @@ NIST standardized lattice schemes. <em>(Honest scope: this is a faithful teachin
 implementation of plain LWE, not the constant-time Module-LWE + NTT + Fujisaki–Okamoto
 construction of production Kyber; real systems should use vetted ML-KEM such as <code>liboqs</code>.)</em></p>
 <h2 id="6-engineering">6. Engineering<a class="anchor" href="#6-engineering" aria-label="Link to this section">#</a></h2>
-<p>One shared engine behind CLI + API + dashboard; <strong>97 automated tests</strong>; CI; Docker and
+<p>One shared engine behind CLI + API + dashboard; <strong>213 automated tests</strong>; CI; Docker and
 <code>docker-compose</code>; a reusable <strong>GitHub Action</strong> (<code>action.yml</code>) that fails a build over a
 risk threshold; multi-service deploy configs; and a published PyPI package
 (<code>pip install quantumsafe-scan</code>, v0.2.0). The benchmark, real-world study, seeded recall

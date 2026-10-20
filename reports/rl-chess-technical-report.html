@@ -310,7 +310,7 @@ signs flipped consistently up the tree. Tested by
 promotions. Tested by <code>test_move_encoding_roundtrip_white</code> /
 <code>_promotions</code> and <code>test_move_index_in_range_for_all_legal_start_moves</code>.</li>
 </ul>
-<p>The full suite (25 tests, run in CI) also covers terminal values
+<p>The full suite (39 tests, run in CI) also covers terminal values
 (<code>test_terminal_value_checkmate</code>, <code>test_stalemate_is_a_draw</code>,
 <code>test_insufficient_material_is_a_draw</code>), search behaviour
 (<code>test_mcts_returns_valid_distribution</code>, <code>test_mcts_is_deterministic_without_noise</code>,
@@ -598,7 +598,7 @@ truth about which engine is playing — is stronger than a polished fiction. It
 certainly taught me more.</p>
 <h2 id="10-reproducibility">10. Reproducibility<a class="anchor" href="#10-reproducibility" aria-label="Link to this section">#</a></h2>
 <p><strong>Repository.</strong> <a href="https://github.com/Danny-397/RL-Chess-Engine">https://github.com/Danny-397/RL-Chess-Engine</a> (MIT). The code is
-~3,200 lines; the 25-test suite runs in CI on every push.</p>
+~3,200 lines; the 39-test suite runs in CI on every push.</p>
 <p><strong>Environment.</strong> <code>pip install -r requirements-train.txt</code> (adds PyTorch to the
 light runtime deps in <code>requirements.txt</code>). The GPU results in §5 were produced on
 Kaggle with 2× Tesla T4.</p>

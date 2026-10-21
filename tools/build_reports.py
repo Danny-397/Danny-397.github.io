@@ -86,12 +86,19 @@ REPORTS = [
     Report("quantumsafe-whitepaper", "QuantumSafe — Whitepaper", "QuantumSafe Scan",
            "Quantum-Safe-Scan", "docs/WHITEPAPER.md", "QuantumSafe-Whitepaper.pdf",
            "The long form: threat model, algorithm math, and references."),
+    # Both chess reports reference ../assets/*.png -- the site's own assets/
+    # directory, which never held them, so the two figures were 404 on the live
+    # pages. The relative paths resolve correctly through the copy step: source
+    # <repo>/docs/../assets/x.png, destination reports/../assets/x.png, which
+    # is where the existing markup already looks.
     Report("rl-chess-technical-report", "AlphaZero Chess — Technical Report", "RL-Chess-Engine",
            "RL-Chess-Engine", "docs/technical-report.md", "RL-Chess-Technical-Report.pdf",
-           "Network, MCTS, self-play loop, and the training curve."),
+           "Network, MCTS, self-play loop, and the training curve.",
+           assets=("../assets/training_progress.png", "../assets/draw_cycle.png")),
     Report("rl-chess-experiment-results", "AlphaZero Chess — Experiment Results", "RL-Chess-Engine",
            "RL-Chess-Engine", "docs/experiment-results.md", "RL-Chess-Experiment-Results.pdf",
-           "What the engine learned, measured against fixed opponents."),
+           "What the engine learned, measured against fixed opponents.",
+           assets=("../assets/training_progress.png", "../assets/draw_cycle.png")),
     Report("alphaglyph-technical-report", "AlphaGlyph — Technical Report", "AlphaGlyph",
            "Alphaglyph", "docs/technical-report.md", "AlphaGlyph-Technical-Report.pdf",
            "Signal generation, the risk layer, and the live trading loop."),

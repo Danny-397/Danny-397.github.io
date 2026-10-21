@@ -221,3 +221,31 @@ h2:hover .anchor, h3:hover .anchor, .anchor:focus { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .doclink, .anchor { transition: none; }
 }
+
+/* ---------- figures ---------- */
+/* box-sizing is explicit: max-width:100% caps the CONTENT box, so the 1px
+   border would otherwise push the rendered width 2px past the viewport.
+   Nothing constrained images until the first report page with a figure. A
+   1408px-wide PNG stretched the document to 1448px inside a 390px viewport,
+   and that also defeated .tablewrap above: once the document itself was
+   over-wide the tables fitted inside it, so they never scrolled and the whole
+   page scrolled sideways instead. Constraining the image fixes both. */
+.prose-doc img {
+  display: block;
+  box-sizing: border-box;
+  max-width: 100%;
+  height: auto;
+  margin: var(--s4) auto;
+  border: 1px solid var(--rule-soft);
+  border-radius: 8px;
+}
+
+/* Inline code carries long identifiers -- the worst here is
+   test_move_index_in_range_for_all_legal_start_moves -- and monospace text
+   with no hyphen or space has no break opportunity, so it pushed the page
+   69px past a 390px viewport. Scoped to inline code deliberately: code inside
+   <pre> must keep its own line breaks and scroll horizontally (handled
+   above), not re-wrap. */
+.prose-doc :not(pre) > code {
+  overflow-wrap: anywhere;
+}

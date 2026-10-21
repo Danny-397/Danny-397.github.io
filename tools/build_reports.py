@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import posixpath
 import re
 import sys
 from pathlib import Path
@@ -159,13 +160,20 @@ def wrap_tables(body: str) -> str:
                .replace("</table>", "</table></div>")
 
 
-def rewrite_links(body: str, built: set[str], repo: str) -> str:
+def rewrite_links(body: str, built: set[str], repo: str, source: str) -> str:
     """Point relative .md links at a sibling page if we built one, else GitHub.
 
     A report that links to ARCHITECTURE.md should not produce a dead local link.
+
+    Link targets are relative to the SOURCE FILE's directory, not the repo
+    root, so they are resolved against it before being turned into a GitHub
+    URL. Pasting them straight after blob/main/ produced
+    ".../blob/main/../benchmark/RESULTS.md" from docs/WHITEPAPER.md, which
+    GitHub serves as 404 -- two dead links shipped on the whitepaper page.
     """
     by_source = {r.source.rsplit("/", 1)[-1].lower(): r.slug
                  for r in REPORTS if r.slug in built and r.repo == repo}
+    src_dir = posixpath.dirname(source)
 
     def repl(m: re.Match) -> str:
         quote, target = m.group(1), m.group(2)
@@ -176,7 +184,16 @@ def rewrite_links(body: str, built: set[str], repo: str) -> str:
             frag = "#" + frag
         if name in by_source:
             return f'href={quote}{by_source[name]}.html{frag}{quote}'
-        return f'href={quote}{GITHUB}/{repo}/blob/main/{target}{quote}'
+
+        path, _, anchor = target.partition("#")
+        resolved = posixpath.normpath(posixpath.join(src_dir, path))
+        if resolved.startswith(".."):
+            # Escapes the repository: leave it alone rather than emit a URL
+            # that silently points somewhere else.
+            print(f"    LINK ESCAPES REPO  {target}  (in {source})", file=sys.stderr)
+            resolved = path
+        anchor = ("#" + anchor) if anchor else ""
+        return f'href={quote}{GITHUB}/{repo}/blob/main/{resolved}{anchor}{quote}'
 
     return re.sub(r'href=(["\'])((?!https?:|#|mailto:)[^"\']*?\.md(?:#[^"\']*)?)\1',
                   repl, body)
@@ -282,7 +299,7 @@ def build(report: Report, built: set[str], renderer: MarkdownIt) -> str:
     raw = re.sub(r"\A\s*#\s+.*?\n", "", raw, count=1)
 
     body = renderer.render(raw)
-    body = rewrite_links(body, built, report.repo)
+    body = rewrite_links(body, built, report.repo, report.source)
     body, toc = add_heading_anchors(body)
     body = wrap_tables(body)
 

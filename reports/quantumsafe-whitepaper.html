@@ -179,7 +179,7 @@ encapsulation mechanism, the mathematical basis of CRYSTALS-Kyber / ML-KEM.</li>
 <p>These are delivered through three product surfaces that all consume the same
 detection engine: a <strong>CLI</strong> (<code>pip install quantumsafe-scan</code>), a <strong>Flask REST API</strong>, and
 a <strong>static web dashboard</strong>. A detailed component and data-flow description is in
-<a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/ARCHITECTURE.md">ARCHITECTURE.md</a>.</p>
+<a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE.md</a>.</p>
 <hr />
 <h2 id="4-detection-engine-design-ast-regex-hybrid">4. Detection engine design (AST + regex hybrid)<a class="anchor" href="#4-detection-engine-design-ast-regex-hybrid" aria-label="Link to this section">#</a></h2>
 <p>The engine combines two complementary strategies to balance precision and
@@ -378,7 +378,7 @@ enforced by <code>tests/test_benchmark.py</code>.</p>
 <p>The comment decoys yield zero false positives because the engine skips
 comment-only lines; the word-boundary traps are excluded by anchored patterns.
 Per-family and severity distributions, plus reproducible charts, are in
-<a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/../benchmark/RESULTS.md">../benchmark/RESULTS.md</a>.</p>
+<a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/benchmark/RESULTS.md">../benchmark/RESULTS.md</a>.</p>
 <h3 id="84-empirical-study">8.4 Empirical study<a class="anchor" href="#84-empirical-study" aria-label="Link to this section">#</a></h3>
 <p>Scanning eight widely-used open-source projects (<code>study/</code>, reproducible via
 <code>python study/run_study.py</code>) found <strong>88%</strong> contained at least one HIGH-risk

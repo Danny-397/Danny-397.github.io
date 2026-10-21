@@ -71,9 +71,10 @@ catch (e) { /* private mode */ }</script>
       <li><a href="#3-the-detection-engine">3. The detection engine</a></li>
       <li><a href="#4-does-it-actually-work-measured-not-asserted">4. Does it actually work? (measured, not asserted)</a></li>
       <li><a href="#5-the-post-quantum-fix-implemented">5. The post-quantum fix, implemented</a></li>
-      <li><a href="#6-engineering">6. Engineering</a></li>
-      <li><a href="#7-honest-limitations">7. Honest limitations</a></li>
-      <li><a href="#8-whats-next">8. What&#x27;s next</a></li>
+      <li><a href="#6-beyond-the-codebase-live-endpoints-and-deadlines">6. Beyond the codebase: live endpoints and deadlines</a></li>
+      <li><a href="#7-engineering">7. Engineering</a></li>
+      <li><a href="#8-honest-limitations">8. Honest limitations</a></li>
+      <li><a href="#9-whats-next">9. What&#x27;s next</a></li>
     </ol>
   </nav>
   <article class="prose-doc">
@@ -319,14 +320,70 @@ accumulated error stays well below <code>q/4</code>, so decapsulation is reliabl
 NIST standardized lattice schemes. <em>(Honest scope: this is a faithful teaching
 implementation of plain LWE, not the constant-time Module-LWE + NTT + Fujisaki–Okamoto
 construction of production Kyber; real systems should use vetted ML-KEM such as <code>liboqs</code>.)</em></p>
-<h2 id="6-engineering">6. Engineering<a class="anchor" href="#6-engineering" aria-label="Link to this section">#</a></h2>
-<p>One shared engine behind CLI + API + dashboard; <strong>232 automated tests</strong>; CI; Docker and
+<h2 id="6-beyond-the-codebase-live-endpoints-and-deadlines">6. Beyond the codebase: live endpoints and deadlines<a class="anchor" href="#6-beyond-the-codebase-live-endpoints-and-deadlines" aria-label="Link to this section">#</a></h2>
+<p>Two things a code scan cannot answer: what a deployed service actually negotiates,
+and whether the migration finishes in time.</p>
+<p><strong>The TLS handshake (<code>cli/tlsscan.py</code>).</strong> A website's quantum exposure is not in its
+source — it is in two brief public-key steps of the handshake. The <strong>key exchange</strong> is
+the urgent one: Shor recovers the session secret, and because an adversary can record
+traffic now and decrypt it later, data sent today is exposed <em>retroactively</em>. The
+<strong>certificate signature</strong> is also Shor-breakable, but only to forge <em>future</em>
+certificates, and those rotate every ~90 days. Symmetric cryptography is not the
+problem at all: Grover square-roots a brute-force search, so AES-128 retains ~64-bit
+security and AES-256 is comfortable.</p>
+<p>Reading the key exchange needed a hand-built ClientHello. TLS 1.2 named the key exchange
+in the cipher suite (<code>ECDHE_RSA_WITH_AES_128_GCM_SHA256</code>); TLS 1.3 removed it, so every
+modern site reports only <code>TLS_AES_128_GCM_SHA256</code> — which says nothing. The group lives
+in the <code>key_share</code> extension, and Python's <code>ssl</code> cannot report it (<code>set_groups</code> and
+<code>group_used</code> need OpenSSL 3.5+ and Python 3.14; ML-KEM groups need OpenSSL 3.5 at all).
+So the scanner offers the hybrid groups in <code>supported_groups</code> but a <code>key_share</code> for
+X25519 only: a server preferring a hybrid cannot proceed from that share and must answer
+with a HelloRetryRequest naming the group it wants (RFC 8446 §4.1.3). No ML-KEM
+implementation and no new dependency are needed to ask the question. One handshake,
+89–257 ms.</p>
+<p><strong>The whole certificate chain (<code>cli/certchain.py</code>).</strong> A chain is only as strong as its
+weakest signature, and the weak link is usually not the leaf: <code>cloudflare.com</code> serves an
+ECDSA P-256 leaf, but an intermediate above it is signed <strong>SHA-256 with RSA</strong>. Forging
+that signature mints a leaf for any name beneath it. The signature algorithm and public
+key are precisely the two fields <code>ssl.getpeercert()</code> omits, so rather than take on a
+<code>cryptography</code> dependency they are walked out of the DER with a minimal
+tag-length-value reader that parses structure and OIDs and verifies nothing — <code>ssl</code> has
+already validated the chain by then. A root's self-signature is shown but not scored: a
+root is trusted because it is in the client's trust store, so forging that signature
+gains an attacker nothing.</p>
+<p><strong>Mosca's inequality (<code>cli/horizon.py</code>).</strong> The risk score says <em>how much</em> vulnerable
+cryptography exists. It cannot say whether the migration lands in time, which is the
+question the threat model actually poses: one RSA key exchange protecting data that must
+stay secret for fifty years is worse than forty MD5 checksums.</p>
+<pre><code>X  how long the data must stay confidential
+Y  how long the migration takes
+Z  how long until a quantum computer can break it
+
+X + Y &gt; Z   -&gt;   data sent today is already exposed
+</code></pre>
+<p>What the tool refuses to claim matters as much as what it reports. <strong>Z is unknowable, so
+there is no default for it</strong> — omitting it yields <code>no_verdict</code> rather than a guess. What
+is always computed is the <strong>break-even year</strong>: the latest a quantum computer could arrive
+while still leaving time to migrate, which needs no estimate of Z and is a property of
+the code and the data rather than a forecast. Y is an engineering estimate, so it is a
+range, counted per cryptographic <em>family</em> rather than per finding (the design decision is
+paid once; call sites scale sub-linearly), and all six coefficients are emitted under
+<code>horizon.assumptions</code> so a reader can reject a specific number instead of the whole figure.</p>
+<p><strong>Scanning someone else's server</strong> is bounded to a single TLS handshake — what any
+browser does on every visit. It is not port or vulnerability scanning. The target must
+resolve <em>entirely</em> to public addresses on port 443/8443, and the connection is made to
+the address that was checked rather than re-resolved, which closes the DNS-rebinding
+window; private ranges, loopback, link-local (cloud instance metadata at
+<code>169.254.169.254</code>), carrier-grade NAT and the IPv4-mapped IPv6 forms of all of them are
+refused.</p>
+<h2 id="7-engineering">7. Engineering<a class="anchor" href="#7-engineering" aria-label="Link to this section">#</a></h2>
+<p>One shared engine behind CLI + API + dashboard; <strong>496 automated tests</strong>; CI; Docker and
 <code>docker-compose</code>; a reusable <strong>GitHub Action</strong> (<code>action.yml</code>) that fails a build over a
 risk threshold; multi-service deploy configs; and a published PyPI package
 (<code>pip install quantumsafe-scan</code>, v0.2.0). The benchmark, real-world study, seeded recall
 harness, comparison, and every chart are <strong>reproducible from scripts</strong> and generated
 from live scanner output, not hand-drawn.</p>
-<h2 id="7-honest-limitations">7. Honest limitations<a class="anchor" href="#7-honest-limitations" aria-label="Link to this section">#</a></h2>
+<h2 id="8-honest-limitations">8. Honest limitations<a class="anchor" href="#8-honest-limitations" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><strong>Heuristic, not a proof.</strong> It detects <em>usage patterns</em>; reachability is a conservative
 ranking signal, not a proof that a primitive is exploitable or live.</li>
@@ -344,8 +401,23 @@ not modeled; non-Python findings get the path-based signal only.</li>
 the seeded harness adds 50 constructed recall cases. Neither is a claim of 100% on
 arbitrary real-world code.</li>
 <li><strong>Demonstration scale.</strong> Shor runs on <code>N = 15</code>; the LWE KEM is teaching-grade.</li>
+<li><strong>The TLS scan reports what a server <em>selects</em>, not everything it supports.</strong> The
+result is the group chosen from the set offered — the same answer a browser offering
+that set would get — so a server that supports a hybrid but ranks it lower reads as
+classical. Findings say &quot;negotiated&quot;, not &quot;supports&quot;, for exactly that reason.</li>
+<li><strong>One endpoint, one handshake.</strong> It does not follow redirects, probe other ports, or
+sweep the third-party origins a page actually loads from, so a site whose own TLS is
+post-quantum may still pull sub-resources over classical key exchange.</li>
+<li><strong>Migration time is an estimate, not a measurement.</strong> The horizon's coefficients are
+assumptions about how long cryptographic work takes, and they are printed alongside
+the result precisely because they should be replaced with figures from a real
+migration. The break-even year is the only number there that rests on no guess about
+the future.</li>
+<li><strong>A diff cannot prove a fix.</strong> A finding that disappeared may have been deleted,
+excluded or renamed — a rename reads as one fixed plus one new. The diff reports
+counts and locations, not conclusions, and says so in its own output.</li>
 </ul>
-<h2 id="8-whats-next">8. What's next<a class="anchor" href="#8-whats-next" aria-label="Link to this section">#</a></h2>
+<h2 id="9-whats-next">9. What's next<a class="anchor" href="#9-whats-next" aria-label="Link to this section">#</a></h2>
 <p>Tree-sitter AST parsing to bring non-Python languages up to AST-level precision;
 import-resolving reachability (the taint pass is already cross-file); a larger hand-labeled real-world
 corpus to complement the seeded recall benchmark; per-protocol hybrid (classical + PQC)

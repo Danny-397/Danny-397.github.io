@@ -1165,10 +1165,12 @@ catch (e) { /* private mode */ }</script>
         <div class="inner">
           <ul>
             <li><strong>Attack.</strong> Shor's and Grover's algorithms implemented on the Qiskit simulator, so the HIGH risk rating on RSA, ECC and Diffie-Hellman is demonstrated rather than asserted.</li>
-            <li><strong>Detect.</strong> Cross-language AST + regex scanning with dependency analysis; results export to JSON, HTML, SARIF, CycloneDX CBOM and SVG badges so it drops into an existing CI pipeline.</li>
+            <li><strong>Detect in code.</strong> Cross-language AST + regex scanning with dependency analysis; results export to JSON, HTML, SARIF, CycloneDX CBOM and SVG badges so it drops into an existing CI pipeline.</li>
+            <li><strong>Detect on the wire.</strong> A website's quantum exposure is in its TLS handshake, not its source. TLS 1.3 removed the key exchange from the cipher-suite name and Python's <code>ssl</code> cannot read the group, so the scanner builds a ClientHello by hand: it offers post-quantum hybrids but a key share for X25519 only, so a server preferring a hybrid has to name it in a HelloRetryRequest. It also reads every signature in the certificate chain &mdash; Cloudflare's leaf is modern ECDSA, but an intermediate above it is signed with RSA, which a leaf-only check misses.</li>
+            <li><strong>Prioritise.</strong> A severity score says how much vulnerable cryptography exists, not whether you will finish migrating in time. Mosca's inequality &mdash; secrecy lifetime plus migration time, against time-to-quantum &mdash; turns it into a deadline. No default is supplied for the quantum date, because nobody knows it; the tool reports the break-even year instead, which needs no such guess.</li>
             <li><strong>Fix.</strong> A lattice-based (LWE) key-encapsulation mechanism written from scratch &mdash; the underlying math of CRYSTALS-Kyber / ML-KEM &mdash; rather than a library call.</li>
             <li><strong>Field results.</strong> Paramiko, the standard Python SSH library, scores 100/100 Critical with 110 findings. Across 37 PyPI packages, 32 (86%) contained at least one finding. In a study of 8 widely-used projects, 88% contained HIGH-risk usage, mean score 61.4/100.</li>
-            <li><strong>Assurance.</strong> 213 automated tests in continuous integration.</li>
+            <li><strong>Assurance.</strong> 496 automated tests in continuous integration, plus a baseline mode that fails a build only on <em>new</em> findings &mdash; so a project with an existing backlog can ratchet it down instead of disabling the check.</li>
           </ul>
         </div>
       </details>

@@ -855,7 +855,7 @@ catch (e) { /* private mode */ }</script>
         <dd>projects deployed to a public URL — not just a repository</dd>
       </div>
       <div>
-        <dt>830</dt>
+        <dt>1,298</dt>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
@@ -1170,7 +1170,7 @@ catch (e) { /* private mode */ }</script>
             <li><strong>Prioritise.</strong> A severity score says how much vulnerable cryptography exists, not whether you will finish migrating in time. Mosca's inequality &mdash; secrecy lifetime plus migration time, against time-to-quantum &mdash; turns it into a deadline. No default is supplied for the quantum date, because nobody knows it; the tool reports the break-even year instead, which needs no such guess.</li>
             <li><strong>Fix.</strong> A lattice-based (LWE) key-encapsulation mechanism written from scratch &mdash; the underlying math of CRYSTALS-Kyber / ML-KEM &mdash; rather than a library call.</li>
             <li><strong>Field results.</strong> Paramiko, the standard Python SSH library, scores 100/100 Critical with 110 findings. Across 37 PyPI packages, 32 (86%) contained at least one finding. In a study of 8 widely-used projects, 88% contained HIGH-risk usage, mean score 61.4/100.</li>
-            <li><strong>Assurance.</strong> 496 automated tests in continuous integration, plus a baseline mode that fails a build only on <em>new</em> findings &mdash; so a project with an existing backlog can ratchet it down instead of disabling the check.</li>
+            <li><strong>Assurance.</strong> 545 automated tests in continuous integration, plus a baseline mode that fails a build only on <em>new</em> findings &mdash; so a project with an existing backlog can ratchet it down instead of disabling the check.</li>
           </ul>
         </div>
       </details>
@@ -1229,7 +1229,7 @@ catch (e) { /* private mode */ }</script>
       <dl class="figs">
         <div><dt>Forecaster test AUC</dt><dd>&asymp;0.51 <small>a coin flip</small></dd></div>
         <div><dt>In-sample Sharpe surviving OOS</dt><dd>~52% <small>median</small></dd></div>
-        <div><dt>Tests in CI</dt><dd>169</dd></div>
+        <div><dt>Tests in CI</dt><dd>186</dd></div>
       </dl>
 
       <figure class="viz reveal">
@@ -1344,7 +1344,7 @@ catch (e) { /* private mode */ }</script>
             data-src="media/rlchess-selfplay.mp4"
             aria-label="The engine playing itself in the browser: pieces move on the board while the panel on the left lists the engine's top three candidate moves with their evaluations and the move list fills in below."></video>
           <button type="button" class="plate-toggle" data-play data-clip="the chess engine self-play clip">Pause</button>
-          <a class="plate-cover" href="https://rlchess.xyz">
+          <a class="plate-cover" href="https://rlchess.xyz/#play">
             <span class="plate-cta">Play the engine &nearr;</span>
           </a>
         </div>
@@ -1388,7 +1388,7 @@ catch (e) { /* private mode */ }</script>
             <li>Modular by component so each piece is testable in isolation: <code>chess_game.py</code> (rules and encoding), <code>model.py</code> (network), <code>mcts.py</code> (search), <code>self_play.py</code> / <code>training.py</code> (the learning loop), <code>evaluation.py</code> (strength measurement).</li>
             <li>Trained with cross-entropy loss against the MCTS visit distribution and mean-squared error against the final game outcome.</li>
             <li>Three ways in: a browser UI, a console client, and a FastAPI HTTP API.</li>
-            <li>25-test pytest suite on GitHub Actions.</li>
+            <li>39-test pytest suite on GitHub Actions, including an ONNX-vs-PyTorch parity check on the exported network.</li>
           </ul>
         </div>
       </details>
@@ -1397,7 +1397,7 @@ catch (e) { /* private mode */ }</script>
         <span>PyTorch</span><span>Python 3.10+</span><span>FastAPI</span><span>ONNX Runtime Web</span><span>chessboard.js</span><span>Vercel</span>
       </div>
       <div class="links">
-        <a class="primary" href="https://rlchess.xyz">Play the engine &rarr;</a>
+        <a class="primary" href="https://rlchess.xyz/#play">Play the engine &rarr;</a>
         <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/technical-report.md">Technical report</a>
         <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md">Experiment results</a>
         <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine">Source</a>
@@ -1441,7 +1441,7 @@ catch (e) { /* private mode */ }</script>
       <dl class="figs">
         <div><dt>Symbols tracked live</dt><dd>11 <small>ticker + correlation matrix</small></dd></div>
         <div><dt>Fed series, hourly refresh</dt><dd>7 <small>via FRED API</small></dd></div>
-        <div><dt>Tests in CI</dt><dd>86 <small>across 12 files</small></dd></div>
+        <div><dt>Tests in CI</dt><dd>110 <small>across 13 files</small></dd></div>
       </dl>
 
       <p class="prose">
@@ -1907,7 +1907,7 @@ catch (e) { /* private mode */ }</script>
   });
 
   /* No count-up on the ledger figures. They are factual claims, and an animation
-     that counts 584 -> 830 means the page displays a wrong number for a second --
+     that counts 584 -> 1,298 means the page displays a wrong number for a second --
      which is the exact failure mode the rest of this site argues against. */
 })();
 </script>

@@ -52,7 +52,7 @@ friendlier run. 186 tests in CI.
 
 **Tradeski** · [tradeski.dev](https://www.tradeski.dev/) — Live market, macro, and
 sentiment data in one dashboard: 11 ticker symbols, 7 FRED series hourly, a 29-symbol
-screener, a retrieval-grounded assistant, 86 tests. Its most useful lesson was a bug:
+screener, a retrieval-grounded assistant, 110 tests. Its most useful lesson was a bug:
 live prices never reached the browser because the server emitted on one Socket.IO
 namespace while the client listened on another. Both halves were correct alone, and all
 71 tests passed throughout — every one of them tested a pure function, so no test

@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- Source of og-image.png (the link-preview card). Render with
+     `python tools/render_og.py`; tools/check_numbers.py keeps the week span honest. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; }
+  body {
+    width: 1200px; height: 630px; box-sizing: border-box; position: relative;
+    background: #0E1218; color: #E9EDF2;
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    padding: 72px 80px 0;
+  }
+  .who {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 19px; letter-spacing: .14em; font-weight: 600; color: #7FA6E8; margin: 0;
+  }
+  h1 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-weight: 400; font-size: 68px; line-height: 1.12; letter-spacing: -.01em;
+    margin: 22px 0 26px;
+  }
+  .sub { font-size: 24px; line-height: 1.5; color: #939BA6; margin: 0; max-width: 940px; }
+  .stats { position: absolute; left: 80px; right: 80px; bottom: 82px; display: flex; gap: 52px; align-items: flex-end; }
+  .stat b { display: block; font-size: 30px; font-weight: 600; color: #7FA6E8; line-height: 1.1; }
+  .stat span {
+    display: block; margin-top: 6px;
+    font-size: 15px; letter-spacing: .1em; text-transform: uppercase; color: #7C858F;
+  }
+  .url { margin-left: auto; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 19px; color: #C9D1DA; padding-bottom: 4px; }
+  .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: #7FA6E8; }
+</style>
+</head>
+<body>
+  <p class="who">DAN LICHTENBERGER · NEW YORK</p>
+  <h1>Six systems, and what<br>each one actually proved.</h1>
+  <p class="sub">Reinforcement learning, post-quantum cryptography, quantitative finance, and one piece of interactive art — every one deployed and measured.</p>
+  <div class="stats">
+    <div class="stat"><b>6 / 6</b><span>Deployed live</span></div>
+    <div class="stat"><b>3</b><span>Report null results</span></div>
+    <div class="stat"><b>24 weeks</b><span>First commit to last</span></div>
+    <div class="url">danny-397.github.io</div>
+  </div>
+  <div class="bar"></div>
+</body>
+</html>

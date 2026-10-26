@@ -838,7 +838,7 @@ catch (e) { /* private mode */ }</script>
     </p>
 
     <p class="whoami">
-      Everything here was written between May and September 2026: reinforcement learning,
+      Everything here was written between May and October 2026: reinforcement learning,
       post-quantum cryptography, quantitative finance, and one piece of interactive art.
       Every project is deployed to a public URL you can open right now, and every screen
       below is a recording or screenshot of that deployment — not a mockup. They are ordered
@@ -852,11 +852,11 @@ catch (e) { /* private mode */ }</script>
         <dd>projects deployed to a public URL — not just a repository</dd>
       </div>
       <div>
-        <dt>1,298</dt>
+        <dt>1,305</dt>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
-        <dt>20 weeks</dt>
+        <dt>24 weeks</dt>
         <dd>from the first commit of the oldest project to the most recent</dd>
       </div>
       <div>
@@ -951,7 +951,7 @@ catch (e) { /* private mode */ }</script>
       <dl class="figs">
         <div><dt>The run I nearly published</dt><dd>+275% <small>vs. +19% &middot; superseded v1, commit d4c0ef9</small></dd></div>
         <div><dt>Rebuilt, 10 seeds</dt><dd>+57% <small>vs. +34% buy-and-hold &middot; p = 0.79</small></dd></div>
-        <div><dt>Domain randomization, held-out</dt><dd>&minus;26% &rarr; +47% <small>stocks, 5 seeds</small></dd></div>
+        <div><dt>Domain randomization, held-out</dt><dd>&minus;26% &rarr; +38% <small>stocks, 5 seeds</small></dd></div>
       </dl>
 
       <figure class="viz reveal">
@@ -1045,8 +1045,8 @@ catch (e) { /* private mode */ }</script>
 
       <figure class="plate">
         <div class="plate-frame plate-scroll">
-          <img src="media/rltrader-arms.webp" width="1400" height="516" loading="lazy" decoding="async"
-               alt="Two panels compared. Trained on one asset, tagged memorised: training return +322k% to +4.0M% across 5 seeds, held-out return minus 51% with a 95% confidence interval of minus 62% to minus 39%. Trained across the basket, tagged generalised: training return +5% to +154%, held-out return +129% with a 95% confidence interval of +82% to +185%.">
+          <img src="media/rltrader-arms.webp" width="1400" height="514" loading="lazy" decoding="async"
+               alt="Two panels compared. Trained on one asset, tagged memorised: training return +322k% to +4.0M% across 5 seeds, held-out return minus 51% with a 95% confidence interval of minus 62% to minus 39%. Trained across the basket, tagged generalised: training return +87% to +460%, held-out return +204% with a 95% confidence interval of +160% to +248%.">
           <a class="plate-cover" href="https://rl-for-crypto-and-stocks.vercel.app/#result">
             <span class="plate-cta">See the full result &nearr;</span>
           </a>
@@ -1074,8 +1074,8 @@ catch (e) { /* private mode */ }</script>
           <em>worse</em>, at p = 0.002. Retrained across four separate slices of Bitcoin's history, it lost
           money in every one.
           Separately, an agent trained on a single price path memorizes it catastrophically; training on a
-          freshly generated synthetic path each episode flips held-out return from &minus;26% to +47% on
-          equities and from &minus;51% to +129% on crypto &mdash; across five seeds, with all four confidence
+          freshly generated synthetic path each episode flips held-out return from &minus;26% to +38% on
+          equities and from &minus;51% to +204% on crypto &mdash; across five seeds, with all four confidence
           intervals excluding zero. Reported as a distribution rather than a single run, because the
           in-sample figure that version quoted swings by an order of magnitude between seeds.
           The result reproduces Henderson et al. (2018) on the unreliability of

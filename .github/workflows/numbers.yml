@@ -1,0 +1,28 @@
+name: Numbers
+
+# The home page quotes a test total, a week span and per-project test counts that
+# all come from other repositories. tools/check_numbers.py re-derives each one from
+# its source (CI logs, commit dates) and fails if the site disagrees, so a stale
+# figure turns this red instead of sitting on the page for months.
+
+on:
+  schedule:
+    - cron: "41 13 * * 1"   # Mondays 13:41 UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["index.html", "research-summary.md", "assets/og-card.html", "tools/check_numbers.py"]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare the site's figures with their sources
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tools/check_numbers.py

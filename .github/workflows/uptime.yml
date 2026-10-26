@@ -1,0 +1,96 @@
+name: Uptime
+
+# WHY THIS EXISTS
+# Two of the project backends have died silently for weeks at a time (QuantumSafe's
+# API from August to October, Tradeski's in September) and nothing noticed. This
+# checks every public site and backend once a day and keeps ONE open issue in this
+# repo while anything is down: it opens the issue, comments on it while the outage
+# lasts, and closes it once everything answers again.
+#
+# WHY ONCE A DAY, AND WHY IN THIS REPO
+# Render's 750 free instance-hours are shared by every free service on the account,
+# and when they run out Render suspends ALL of them. Each ping wakes a sleeping
+# backend for ~15 minutes, so a daily check costs ~8 h/month per backend; an hourly
+# one would cost the whole allowance. GitHub pauses scheduled workflows after 60 days
+# with no commits, and this is the repo that gets committed to most often.
+
+on:
+  schedule:
+    - cron: "17 14 * * *"   # daily, 14:17 UTC (off the hour, when GitHub cron is busiest)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Check every site and backend
+        id: probe
+        run: |
+          # name|url — backends first. A cold Render instance takes ~50 s to boot,
+          # so each URL gets a 120 s timeout and one retry before it counts as down.
+          targets="
+          QuantumSafe API|https://quantumsafe-api.onrender.com/health
+          Tradeski API|https://tradeski.onrender.com/health
+          AlphaGlyph API|https://trading-bot-jy87.onrender.com/health
+          Portfolio|https://danny-397.github.io/
+          RL Chess|https://rlchess.xyz/
+          QuantumSafe site|https://quantumsafescan.com/
+          AlphaGlyph site|https://alphaglyph.org/
+          RL Trader site|https://rl-for-crypto-and-stocks.vercel.app/
+          Tradeski site|https://www.tradeski.dev/
+          Neural Canvas|https://danny-397.github.io/neural-canvas/
+          "
+          down=""
+          while IFS='|' read -r name url; do
+            [ -z "$name" ] && continue
+            name="$(echo "$name" | xargs)"
+            code=000
+            for attempt in 1 2; do
+              code=$(curl -s -o /dev/null -L -m 120 -w '%{http_code}' "$url" || true)
+              [ "$code" -ge 200 ] && [ "$code" -lt 400 ] && break
+              [ "$attempt" -eq 1 ] && sleep 30
+            done
+            if [ "$code" -ge 200 ] && [ "$code" -lt 400 ]; then
+              echo "up    $code  $name"
+            else
+              echo "DOWN  $code  $name"
+              down="${down}- **${name}**: HTTP ${code} from ${url}"$'\n'
+            fi
+          done <<< "$targets"
+          {
+            echo "down<<EOF"
+            printf '%s' "$down"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open, update or close the outage issue
+        env:
+          DOWN: ${{ steps.probe.outputs.down }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create uptime --color B60205 --description "A site or backend is down" --force >/dev/null
+          open=$(gh issue list --label uptime --state open --json number -q '.[0].number')
+          today=$(date -u +%Y-%m-%d)
+          if [ -n "$DOWN" ]; then
+            body="Daily check on ${today} found these down:"$'\n\n'"${DOWN}"$'\n'"Run: ${RUN_URL}"
+            if [ -n "$open" ]; then
+              gh issue comment "$open" --body "$body"
+            else
+              gh issue create --label uptime --title "Outage: a site or backend is down" --body "$body"
+            fi
+            exit 1   # also mark the run red, so it shows on the Actions tab
+          elif [ -n "$open" ]; then
+            gh issue close "$open" --comment "Everything answered on ${today}. Run: ${RUN_URL}"
+          fi

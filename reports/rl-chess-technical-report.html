@@ -86,7 +86,7 @@ implementation, a controlled study of the training plateau I call the <em>draw
 cycle</em>, and the engineering decisions behind a deployed, honest demo. All
 empirical figures in §5 come from a real GPU run (Kaggle, 2× Tesla T4,
 2026-07-14, ~9.8 h training); the full per-iteration data is in
-<a href="rl-chess-experiment-results.html"><code>experiment-results.md</code></a>.</p>
+<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md"><code>experiment-results.md</code></a>.</p>
 </blockquote>
 <hr />
 <h2 id="1-abstract">1. Abstract<a class="anchor" href="#1-abstract" aria-label="Link to this section">#</a></h2>
@@ -339,7 +339,7 @@ genuinely strong, and tell the user the truth about what they are playing.</p>
 <p><strong>Provenance.</strong> The figures in §5.1–§5.3 are from a real ~9.8 h GPU run (Kaggle,
 2× Tesla T4, <code>run_experiment.py --device cuda</code>, 2026-07-14); the full
 per-iteration data — self-play termination histograms, evaluation checkpoints, and
-loss curves — is in <a href="rl-chess-experiment-results.html"><code>experiment-results.md</code></a>. Caveat: the
+loss curves — is in <a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md"><code>experiment-results.md</code></a>. Caveat: the
 committed <code>logs/training.log</code> still holds only the earlier <strong>smoke-test</strong> runs; the
 GPU run's raw per-iteration log was not recovered from the Kaggle session (its
 automatic push failed with a 403), so the numbers here are transcribed from that
@@ -471,7 +471,7 @@ moves the metrics <em>distinguishes the cause</em>, rather than assuming it:</p>
 <tr>
 <td>yes</td>
 <td>yes</td>
-<td>both compound</td>
+<td>both contribute (whether they compound needs a combined run)</td>
 </tr>
 <tr>
 <td>no</td>

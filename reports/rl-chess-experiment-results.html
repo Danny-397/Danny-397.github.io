@@ -987,8 +987,11 @@ aggregate), yet Elo stays negative and the non-decisive rate stays in the high
 self-play — at the <em>same</em> baseline compute — drops the final-iteration
 non-decisive rate to 70%, keeps checkmates appearing throughout training
 (19/100 aggregate), and flips Elo to <strong>+28</strong>. The engine beats random.</li>
-<li><strong>Both effects compound</strong> (&quot;yes | yes&quot; in the §5.3 reading matrix): compute helps
-<em>and</em> signal helps. A combined scaled-plus-assisted run is the natural next step.</li>
+<li><strong>Both levers help</strong> (&quot;yes | yes&quot; in the §5.3 reading matrix): compute helps
+<em>and</em> signal helps, each measured on its own. Whether they <em>compound</em> (stacking
+them beats either alone) is untested until a combined scaled-plus-assisted run;
+it is ready to run on Kaggle as <a href="../notebooks/experiment_c.ipynb"><code>notebooks/experiment_c.ipynb</code></a>
+(<code>python run_experiment.py --device cuda --only-combined</code>).</li>
 <li><strong><code>material_weight = 0.30</code> is the recommended self-play default</strong>, now set via
 <code>MCTSConfig.material_weight</code> and exposed as <code>run_experiment.py --assist-weight</code>.</li>
 </ol>

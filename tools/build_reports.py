@@ -195,7 +195,39 @@ def rewrite_links(body: str, built: set[str], repo: str, source: str) -> str:
         anchor = ("#" + anchor) if anchor else ""
         return f'href={quote}{GITHUB}/{repo}/blob/main/{resolved}{anchor}{quote}'
 
-    return re.sub(r'href=(["\'])((?!https?:|#|mailto:)[^"\']*?\.md(?:#[^"\']*)?)\1',
+    body = re.sub(r'href=(["\'])((?!https?:|#|mailto:)[^"\']*?\.md(?:#[^"\']*)?)\1',
+                  repl, body)
+    return rewrite_file_links(body, repo, source)
+
+
+def rewrite_file_links(body: str, repo: str, source: str) -> str:
+    """Re-point the remaining relative links: source files, notebooks, PDFs.
+
+    rewrite_links only handled .md targets, so a report's link to code
+    (../tracker/news.py, ../notebooks/experiment_c.ipynb) shipped as a path
+    that resolved against this site instead of the project repo -- four dead
+    links on the published Tradeski and chess pages. A project's file goes to
+    GitHub. The site's own documents (repo ".") are re-based from the site
+    root to reports/, where the page is published: research-summary.md's
+    "reports/RL-Trader-Paper.pdf" had become reports/reports/....
+    """
+    src_dir = posixpath.dirname(source)
+
+    def repl(m: re.Match) -> str:
+        quote, target = m.group(1), m.group(2)
+        path, _, anchor = target.partition("#")
+        anchor = ("#" + anchor) if anchor else ""
+        resolved = posixpath.normpath(posixpath.join(src_dir, path))
+        if repo == ".":
+            return f'href={quote}{posixpath.relpath(resolved, "reports")}{anchor}{quote}'
+        if resolved.startswith(".."):
+            print(f"    LINK ESCAPES REPO  {target}  (in {source})", file=sys.stderr)
+            return m.group(0)
+        return f'href={quote}{GITHUB}/{repo}/blob/main/{resolved}{anchor}{quote}'
+
+    # Relative links only: not absolute URLs, in-page anchors, mailto:, or the
+    # sibling-report links (bare "slug.html") rewrite_links has just produced.
+    return re.sub(r'href=(["\'])((?!https?:|#|mailto:|/)(?![\w-]+\.html(?:#|["\']))[^"\']+)\1',
                   repl, body)
 
 

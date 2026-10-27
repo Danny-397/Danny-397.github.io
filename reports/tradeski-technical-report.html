@@ -170,7 +170,7 @@ underlying quantity actually moves:</p>
 </tbody>
 </table></div>
 <p>The cache itself is deliberately unremarkable — a dict of <code>(value, expires_at)</code> with lazy
-eviction on read (<a href="../Plotly%20dashboard/cache.py"><code>cache.py</code></a>). Its limitations are real and
+eviction on read (<a href="https://github.com/Danny-397/Tradeski/blob/main/Plotly%20dashboard/cache.py"><code>cache.py</code></a>). Its limitations are real and
 are discussed in §9. What matters is that the TTL is a per-source decision rather than a
 global constant, and that per-route rate limiting sits in front of the expensive endpoints:
 registration at 10/hour, login at 10/minute, the assistant at 20/hour and 50/day.</p>
@@ -202,7 +202,7 @@ inserts it onto <code>sys.path</code> explicitly so the process works regardless
 <p>Every technical indicator is implemented directly on NumPy arrays rather than pulled from
 TA-Lib or pandas: SMA, EMA, RSI with Wilder smoothing, MACD, Bollinger Bands, ATR, the
 Stochastic Oscillator, rolling Z-score, rolling volatility, and a least-squares linear
-regression forecast (<a href="../tracker/analyzer.py"><code>analyzer.py</code></a>).</p>
+regression forecast (<a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/analyzer.py"><code>analyzer.py</code></a>).</p>
 <p>The point of writing them by hand is not that the libraries are wrong. It is that the
 boundary conditions are where indicators are actually wrong, and you only meet them if you
 write the code.</p>
@@ -238,7 +238,7 @@ correlation for any two assets that both drift upward.</p>
 <hr />
 <h2 id="5-news-sentiment-why-general-purpose-scoring-fails-here">5. News sentiment: why general-purpose scoring fails here<a class="anchor" href="#5-news-sentiment-why-general-purpose-scoring-fails-here" aria-label="Link to this section">#</a></h2>
 <p>Sentiment is VADER, extended with roughly 45 finance-specific terms
-(<a href="../tracker/news.py"><code>news.py</code></a>).</p>
+(<a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/news.py"><code>news.py</code></a>).</p>
 <p>The extension is not decoration. VADER is tuned on social-media English, and financial
 headlines use a register it has no entries for. &quot;Apple beats expectations&quot; scores 0.0 out of
 the box — <em>beats</em> is not in the lexicon in its financial sense, and the headline reads as

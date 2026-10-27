@@ -472,6 +472,16 @@ catch (e) { /* private mode */ }</script>
     font-family: var(--sans); font-size: var(--fs-sm); font-weight: 600;
     color: var(--accent); text-decoration: none; white-space: nowrap;
   }
+  .takeaway {
+    margin: var(--s1) 0 0; padding-left: var(--s3);
+    border-left: 2px solid var(--accent);
+    font-size: var(--fs-base); line-height: 1.5; color: var(--text);
+  }
+  .takeaway-label {
+    display: block; margin-bottom: 2px;
+    font-family: var(--mono); font-size: var(--fs-micro); color: var(--faint);
+    text-transform: uppercase; letter-spacing: .08em;
+  }
   .rank .try-live:hover { color: var(--accent-lift); text-decoration: underline; text-underline-offset: 3px; }
 
   .tags { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s2); align-items: center; }
@@ -928,6 +938,7 @@ catch (e) { /* private mode */ }</script>
           markets &mdash; to ask one question: does an agent that looks brilliant in a single run survive
           being run five times?
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>A +275% single run was luck: across 10 seeds the edge over buy-and-hold is not significant (p&nbsp;=&nbsp;0.79).</p>
       </div>
 
       <figure class="plate">
@@ -1127,6 +1138,7 @@ catch (e) { /* private mode */ }</script>
           scores how exposed the project is from 0&ndash;100, and names the specific NIST-standard
           replacement for every finding.
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Usage-aware AST scanning reaches 100% precision on a labeled benchmark where naive pattern matching gets 49.1%.</p>
       </div>
 
       <figure class="plate">
@@ -1203,6 +1215,7 @@ catch (e) { /* private mode */ }</script>
           until they survive the statistical tests institutional quant funds use to separate skill from luck
           &mdash; including the forecast it makes about tomorrow.
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>The best backtest in a 42-variant search is more likely overfit than not (72%), and the forecaster scores a coin flip (AUC&nbsp;&asymp;&nbsp;0.51).</p>
       </div>
 
       <figure class="plate">
@@ -1334,6 +1347,7 @@ catch (e) { /* private mode */ }</script>
           evaluation function &mdash; that learns entirely from playing itself. You can play the
           trained network in your browser.
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>The plateau was a training-signal problem, not compute: 10&times; more self-play moved Elo from &minus;21 to &minus;7; a material signal reached +28.</p>
       </div>
 
       <figure class="plate">
@@ -1419,6 +1433,7 @@ catch (e) { /* private mode */ }</script>
           A real-time market dashboard &mdash; streaming prices, Federal Reserve data, news sentiment and
           an assistant that answers questions about <em>your</em> portfolio rather than the market in general.
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Every indicator hand-coded on NumPy and streamed live, with an assistant that reasons about your actual holdings.</p>
       </div>
 
       <figure class="plate">
@@ -1492,6 +1507,7 @@ catch (e) { /* private mode */ }</script>
           Paint glowing light in mid-air with your bare hands. No controller, no mouse, no stylus &mdash;
           a webcam, a neural network, and a pinch of your fingers.
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Hand tracking as the medium: 21 3D landmarks per hand at ~60 frames a second, entirely on-device, in one HTML file.</p>
       </div>
 
       <figure class="plate">

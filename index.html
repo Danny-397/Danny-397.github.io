@@ -852,7 +852,7 @@ catch (e) { /* private mode */ }</script>
         <dd>projects deployed to a public URL — not just a repository</dd>
       </div>
       <div>
-        <dt>1,314</dt>
+        <dt>1,317</dt>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
@@ -1226,7 +1226,7 @@ catch (e) { /* private mode */ }</script>
       <dl class="figs">
         <div><dt>Forecaster test AUC</dt><dd>&asymp;0.51 <small>a coin flip</small></dd></div>
         <div><dt>In-sample Sharpe surviving OOS</dt><dd>~52% <small>median</small></dd></div>
-        <div><dt>Tests in CI</dt><dd>186</dd></div>
+        <div><dt>Tests in CI</dt><dd>192</dd></div>
       </dl>
 
       <figure class="viz reveal">
@@ -1298,7 +1298,7 @@ catch (e) { /* private mode */ }</script>
             <li><strong>What the shipped model can't do.</strong> The committed checkpoint was trained with the macro and news blocks zero-filled, so it currently predicts from price alone; the multi-modal plumbing is real and tested, and a retrain activates the other two channels with no code change. The metadata file shows it &mdash; those five features carry a standard deviation of exactly zero.</li>
             <li><strong>Indicators from first principles.</strong> SMA, EMA, RSI, MACD, ADX and Bollinger Bands implemented directly rather than pulled from a TA library, across six strategies plus a no-code custom rule builder and a regime-detecting adaptive mode.</li>
             <li><strong>Data resilience.</strong> A three-stage cascade &mdash; Tiingo, then yfinance, then Stooq &mdash; so a single upstream outage doesn't take the system down.</li>
-            <li><strong>Pipeline.</strong> GitHub Actions running 186 pytest cases, flake8 linting and smoke tests on every push.</li>
+            <li><strong>Pipeline.</strong> GitHub Actions running 192 pytest cases, flake8 linting and smoke tests on every push.</li>
           </ul>
         </div>
       </details>
@@ -1438,7 +1438,7 @@ catch (e) { /* private mode */ }</script>
       <dl class="figs">
         <div><dt>Symbols tracked live</dt><dd>11 <small>ticker + correlation matrix</small></dd></div>
         <div><dt>Fed series, hourly refresh</dt><dd>7 <small>via FRED API</small></dd></div>
-        <div><dt>Tests in CI</dt><dd>110 <small>across 13 files</small></dd></div>
+        <div><dt>Tests in CI</dt><dd>112 <small>across 14 files</small></dd></div>
       </dl>
 
       <p class="prose">
@@ -1904,7 +1904,7 @@ catch (e) { /* private mode */ }</script>
   });
 
   /* No count-up on the ledger figures. They are factual claims, and an animation
-     that counts 584 -> 1,298 means the page displays a wrong number for a second --
+     that counts 584 -> 1,317 means the page displays a wrong number for a second --
      which is the exact failure mode the rest of this site argues against. */
 })();
 </script>

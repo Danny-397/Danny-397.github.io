@@ -465,6 +465,24 @@ catch (e) { /* private mode */ }</script>
   .rank .lede-note {
     font-size: var(--fs-xs); color: var(--faint);
   }
+  /* The live link, at the top of the card where a skimmer looks first; the
+     full link row stays at the bottom for readers who finish the write-up. */
+  .rank .try-live {
+    margin-left: auto;
+    font-family: var(--sans); font-size: var(--fs-sm); font-weight: 600;
+    color: var(--accent); text-decoration: none; white-space: nowrap;
+  }
+  .takeaway {
+    margin: var(--s1) 0 0; padding-left: var(--s3);
+    border-left: 2px solid var(--accent);
+    font-size: var(--fs-base); line-height: 1.5; color: var(--text);
+  }
+  .takeaway-label {
+    display: block; margin-bottom: 2px;
+    font-family: var(--mono); font-size: var(--fs-micro); color: var(--faint);
+    text-transform: uppercase; letter-spacing: .08em;
+  }
+  .rank .try-live:hover { color: var(--accent-lift); text-decoration: underline; text-underline-offset: 3px; }
 
   .tags { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s2); align-items: center; }
   .tag {
@@ -838,12 +856,8 @@ catch (e) { /* private mode */ }</script>
     </p>
 
     <p class="whoami">
-      Everything here was written between May and October 2026: reinforcement learning,
-      post-quantum cryptography, quantitative finance, and one piece of interactive art.
-      Every project is deployed to a public URL you can open right now, and every screen
-      below is a recording or screenshot of that deployment — not a mockup. They are ordered
-      with the strongest first. Expand <span class="kbd">Method</span> on anything you want
-      the details of.
+      Built May to October 2026 and ordered strongest first. Every project is live, and every
+      screen below is a recording of the real deployment, not a mockup.
     </p>
 
     <dl class="ledger">
@@ -912,7 +926,7 @@ catch (e) { /* private mode */ }</script>
     <!-- ============ 01 · RL TRADER ============ -->
     <article class="rec" data-field="ml" id="rl-trader">
       <div class="rec-head">
-        <div class="rank"><span class="num">01</span><span class="lede-note">Start here</span></div>
+        <div class="rank"><span class="num">01</span><span class="lede-note">Start here</span><a class="try-live" href="https://rl-for-crypto-and-stocks.vercel.app">Try it live <span aria-hidden="true">&nearr;</span></a></div>
         <div class="tags">
           <span class="tag type">Research study</span>
           <span class="tag">Reinforcement learning</span>
@@ -924,6 +938,7 @@ catch (e) { /* private mode */ }</script>
           markets &mdash; to ask one question: does an agent that looks brilliant in a single run survive
           being run five times?
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>A +275% single run was luck: across 10 seeds the edge over buy-and-hold is not significant (p&nbsp;=&nbsp;0.79).</p>
       </div>
 
       <figure class="plate">
@@ -1111,7 +1126,7 @@ catch (e) { /* private mode */ }</script>
     <!-- ============ 02 · QUANTUM SAFE SCAN ============ -->
     <article class="rec" data-field="sec" id="quantumsafe">
       <div class="rec-head">
-        <div class="rank"><span class="num">02</span><span class="lede-note">Shipped product</span></div>
+        <div class="rank"><span class="num">02</span><span class="lede-note">Shipped product</span><a class="try-live" href="https://quantumsafescan.com">Try it live <span aria-hidden="true">&nearr;</span></a></div>
         <div class="tags">
           <span class="tag type">Developer tool</span>
           <span class="tag">Post-quantum cryptography</span>
@@ -1123,6 +1138,7 @@ catch (e) { /* private mode */ }</script>
           scores how exposed the project is from 0&ndash;100, and names the specific NIST-standard
           replacement for every finding.
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Usage-aware AST scanning reaches 100% precision on a labeled benchmark where naive pattern matching gets 49.1%.</p>
       </div>
 
       <figure class="plate">
@@ -1186,7 +1202,7 @@ catch (e) { /* private mode */ }</script>
     <!-- ============ 03 · ALPHAGLYPH ============ -->
     <article class="rec" data-field="quant" id="alphaglyph">
       <div class="rec-head">
-        <div class="rank"><span class="num">03</span><span class="lede-note">Statistical rigor</span></div>
+        <div class="rank"><span class="num">03</span><span class="lede-note">Statistical rigor</span><a class="try-live" href="https://alphaglyph.org/backtest.html">Try it live <span aria-hidden="true">&nearr;</span></a></div>
         <div class="tags">
           <span class="tag type">Live system</span>
           <span class="tag">Statistical validation</span>
@@ -1199,6 +1215,7 @@ catch (e) { /* private mode */ }</script>
           until they survive the statistical tests institutional quant funds use to separate skill from luck
           &mdash; including the forecast it makes about tomorrow.
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>The best backtest in a 42-variant search is more likely overfit than not (72%), and the forecaster scores a coin flip (AUC&nbsp;&asymp;&nbsp;0.51).</p>
       </div>
 
       <figure class="plate">
@@ -1318,7 +1335,7 @@ catch (e) { /* private mode */ }</script>
     <!-- ============ 04 · RL CHESS ============ -->
     <article class="rec" data-field="ml" id="rl-chess">
       <div class="rec-head">
-        <div class="rank"><span class="num">04</span><span class="lede-note">Play it yourself</span></div>
+        <div class="rank"><span class="num">04</span><span class="lede-note">Play it yourself</span><a class="try-live" href="https://rlchess.xyz/#play">Try it live <span aria-hidden="true">&nearr;</span></a></div>
         <div class="tags">
           <span class="tag type">Research study</span>
           <span class="tag">Reinforcement learning</span>
@@ -1330,6 +1347,7 @@ catch (e) { /* private mode */ }</script>
           evaluation function &mdash; that learns entirely from playing itself. You can play the
           trained network in your browser.
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>The plateau was a training-signal problem, not compute: 10&times; more self-play moved Elo from &minus;21 to &minus;7; a material signal reached +28.</p>
       </div>
 
       <figure class="plate">
@@ -1404,7 +1422,7 @@ catch (e) { /* private mode */ }</script>
     <!-- ============ 05 · TRADESKI ============ -->
     <article class="rec" data-field="quant" id="tradeski">
       <div class="rec-head">
-        <div class="rank"><span class="num">05</span><span class="lede-note">Real-time infrastructure</span></div>
+        <div class="rank"><span class="num">05</span><span class="lede-note">Real-time infrastructure</span><a class="try-live" href="https://www.tradeski.dev/">Try it live <span aria-hidden="true">&nearr;</span></a></div>
         <div class="tags">
           <span class="tag type">Live system</span>
           <span class="tag">Real-time infrastructure</span>
@@ -1415,6 +1433,7 @@ catch (e) { /* private mode */ }</script>
           A real-time market dashboard &mdash; streaming prices, Federal Reserve data, news sentiment and
           an assistant that answers questions about <em>your</em> portfolio rather than the market in general.
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Every indicator hand-coded on NumPy and streamed live, with an assistant that reasons about your actual holdings.</p>
       </div>
 
       <figure class="plate">
@@ -1477,7 +1496,7 @@ catch (e) { /* private mode */ }</script>
     <!-- ============ 06 · NEURAL CANVAS ============ -->
     <article class="rec" data-field="art" id="neural-canvas">
       <div class="rec-head">
-        <div class="rank"><span class="num">06</span><span class="lede-note">Hackathon piece</span></div>
+        <div class="rank"><span class="num">06</span><span class="lede-note">Hackathon piece</span><a class="try-live" href="https://danny-397.github.io/neural-canvas/">Try it live <span aria-hidden="true">&nearr;</span></a></div>
         <div class="tags">
           <span class="tag type">Artwork</span>
           <span class="tag">Hack the Arts 2026</span>
@@ -1488,6 +1507,7 @@ catch (e) { /* private mode */ }</script>
           Paint glowing light in mid-air with your bare hands. No controller, no mouse, no stylus &mdash;
           a webcam, a neural network, and a pinch of your fingers.
         </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Hand tracking as the medium: 21 3D landmarks per hand at ~60 frames a second, entirely on-device, in one HTML file.</p>
       </div>
 
       <figure class="plate">

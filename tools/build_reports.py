@@ -79,7 +79,7 @@ REPORTS = [
            "protocol whose headline result is negative.",
            assets=("figures/fig_ablation.png",)),
     Report("research-summary", "Research Summary", "All six projects",
-           ".", "research-summary.md", "Research-Summary.pdf",
+           ".", "research-summary.md", None,   # web-only: its old PDF went stale and was removed
            "One page across all six projects: what each claimed, and what the numbers said."),
     Report("quantumsafe-technical-report", "QuantumSafe — Technical Report", "QuantumSafe Scan",
            "Quantum-Safe-Scan", "docs/TECHNICAL_REPORT.md", "QuantumSafe-Technical-Report.pdf",
@@ -263,7 +263,7 @@ TAIL = """
     <p class="eyebrow">On this document</p>
     <p>
       Rendered from <a href="{source_url}"><code>{source}</code></a> in the
-      {project} repository, so this page, the PDF and the code stay in step.
+      {project} repository, so this page{pdf_clause} and the code stay in step.
       <a href="../reports.html">All reports &rarr;</a>
     </p>
   </div>
@@ -337,7 +337,7 @@ def build(report: Report, built: set[str], renderer: MarkdownIt) -> str:
 </main>
 """
 
-    tail = TAIL.format(source_url=report.source_url,
+    tail = TAIL.format(pdf_clause=", the PDF" if report.pdf else "", source_url=report.source_url,
                        source=html.escape(report.source),
                        project=html.escape(report.project))
     return head + masthead + tail

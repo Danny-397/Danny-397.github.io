@@ -852,7 +852,7 @@ catch (e) { /* private mode */ }</script>
         <dd>projects deployed to a public URL — not just a repository</dd>
       </div>
       <div>
-        <dt>1,305</dt>
+        <dt>1,314</dt>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
@@ -951,7 +951,7 @@ catch (e) { /* private mode */ }</script>
       <dl class="figs">
         <div><dt>The run I nearly published</dt><dd>+275% <small>vs. +19% &middot; superseded v1, commit d4c0ef9</small></dd></div>
         <div><dt>Rebuilt, 10 seeds</dt><dd>+57% <small>vs. +34% buy-and-hold &middot; p = 0.79</small></dd></div>
-        <div><dt>Domain randomization, held-out</dt><dd>&minus;26% &rarr; +38% <small>stocks, 5 seeds</small></dd></div>
+        <div><dt>Domain randomization, held-out</dt><dd>&minus;25% &rarr; +31% <small>stocks, 10 seeds</small></dd></div>
       </dl>
 
       <figure class="viz reveal">
@@ -1046,7 +1046,7 @@ catch (e) { /* private mode */ }</script>
       <figure class="plate">
         <div class="plate-frame plate-scroll">
           <img src="media/rltrader-arms.webp" width="1400" height="514" loading="lazy" decoding="async"
-               alt="Two panels compared. Trained on one asset, tagged memorised: training return +322k% to +4.0M% across 5 seeds, held-out return minus 51% with a 95% confidence interval of minus 62% to minus 39%. Trained across the basket, tagged generalised: training return +87% to +460%, held-out return +204% with a 95% confidence interval of +160% to +248%.">
+               alt="Two panels compared. Trained on one asset, tagged memorised: training return +87k% to +4.0M% across 10 seeds, held-out return minus 44% with a 95% confidence interval of minus 59% to minus 21%. Trained across the basket, tagged generalised: training return +24% to +460%, held-out return +187% with a 95% confidence interval of +147% to +229%.">
           <a class="plate-cover" href="https://rl-for-crypto-and-stocks.vercel.app/#result">
             <span class="plate-cta">See the full result &nearr;</span>
           </a>
@@ -1055,7 +1055,7 @@ catch (e) { /* private mode */ }</script>
           <span class="chip">Screenshot &middot; the finding</span>
           <b>The whole argument in one figure.</b> Both arms were trained identically and scored on the
           same held-out paths; the only difference is how many assets they saw. The overfit arm's
-          in-sample return of <code>+4.0M%</code> becomes <code>&minus;51%</code> the moment it meets
+          in-sample return of <code>+4.0M%</code> becomes <code>&minus;44%</code> the moment it meets
           data it has never seen. Each dot is one seed.
          <span class="plate-hint">Scroll it sideways to read the detail.</span>
         </figcaption>
@@ -1074,8 +1074,8 @@ catch (e) { /* private mode */ }</script>
           <em>worse</em>, at p = 0.002. Retrained across four separate slices of Bitcoin's history, it lost
           money in every one.
           Separately, an agent trained on a single price path memorizes it catastrophically; training on a
-          freshly generated synthetic path each episode flips held-out return from &minus;26% to +38% on
-          equities and from &minus;51% to +204% on crypto &mdash; across five seeds, with all four confidence
+          freshly generated synthetic path each episode flips held-out return from &minus;25% to +31% on
+          equities and from &minus;44% to +187% on crypto &mdash; across ten seeds, with all four confidence
           intervals excluding zero. Reported as a distribution rather than a single run, because the
           in-sample figure that version quoted swings by an order of magnitude between seeds.
           The result reproduces Henderson et al. (2018) on the unreliability of
@@ -1167,7 +1167,7 @@ catch (e) { /* private mode */ }</script>
             <li><strong>Prioritise.</strong> A severity score says how much vulnerable cryptography exists, not whether you will finish migrating in time. Mosca's inequality &mdash; secrecy lifetime plus migration time, against time-to-quantum &mdash; turns it into a deadline. No default is supplied for the quantum date, because nobody knows it; the tool reports the break-even year instead, which needs no such guess.</li>
             <li><strong>Fix.</strong> A lattice-based (LWE) key-encapsulation mechanism written from scratch &mdash; the underlying math of CRYSTALS-Kyber / ML-KEM &mdash; rather than a library call.</li>
             <li><strong>Field results.</strong> Paramiko, the standard Python SSH library, scores 100/100 Critical with 110 findings. Across 37 PyPI packages, 32 (86%) contained at least one finding. In a study of 8 widely-used projects, 88% contained HIGH-risk usage, mean score 61.4/100.</li>
-            <li><strong>Assurance.</strong> 545 automated tests in continuous integration, plus a baseline mode that fails a build only on <em>new</em> findings &mdash; so a project with an existing backlog can ratchet it down instead of disabling the check.</li>
+            <li><strong>Assurance.</strong> 552 automated tests in continuous integration, plus a baseline mode that fails a build only on <em>new</em> findings &mdash; so a project with an existing backlog can ratchet it down instead of disabling the check.</li>
           </ul>
         </div>
       </details>

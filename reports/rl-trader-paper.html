@@ -77,13 +77,13 @@ catch (e) { /* private mode */ }</script>
   </nav>
   <article class="prose-doc">
 <h2 id="abstract">Abstract<a class="anchor" href="#abstract" aria-label="Link to this section">#</a></h2>
-<p>Deep reinforcement learning is unusually easy to fool yourself with: agents memorize their training trajectory, and a single lucky random seed can masquerade as a real result. We study both failure modes from scratch — a PyTorch implementation of Proximal Policy Optimization (PPO), two custom Gymnasium environments, and a full evaluation suite — using financial markets as a deliberately hard testbed: non-stationary, partially observable, with a noisy reward and near–random-walk signal. We ask (RQ1) whether one fixed recipe generalizes across two market regimes; (RQ2) how severely an agent overfits a single price trajectory and whether <em>domain randomization</em> repairs it; (RQ3) whether an apparent out-of-sample edge survives multi-seed significance testing; and (RQ4) whether the same holds for cross-sectional allocation. Our headline result is negative, and that is the point: on real markets the agent has <em>no seed-robust edge</em> over buy-and-hold, and our own significance tooling catches it: an earlier build of this study published a <code>+275%</code> single-seed crypto run that survived neither reseeding nor a two-month extension of the evaluation window. We further introduce a <strong>surrogate-data falsification test</strong> that separates “the agent is weak” from “there is no signal to find,” and validate it with a positive control on synthetic data with known structure. In doing so the project reproduces, in a new domain, the central methodological finding of Henderson et al. (2018) — that single-run RL evaluation is unreliable. We then apply that finding to our own ablation, whose domain-randomized arm is unseeded by construction and so cannot be reproduced from a single run: we report both arms as distributions over five seeds, where all four confidence intervals exclude zero.</p>
+<p>Deep reinforcement learning is unusually easy to fool yourself with: agents memorize their training trajectory, and a single lucky random seed can masquerade as a real result. We study both failure modes from scratch — a PyTorch implementation of Proximal Policy Optimization (PPO), two custom Gymnasium environments, and a full evaluation suite — using financial markets as a deliberately hard testbed: non-stationary, partially observable, with a noisy reward and near–random-walk signal. We ask (RQ1) whether one fixed recipe generalizes across two market regimes; (RQ2) how severely an agent overfits a single price trajectory and whether <em>domain randomization</em> repairs it; (RQ3) whether an apparent out-of-sample edge survives multi-seed significance testing; and (RQ4) whether the same holds for cross-sectional allocation. Our headline result is negative, and that is the point: on real markets the agent has <em>no seed-robust edge</em> over buy-and-hold, and our own significance tooling catches it: an earlier build of this study published a <code>+275%</code> single-seed crypto run that survived neither reseeding nor a two-month extension of the evaluation window. We further introduce a <strong>surrogate-data falsification test</strong> that separates “the agent is weak” from “there is no signal to find,” and validate it with a positive control on synthetic data with known structure. In doing so the project reproduces, in a new domain, the central methodological finding of Henderson et al. (2018) — that single-run RL evaluation is unreliable. We then apply that finding to our own ablation: we report both arms as distributions over ten seeds, where all four confidence intervals exclude zero, after finding and fixing a seeding bug that had left the domain-randomized arm unreproducible.</p>
 <h2 id="introduction">Introduction<a class="anchor" href="#introduction" aria-label="Link to this section">#</a></h2>
 <p>Reinforcement learning (RL) research has a reproducibility problem: reported performance swings wildly across random seeds, implementation details, and evaluation choices [1]. Trading is a domain where these hazards are especially acute — the data-generating process drifts (non-stationarity), price alone hides the true state (partial observability), the reward is noisy, and a single historical path is trivial to memorize. That makes markets an excellent <em>stress test</em> for the general RL questions of generalization and honest evaluation, rather than a get-rich scheme.</p>
 <p>We build the entire stack from the algorithm up — PPO [2] with Generalized Advantage Estimation [3], two market environments, a 28-feature pipeline, and the evaluation harness — so that every experiment can be instrumented and trusted. Our contributions are:</p>
 <ul>
 <li>
-<p>A controlled study showing an RL agent memorizes a single price path catastrophically, and that <strong>domain randomization</strong> [4, 5] is the single change that flips held-out return from reliably negative to reliably positive — across five seeds all four confidence intervals exclude zero, in both markets (§3.2).</p>
+<p>A controlled study showing an RL agent memorizes a single price path catastrophically, and that <strong>domain randomization</strong> [4, 5] is the single change that flips held-out return from reliably negative to reliably positive — across ten seeds all four confidence intervals exclude zero, in both markets (§3.2).</p>
 </li>
 <li>
 <p>A <strong>multi-seed significance protocol</strong> (bootstrap CIs + paired permutation tests) that reproduces the Henderson et al. [1] finding in a new domain: a favorable single-seed “win” does not survive resampling (§3.3).</p>
@@ -120,37 +120,37 @@ catch (e) { /* private mode */ }</script>
 <tr>
 <td style="text-align:left">Stock</td>
 <td style="text-align:left">single</td>
-<td style="text-align:right"><code>+17k</code>–<code>+30k</code></td>
-<td style="text-align:right"><code>-26</code> <code>[-37,-9]</code></td>
+<td style="text-align:right"><code>+6k</code>–<code>+31k</code></td>
+<td style="text-align:right"><code>-25</code> <code>[-33,-15]</code></td>
 </tr>
 <tr>
 <td style="text-align:left">Stock</td>
 <td style="text-align:left">domain</td>
 <td style="text-align:right"><code>-22</code>–<code>+59</code></td>
-<td style="text-align:right"><code>+38</code> <code>[+21,+60]</code></td>
+<td style="text-align:right"><code>+31</code> <code>[+21,+44]</code></td>
 </tr>
 <tr>
 <td style="text-align:left">Crypto</td>
 <td style="text-align:left">single</td>
-<td style="text-align:right"><code>+322k</code>–<code>+4.0M</code></td>
-<td style="text-align:right"><code>-51</code> <code>[-62,-39]</code></td>
+<td style="text-align:right"><code>+87k</code>–<code>+4.0M</code></td>
+<td style="text-align:right"><code>-44</code> <code>[-59,-21]</code></td>
 </tr>
 <tr>
 <td style="text-align:left">Crypto</td>
 <td style="text-align:left">domain</td>
-<td style="text-align:right"><code>+87</code>–<code>+460</code></td>
-<td style="text-align:right"><code>+204</code> <code>[+160,+248]</code></td>
+<td style="text-align:right"><code>+24</code>–<code>+460</code></td>
+<td style="text-align:right"><code>+187</code> <code>[+147,+229]</code></td>
 </tr>
 </tbody>
 </table></div>
-<p>Domain-randomization ablation, 5 seeds <code>×</code> 60k steps; all cells are percent returns. Held-out is the mean over 30 unseen paths — identical for every arm and seed — with a bootstrap 95% CI across seeds. In-sample is a <em>range</em> over seeds, not a mean: it is one leveraged compounding return on a memorized path and spans orders of magnitude. The domain-randomized arm’s in-sample figure is its return on the very path the single-path agent memorized.</p>
+<p>Domain-randomization ablation, 10 seeds <code>×</code> 60k steps; all cells are percent returns. Held-out is the mean over 30 unseen paths — identical for every arm and seed — with a bootstrap 95% CI across seeds. In-sample is a <em>range</em> over seeds, not a mean: it is one leveraged compounding return on a memorized path and spans orders of magnitude. The domain-randomized arm’s in-sample figure is its return on the very path the single-path agent memorized.</p>
 </div>
 <figure id="fig:ablation" data-latex-placement="t">
 <img src="figures/fig_ablation.png" />
 <figcaption>Held-out return by training regime. Bars are the mean over seeds, whiskers the bootstrap 95% CI, and dots the individual seeds — so the reader sees <span class="math inline"><em>n</em></span> and the spread rather than a bar alone. The in-sample range is annotated rather than plotted: it spans several orders of magnitude and would flatten everything else to a line.</figcaption>
 </figure>
 <p>The astronomical in-sample figures are not a win — they are the overfitting signature. Domain randomization is the single change that turns a memorizer into a generalizer, echoing sim-to-real transfer [4] and RL generalization benchmarks [5].</p>
-<p>Across five seeds all four intervals exclude zero: single-path training is reliably unprofitable out-of-sample and domain randomization is reliably profitable, in both markets. The effect is therefore robust to seed choice, which is the property the rest of this paper spends its time showing that real-market edges lack.</p>
+<p>Across ten seeds all four intervals exclude zero: single-path training is reliably unprofitable out-of-sample and domain randomization is reliably profitable, in both markets. The effect is therefore robust to seed choice, which is the property the rest of this paper spends its time showing that real-market edges lack.</p>
 <p>Two caveats the distribution makes visible and a single run would hide. Equities are the weaker case — one of five single-path seeds returned <code>+8%</code> rather than a loss, and the interval reaches to <code>-9%</code>, so “reliably negative” there rests on a margin, not a chasm. And the crypto domain-randomized mean is inflated by one seed at <code>+307%</code> against a cluster near <code>+60%</code>; the interval is correspondingly wide. Figure 1 plots the individual seeds for exactly this reason.</p>
 <h3 id="rq3-does-the-edge-survive-multiple-seeds">RQ3: Does the edge survive multiple seeds?<a class="anchor" href="#rq3-does-the-edge-survive-multiple-seeds" aria-label="Link to this section">#</a></h3>
 <p>A single backtest is an anecdote. On synthetic markets where a signal provably exists, the agent is repeatably profitable across 5 seeds — its bootstrap interval excludes zero in both markets — yet remains statistically indistinguishable from buy-and-hold under a paired permutation test. On <em>real</em> markets the two markets fail differently (Table 2). On equities the agent is significantly <em>worse</em> than the mega-cap bull. On crypto the mean across seeds is positive and its interval excludes zero, so the agent did make money on average; what it did not do is beat buy-and-hold, which the paired test cannot distinguish it from. The per-seed returns span more than an order of magnitude, and with 5 seeds a sign-flip test on that axis cannot reach <code>p≤0.05</code> even in principle — its floor is <code>2/2^5=0.0625</code>. An earlier build of this study (commit <code>d4c0ef9</code>) published the crypto agent at <code>+275%</code> against buy-and-hold’s <code>+19%</code>; rebuilding the identical recipe — same code, same seed, same budget — against a data snapshot pinned two months later erased that headline entirely. The run was not merely seed-lucky but window-lucky.</p>

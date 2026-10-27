@@ -52,6 +52,54 @@ HEADERS = {
         "site": "rlchess.xyz",
         "repo_pdf": "docs/RL-Chess-Experiment-Results.pdf",
     },
+    "alphaglyph-technical-report": {
+        "eyebrow": "Technical report",
+        "title": "AlphaGlyph: A Backtesting Laboratory That Measures Its Own Credibility",
+        # The PDF said 63%, the pre-August run. 72% is the dated run the report
+        # tables, reproducible from tools/pbo_snapshot.py in the AlphaGlyph repo.
+        "subtitle": "Walk-forward simulation, Deflated Sharpe, and combinatorial purged "
+                    "cross-validation — and a 72% probability that its own best strategy "
+                    "is overfit.",
+        "date": "August 2026",
+        "site": "alphaglyph.org",
+        "repo_pdf": "docs/AlphaGlyph-Technical-Report.pdf",
+    },
+    "quantumsafe-technical-report": {
+        "eyebrow": "Technical report",
+        "title": "QuantumSafe: Detecting Quantum-Vulnerable Cryptography",
+        "subtitle": "What the scanner is, how the hybrid AST/regex engine works, and how well "
+                    "it measures against a labeled nine-language benchmark.",
+        "date": "July 2026",
+        "site": "quantumsafescan.com",
+        "repo_pdf": "docs/QuantumSafe-Technical-Report.pdf",
+    },
+    "quantumsafe-whitepaper": {
+        "eyebrow": "Whitepaper",
+        "title": "Detecting Quantum-Vulnerable Cryptography and Guiding Post-Quantum Migration",
+        "subtitle": "Long-form treatment: threat model, the mathematics of Shor and Grover, the "
+                    "NIST replacement standards, and a from-scratch lattice-based KEM.",
+        "date": "July 2026",
+        "site": "quantumsafescan.com",
+        "repo_pdf": "docs/QuantumSafe-Whitepaper.pdf",
+    },
+    "tradeski-technical-report": {
+        "eyebrow": "Technical report",
+        "title": "Tradeski: A Real-Time Market Dashboard",
+        "subtitle": "Rate-limit budgeting, indicators correct at their boundary conditions, and "
+                    "grounding a language model in one user's actual portfolio.",
+        "date": "2026",
+        "site": "tradeski.dev",
+        "repo_pdf": "docs/Tradeski-Technical-Report.pdf",
+    },
+    "neural-canvas-technical-report": {
+        "eyebrow": "Technical report",
+        "title": "Neural Canvas: Painting With Bare Hands",
+        "subtitle": "Estimating drawing intent from a noisy 60 Hz landmark signal — why a fixed "
+                    "low-pass filter fails, and what the one-euro filter does instead.",
+        "date": "2026",
+        "site": "danny-397.github.io/neural-canvas",
+        "repo_pdf": "docs/Neural-Canvas-Technical-Report.pdf",
+    },
 }
 
 CSS = """

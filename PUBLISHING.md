@@ -128,7 +128,7 @@ and so on), so this runs locally and the output HTML is committed — exactly ho
 the PDFs are already handled. There is no build step on GitHub Pages. Re-run it
 after editing any report's markdown, or the committed HTML goes stale.
 
-All nine documents are built this way, including RL-Trader's paper. That one's
+All ten documents are built this way, including RL-Trader's paper. That one's
 source is LaTeX, so it goes through an extra step first: run
 `python tools/paper_to_markdown.py` in the RL-for-Crypto repo to produce
 `paper/rl_trader.md`, then build here as usual. That script exists because

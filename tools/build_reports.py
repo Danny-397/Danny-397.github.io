@@ -81,6 +81,9 @@ REPORTS = [
     Report("research-summary", "Research Summary", "All six projects",
            ".", "research-summary.md", None,   # web-only: its old PDF went stale and was removed
            "One page across all six projects: what each claimed, and what the numbers said."),
+    Report("verification-ledger", "Verification Ledger", "All six projects",
+           ".", "verification-ledger.md", "Verification-Ledger.pdf",
+           "Every headline number, its source, and the command that reproduces it."),
     Report("quantumsafe-technical-report", "QuantumSafe — Technical Report", "QuantumSafe Scan",
            "Quantum-Safe-Scan", "docs/TECHNICAL_REPORT.md", "QuantumSafe-Technical-Report.pdf",
            "What the scanner is, how the hybrid engine works, and how well it scores."),

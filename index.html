@@ -40,7 +40,7 @@ catch (e) { /* private mode */ }</script>
     --surface-2: #FBFAF6;
     --text:      #15181E;
     --muted:     #565B64;
-    --faint:     #6B6F76;
+    --faint:     #5D6168;   /* 5.0:1 on the paper background (was 4.1:1) */
     --rule:      #C7C3B8;
     --rule-soft: #D9D6CC;
     --accent:    #1F4B99;
@@ -816,7 +816,7 @@ catch (e) { /* private mode */ }</script>
 
 <div class="progress" id="progress" aria-hidden="true"></div>
 
-<div class="util" id="util" aria-hidden="true">
+<div class="util" id="util" aria-hidden="true" inert>
   <div class="util-in">
     <span class="util-name">Dan Lichtenberger</span>
     <nav class="util-links">
@@ -1712,6 +1712,7 @@ catch (e) { /* private mode */ }</script>
     var past = window.scrollY > mast.offsetHeight - 40;
     util.classList.toggle('on', past);
     util.setAttribute('aria-hidden', String(!past));
+    util.inert = !past;   // hidden bar's links must not take keyboard focus
 
     var here = null;
     recs.forEach(function (r) {

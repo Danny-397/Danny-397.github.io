@@ -11,7 +11,7 @@
   --surface-2: #FBFAF6;
   --text:      #15181E;
   --muted:     #565B64;
-  --faint:     #6B6F76;
+  --faint:     #5D6168;   /* 5.0:1 on the paper background (was 4.1:1) */
   --rule:      #C7C3B8;
   --rule-soft: #D9D6CC;
   --accent:    #1F4B99;
@@ -66,7 +66,7 @@
   --surface-2: #FBFAF6;
   --text:      #15181E;
   --muted:     #565B64;
-  --faint:     #6B6F76;
+  --faint:     #5D6168;   /* 5.0:1 on the paper background (was 4.1:1) */
   --rule:      #C7C3B8;
   --rule-soft: #D9D6CC;
   --accent:    #1F4B99;

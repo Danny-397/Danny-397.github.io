@@ -1088,7 +1088,9 @@ catch (e) { /* private mode */ }</script>
           +57% [+16%, +106%], cannot be distinguished from buy-and-hold's +34% (p = 0.79). The stock agent
           returned &minus;19% [&minus;27%, &minus;11%] against buy-and-hold's +240% &mdash; significantly
           <em>worse</em>, at p = 0.002. Retrained across four separate slices of Bitcoin's history, it lost
-          money in every one.
+          money in every one. A replication on ten fresh seeds, with its predictions committed before the
+          run, held on all four counts (stock p = 0.002; crypto p = 0.88); the one figure that did not
+          survive was the crypto mean's interval, which now includes zero.
           Separately, an agent trained on a single price path memorizes it catastrophically; training on a
           freshly generated synthetic path each episode flips held-out return from &minus;25% to +31% on
           equities and from &minus;44% to +187% on crypto &mdash; across ten seeds, with all four confidence

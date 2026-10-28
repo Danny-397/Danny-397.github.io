@@ -33,6 +33,14 @@ from build_reports import REPORTS, SITE, md_renderer, rewrite_links, wrap_tables
 
 # slug -> the header block printed above the body (the markdown's own h1 is dropped).
 HEADERS = {
+    "verification-ledger": {
+        "eyebrow": "Verification ledger",
+        "title": "Every Headline Number, and How to Reproduce It",
+        "subtitle": "The research figures across all six projects, each with its source file "
+                    "and the command that regenerates it. Dated, because data moves.",
+        "date": "October 2026",
+        "site": "danny-397.github.io",
+    },
     "rl-chess-technical-report": {
         "eyebrow": "Technical report",
         "title": "An AlphaZero-Style Chess Engine, Built From Scratch",

@@ -866,7 +866,7 @@ catch (e) { /* private mode */ }</script>
         <dd>projects deployed to a public URL — not just a repository</dd>
       </div>
       <div>
-        <dt>1,327</dt>
+        <dt>1,334</dt>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
@@ -1138,7 +1138,7 @@ catch (e) { /* private mode */ }</script>
           scores how exposed the project is from 0&ndash;100, and names the specific NIST-standard
           replacement for every finding.
         </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Usage-aware AST scanning reaches 100% precision on a labeled benchmark where naive pattern matching gets 49.1%.</p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Usage-aware scanning reaches 100% precision on its own benchmark (naive matching: 49.1%) and 93% on a random, hand-labeled sample of real-world findings.</p>
       </div>
 
       <figure class="plate">
@@ -1170,7 +1170,10 @@ catch (e) { /* private mode */ }</script>
         inside a comment, a docstring, or a code path nothing ever calls. A hybrid AST-and-regex engine
         with usage awareness and reachability ranking eliminated 27 false positives the naive
         pattern-matching baseline produced, taking precision from 49.1% to 100% on an 18-file,
-        9-language benchmark, with 100% recall on 50 seeded cases under mutation testing.
+        9-language benchmark, with 100% recall on 50 seeded cases under mutation testing. Because that
+        benchmark is the one it was tuned on, precision was also measured on 100 findings drawn at random
+        from real PyPI packages and labeled by hand: 93% (95% CI 86&ndash;97%). Four of the seven misses
+        were one rule flagging the flags that turn old TLS <em>off</em>; that rule is now fixed.
       </p>
 
       <details class="method">
@@ -1183,7 +1186,7 @@ catch (e) { /* private mode */ }</script>
             <li><strong>Prioritise.</strong> A severity score says how much vulnerable cryptography exists, not whether you will finish migrating in time. Mosca's inequality &mdash; secrecy lifetime plus migration time, against time-to-quantum &mdash; turns it into a deadline. No default is supplied for the quantum date, because nobody knows it; the tool reports the break-even year instead, which needs no such guess.</li>
             <li><strong>Fix.</strong> A lattice-based (LWE) key-encapsulation mechanism written from scratch &mdash; the underlying math of CRYSTALS-Kyber / ML-KEM &mdash; rather than a library call.</li>
             <li><strong>Field results.</strong> Paramiko, the standard Python SSH library, scores 100/100 Critical with 110 findings. Across 37 PyPI packages, 32 (86%) contained at least one finding. In a study of 8 widely-used projects, 88% contained HIGH-risk usage, mean score 61.4/100.</li>
-            <li><strong>Assurance.</strong> 552 automated tests in continuous integration, plus a baseline mode that fails a build only on <em>new</em> findings &mdash; so a project with an existing backlog can ratchet it down instead of disabling the check.</li>
+            <li><strong>Assurance.</strong> 559 automated tests in continuous integration, plus a baseline mode that fails a build only on <em>new</em> findings &mdash; so a project with an existing backlog can ratchet it down instead of disabling the check.</li>
           </ul>
         </div>
       </details>

@@ -22,7 +22,7 @@ cryptography a quantum computer would break, scores exposure 0–100, names the
 NIST-standard replacement. The hard part isn't matching `RSA`; it's *not* matching it
 in a comment or a dead code path. A hybrid AST-and-regex engine with reachability
 ranking took precision from **49.1% to 100%** on a 9-language benchmark at 100% recall
-over 50 seeded cases. Audited 10,938 files; of 37 PyPI packages, 86% had a finding.
+over 50 seeded cases. Audited 11,275 files; of 37 PyPI packages, 86% had a finding.
 Exports SARIF and CycloneDX CBOM, so it drops into real CI.
 
 **RL-Trader** · [4-page paper](reports/RL-Trader-Paper.pdf) — PPO from scratch, aimed

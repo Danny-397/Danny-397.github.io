@@ -80,7 +80,7 @@ catch (e) { /* private mode */ }</script>
   <article class="prose-doc">
 <p><em>A concise, current technical account of what QuantumSafe is, how it works, and how
 well it works. For the long-form treatment (full threat model, algorithm math, and
-references) see <a href="quantumsafe-whitepaper.html">WHITEPAPER.md</a>; for the module/data-flow breakdown see
+references) see <a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/docs/WHITEPAPER.md">WHITEPAPER.md</a>; for the module/data-flow breakdown see
 <a href="https://github.com/Danny-397/Quantum-Safe-Scan/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE.md</a>.</em></p>
 <hr />
 <h2 id="1-the-problem-in-one-paragraph">1. The problem in one paragraph<a class="anchor" href="#1-the-problem-in-one-paragraph" aria-label="Link to this section">#</a></h2>
@@ -296,13 +296,13 @@ methodology and a capability matrix vs. Semgrep/SonarQube/CBOM tools in
 latest sdist of <strong>37 of the most-downloaded PyPI packages</strong> straight from the PyPI JSON
 API and scans them (nothing is built or executed):</p>
 <ul>
-<li><strong>32 of 37 (86%)</strong> contained ≥1 finding; <strong>10,938</strong> Python files analyzed;</li>
-<li><strong>5,512</strong> total findings, <strong>4,083 HIGH-risk</strong>;</li>
+<li><strong>32 of 37 (86%)</strong> contained ≥1 finding; <strong>11,275</strong> Python files analyzed;</li>
+<li><strong>5,609</strong> total findings, <strong>4,236 HIGH-risk</strong> (run of 2026-10-28, scanner 0.3.1);</li>
 <li>every finding is a concrete <code>file:line</code> an auditor can open — e.g. Diffie–Hellman in
 <code>twisted/conch/ssh/transport.py</code>, MD5 in <code>requests/auth.py</code> (HTTP Digest).</li>
 </ul>
-<p>The paramiko case shows why usage-awareness matters at scale: a naive line-regex reports
-<strong>451 raw matches</strong>, most of them the same algorithms repeated in docstrings and SSH
+<p>The paramiko case shows why usage-awareness matters at scale: on paramiko 5.0.0 (July 2026
+run) a naive line-regex reports <strong>451 raw matches</strong>, most of them the same algorithms repeated in docstrings and SSH
 protocol-name strings; focusing on real code brings it to <strong>110</strong> findings — a ~4× noise
 reduction. <em>(Honest caveat: some of the 37 packages are cryptography libraries that
 implement RSA/ECC on purpose, so their large counts are expected; the telling signal is
@@ -394,7 +394,7 @@ window; private ranges, loopback, link-local (cloud instance metadata at
 <code>169.254.169.254</code>), carrier-grade NAT and the IPv4-mapped IPv6 forms of all of them are
 refused.</p>
 <h2 id="7-engineering">7. Engineering<a class="anchor" href="#7-engineering" aria-label="Link to this section">#</a></h2>
-<p>One shared engine behind CLI + API + dashboard; <strong>552 automated tests</strong>; CI; Docker and
+<p>One shared engine behind CLI + API + dashboard; <strong>559 automated tests</strong>; CI; Docker and
 <code>docker-compose</code>; a reusable <strong>GitHub Action</strong> (<code>action.yml</code>) that fails a build over a
 risk threshold; multi-service deploy configs; and a published PyPI package
 (<code>pip install quantumsafe-scan</code>, v0.3.0). The benchmark, real-world study, seeded recall

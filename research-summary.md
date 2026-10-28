@@ -48,11 +48,11 @@ discovery, evaluated against its own overfitting. Combinatorial Purged Cross-Val
 puts the **probability of backtest overfitting at 72%** across a 42-variant grid, with
 about **52%** of in-sample Sharpe surviving out-of-sample. The figure is
 window-dependent, and the report documents that instability rather than quoting the
-friendlier run. 192 tests in CI.
+friendlier run. 195 tests in CI.
 
 **Tradeski** · [tradeski.dev](https://www.tradeski.dev/) — Live market, macro, and
 sentiment data in one dashboard: 11 ticker symbols, 7 FRED series hourly, a 29-symbol
-screener, a retrieval-grounded assistant, 112 tests. Its most useful lesson was a bug:
+screener, a retrieval-grounded assistant, 120 tests. Its most useful lesson was a bug:
 live prices never reached the browser because the server emitted on one Socket.IO
 namespace while the client listened on another. Both halves were correct alone, and all
 71 tests passed throughout — every one of them tested a pure function, so no test

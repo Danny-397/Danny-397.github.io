@@ -33,6 +33,7 @@ catch (e) { /* private mode */ }</script>
 <link rel="stylesheet" href="../site.css">
 <link rel="stylesheet" href="../report.css">
 <script src="../analytics.js" defer></script>
+<script src="../scroll-focus.js" defer></script>
 </head>
 <body>
 
@@ -93,13 +94,13 @@ catch (e) { /* private mode */ }</script>
 </li>
 </ul>
 <h2 id="method">Method<a class="anchor" href="#method" aria-label="Link to this section">#</a></h2>
-<h5>Algorithm.</h5>
+<h3 id="algorithm">Algorithm.<a class="anchor" href="#algorithm" aria-label="Link to this section">#</a></h3>
 <p>A single <code>PPOAgent</code> (shared-trunk actor–critic) implements the clipped surrogate objective, GAE advantages, entropy regularization, orthogonal initialization, gradient clipping, and a Welford [9] running observation normalizer that is exported and reused at serving time. A recurrent (LSTM) actor–critic trains through the same machinery with truncated backpropagation through time.</p>
-<h5>Environments.</h5>
+<h3 id="environments">Environments.<a class="anchor" href="#environments" aria-label="Link to this section">#</a></h3>
 <p><code>StockTradingEnv</code> and <code>CryptoTradingEnv</code> subclass one <code>BaseTradingEnv</code> so accounting, transaction costs, slippage, and reward can never silently diverge. The action is a continuous target position in <code>[-1,1]</code> (fraction of equity; negative <code>=</code> short). The observation is a rolling window of 28 stationary features spanning multi-horizon momentum, moving-average ratios, RSI/MACD, Bollinger %B, Donchian position, ATR and volatility-regime signals, drawdown-from-high, volume microstructure, and cross-asset context (relative strength vs. SPY/BTC and the index’s own trend).</p>
-<h5>Reward.</h5>
+<h3 id="reward">Reward.<a class="anchor" href="#reward" aria-label="Link to this section">#</a></h3>
 <p>Two selectable forms: a risk-aware return net of transaction costs with drawdown and turnover penalties, or the Differential Sharpe Ratio [6], an online per-step approximation to the change in the Sharpe ratio.</p>
-<h5>Evaluation protocol.</h5>
+<h3 id="evaluation-protocol">Evaluation protocol.<a class="anchor" href="#evaluation-protocol" aria-label="Link to this section">#</a></h3>
 <p>Data are split chronologically; feature scalers are fit on the training slice only. Agents are scored on an untouched test split by total return, annualized Sharpe, and maximum drawdown, against buy-and-hold, random, and moving-average-crossover baselines run through the identical cost model. Every headline claim is repeated across independent seeds and reported as a bootstrap 95% confidence interval, with a paired permutation test against buy-and-hold.</p>
 <h2 id="experiments">Experiments<a class="anchor" href="#experiments" aria-label="Link to this section">#</a></h2>
 <h3 id="rq1-regime-transfer">RQ1: Regime transfer<a class="anchor" href="#rq1-regime-transfer" aria-label="Link to this section">#</a></h3>
@@ -146,7 +147,7 @@ catch (e) { /* private mode */ }</script>
 <p>Domain-randomization ablation, 10 seeds <code>×</code> 60k steps; all cells are percent returns. Held-out is the mean over 30 unseen paths — identical for every arm and seed — with a bootstrap 95% CI across seeds. In-sample is a <em>range</em> over seeds, not a mean: it is one leveraged compounding return on a memorized path and spans orders of magnitude. The domain-randomized arm’s in-sample figure is its return on the very path the single-path agent memorized.</p>
 </div>
 <figure id="fig:ablation" data-latex-placement="t">
-<img src="figures/fig_ablation.png" />
+<img src="figures/fig_ablation.png" alt="Held-out return by training regime." />
 <figcaption>Held-out return by training regime. Bars are the mean over seeds, whiskers the bootstrap 95% CI, and dots the individual seeds — so the reader sees <span class="math inline"><em>n</em></span> and the spread rather than a bar alone. The in-sample range is annotated rather than plotted: it spans several orders of magnitude and would flatten everything else to a line.</figcaption>
 </figure>
 <p>The astronomical in-sample figures are not a win — they are the overfitting signature. Domain randomization is the single change that turns a memorizer into a generalizer, echoing sim-to-real transfer [4] and RL generalization benchmarks [5].</p>

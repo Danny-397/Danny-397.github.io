@@ -105,6 +105,13 @@ chip on a dead link. Tradeski's dashboard falls back to a recorded snapshot
 (`frontend/demo-snapshot.js`) and QuantumSafe's home page keeps its in-browser
 snippet scanner, so in both cases something real remains to point at.
 
+**Write the note so it removes itself.** Put it in one
+`<p class="caveat" id="hosting-status">` and give each affected chip
+`class="tag warn" title="Backend paused ..."`. On the first day every site and
+backend answers, `uptime.yml` runs `tools/clear_status_note.py`, which deletes
+the note, turns those chips back to `tag live`, commits, and requests a Pages
+build. Run it yourself with `--check` to see what it would remove.
+
 Both outages traced to the same cause: Render's 750 free instance-hours are per
 *workspace* per month, shared across all five backends (AlphaGlyph, Tradeski,
 QuantumSafe, RL-Trader, and the RL-Chess mirror), and running them out suspends

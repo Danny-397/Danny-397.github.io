@@ -116,7 +116,8 @@ every free service until the 1st of the next month. It happened again on
 A sleeping service costs nothing; each wake costs at least 15 minutes. The rule
 for every site is that **only a human reaching for a live feature wakes a
 backend**: not page load, not a crawler, not a forgotten tab. The one
-deliberate exception is Tradeski's landing price strip (below).
+deliberate exception is Tradeski's landing price strip, which loads for any
+person who opens the page (below).
 
 | Spender | Hours / month |
 |---|---|
@@ -135,10 +136,12 @@ Where each site wakes its backend (2026-10-30):
   runs in the browser and wakes nothing.
 - RL-Trader: the live card when it is on screen in a market tab, and the Lab
   when its tab opens.
-- Tradeski: the landing page's live price strip fetches on load (kept on
-  purpose: it is the page's main live feature, and it shows the recorded
-  snapshot until the backend answers). The dashboard drops its socket and
-  polling after 15 idle minutes or when the tab is hidden.
+- Tradeski: the landing page's live price strip fetches once the page is
+  actually shown to a person (kept on purpose: it is the page's main live
+  feature). Crawlers and automated browsers get the recorded snapshot on both
+  the landing page and the dashboard, with no socket (`?live=1` opts a headless
+  browser back in). The dashboard drops its socket and polling after 15 idle
+  minutes or when the tab is hidden.
 
 Anything new that calls a backend on page load, on a timer, or from a cron
 breaks the budget. Check this table before adding one.

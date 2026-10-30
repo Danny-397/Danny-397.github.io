@@ -20,8 +20,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write   # to take down the hosting-status note once everything answers
   issues: write
+  pages: write      # to start a Pages build after that commit
 
 concurrency:
   group: uptime
@@ -35,6 +36,8 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
     steps:
+      - uses: actions/checkout@v4
+
       - name: Check every site and backend
         id: probe
         run: |
@@ -76,6 +79,22 @@ jobs:
             printf '%s' "$down"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+
+      # When a backend goes down, index.html gets a dated note
+      # (id="hosting-status") and the affected chips turn to `tag warn` with a
+      # "Backend paused ..." title -- see PUBLISHING.md. This removes both on the
+      # first day everything answers, so the note can't outlive the outage.
+      - name: Take down the hosting-status note once everything answers
+        if: steps.probe.outputs.down == ''
+        run: |
+          if python tools/clear_status_note.py; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -qam "Every backend answers again: take down the hosting-status note"
+            git push
+            # A push made with GITHUB_TOKEN may not start a Pages build by itself.
+            gh api -X POST "repos/$GH_REPO/pages/builds" >/dev/null || echo "::warning::could not request a Pages build"
+          fi
 
       - name: Open, update or close the outage issue
         env:

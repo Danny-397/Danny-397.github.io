@@ -106,9 +106,42 @@ chip on a dead link. Tradeski's dashboard falls back to a recorded snapshot
 snippet scanner, so in both cases something real remains to point at.
 
 Both outages traced to the same cause: Render's 750 free instance-hours are per
-*workspace* per month, shared across all four backends, and running them out
-suspends every free service. See `Alphaglyph/.github/workflows/keepwarm.yml`,
-whose ping window was narrowed for exactly this reason.
+*workspace* per month, shared across all five backends (AlphaGlyph, Tradeski,
+QuantumSafe, RL-Trader, and the RL-Chess mirror), and running them out suspends
+every free service until the 1st of the next month. It happened again on
+2026-10-28.
+
+### The hour budget
+
+A sleeping service costs nothing; each wake costs at least 15 minutes. The rule
+for every site is that **only a human reaching for a live feature wakes a
+backend**: not page load, not a crawler, not a forgotten tab. The one
+deliberate exception is Tradeski's landing price strip (below).
+
+| Spender | Hours / month |
+|---|---|
+| AlphaGlyph market-hours keepalive (09:00-16:30 ET weekdays, `keepwarm.yml` + self-ping) | ~165 |
+| Daily `uptime.yml` (5 backends x 15 min x 30 days; AlphaGlyph is already awake for it on weekdays) | ~30 |
+| **Fixed total** | **~195** |
+| Left for visitors | ~555, i.e. about 2,200 wakes a month |
+
+Where each site wakes its backend (2026-10-30):
+
+- Portfolio `warm.js`: the one project card a reader hovers, focuses or keeps on
+  screen 1.5 s, once per session.
+- AlphaGlyph landing: hover/focus/tap on a link to a tool page. The tool pages
+  themselves call the API, since opening one is the request.
+- QuantumSafe landing: the Codebase or Website scan tabs. The Snippet scanner
+  runs in the browser and wakes nothing.
+- RL-Trader: the live card when it is on screen in a market tab, and the Lab
+  when its tab opens.
+- Tradeski: the landing page's live price strip fetches on load (kept on
+  purpose: it is the page's main live feature, and it shows the recorded
+  snapshot until the backend answers). The dashboard drops its socket and
+  polling after 15 idle minutes or when the tab is hidden.
+
+Anything new that calls a backend on page load, on a timer, or from a cron
+breaks the budget. Check this table before adding one.
 
 ## Technical reports: HTML alongside the PDFs
 

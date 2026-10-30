@@ -44,6 +44,8 @@ jobs:
           QuantumSafe API|https://quantumsafe-api.onrender.com/health
           Tradeski API|https://tradeski.onrender.com/health
           AlphaGlyph API|https://trading-bot-jy87.onrender.com/health
+          RL Trader API|https://rl-for-crypto-and-stocks.onrender.com/health
+          RL Chess mirror|https://rl-chess-engine.onrender.com/health
           Portfolio|https://danny-397.github.io/
           RL Chess|https://rlchess.xyz/
           QuantumSafe site|https://quantumsafescan.com/

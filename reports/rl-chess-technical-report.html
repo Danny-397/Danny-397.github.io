@@ -87,11 +87,11 @@ implementation, a controlled study of the training plateau I call the <em>draw
 cycle</em>, and the engineering decisions behind a deployed, honest demo. All
 empirical figures in §5 come from a real GPU run (Kaggle, 2× Tesla T4,
 2026-07-14, ~9.8 h training); the full per-iteration data is in
-<a href="rl-chess-experiment-results.html"><code>experiment-results.md</code></a>.</p>
+<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md"><code>experiment-results.md</code></a>.</p>
 </blockquote>
 <hr />
 <h2 id="1-abstract">1. Abstract<a class="anchor" href="#1-abstract" aria-label="Link to this section">#</a></h2>
-<p>I implemented an AlphaZero-style chess engine from first principles in ~3,200 lines
+<p>I implemented an AlphaZero-style chess engine from first principles in ~4,200 lines
 of Python and PyTorch — the policy/value network, PUCT Monte-Carlo Tree Search, and
 the self-play training loop — with <strong>no reinforcement-learning libraries</strong>;
 <code>python-chess</code> supplies only the rules. The machinery works: training drives the
@@ -170,7 +170,7 @@ search is the network's teacher, and self-play is the data source that couples t
 The draw cycle (§6) is what happens when one link — the value target — degenerates.</p>
 <hr />
 <h2 id="4-method-implementation">4. Method / Implementation<a class="anchor" href="#4-method-implementation" aria-label="Link to this section">#</a></h2>
-<p>The system is ~3,200 lines of Python + PyTorch with no reinforcement-learning
+<p>The system is ~4,200 lines of Python + PyTorch with no reinforcement-learning
 libraries; <code>python-chess</code> is used only for the rules (legal-move generation and
 terminal-state detection), so all intellectual effort sits in the encoding, the
 network, the search, and the training loop.</p>
@@ -340,7 +340,7 @@ genuinely strong, and tell the user the truth about what they are playing.</p>
 <p><strong>Provenance.</strong> The figures in §5.1–§5.3 are from a real ~9.8 h GPU run (Kaggle,
 2× Tesla T4, <code>run_experiment.py --device cuda</code>, 2026-07-14); the full
 per-iteration data — self-play termination histograms, evaluation checkpoints, and
-loss curves — is in <a href="rl-chess-experiment-results.html"><code>experiment-results.md</code></a>. Caveat: the
+loss curves — is in <a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md"><code>experiment-results.md</code></a>. Caveat: the
 committed <code>logs/training.log</code> still holds only the earlier <strong>smoke-test</strong> runs; the
 GPU run's raw per-iteration log was not recovered from the Kaggle session (its
 automatic push failed with a 403), so the numbers here are transcribed from that
@@ -599,7 +599,7 @@ truth about which engine is playing — is stronger than a polished fiction. It
 certainly taught me more.</p>
 <h2 id="10-reproducibility">10. Reproducibility<a class="anchor" href="#10-reproducibility" aria-label="Link to this section">#</a></h2>
 <p><strong>Repository.</strong> <a href="https://github.com/Danny-397/RL-Chess-Engine">https://github.com/Danny-397/RL-Chess-Engine</a> (MIT). The code is
-~3,200 lines; the 39-test suite runs in CI on every push.</p>
+~4,200 lines (excluding tests); the 41-test suite runs in CI on every push.</p>
 <p><strong>Environment.</strong> <code>pip install -r requirements-train.txt</code> (adds PyTorch to the
 light runtime deps in <code>requirements.txt</code>). The GPU results in §5 were produced on
 Kaggle with 2× Tesla T4.</p>

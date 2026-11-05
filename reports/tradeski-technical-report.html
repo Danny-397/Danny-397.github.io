@@ -106,7 +106,7 @@ a specific user's holdings so its answers are about them.</p>
 </tr>
 <tr>
 <td>Frontend</td>
-<td>Static HTML/CSS/JS, 2,299 lines, Plotly.js, no framework and no build step</td>
+<td>Static HTML/CSS/JS, ~6,100 lines (<code>dashboard.js</code> alone is 2,690), Plotly.js, no framework and no build step</td>
 </tr>
 <tr>
 <td>Indicators</td>
@@ -114,7 +114,11 @@ a specific user's holdings so its answers are about them.</p>
 </tr>
 <tr>
 <td>Tests</td>
-<td>75, across 11 files, run in GitHub Actions with flake8</td>
+<td>164, across 20 files, run in GitHub Actions with flake8</td>
+</tr>
+<tr>
+<td>Assistant</td>
+<td>Claude Haiku 5.5 with 6 Tradeski tools + web search, a figure-grounding check, and a 19-question eval</td>
 </tr>
 <tr>
 <td>Deployment</td>
@@ -256,6 +260,10 @@ symbol carries an explicit descriptive query string rather than its ticker.</p>
 not fitted values, and there is no labeled financial-headline set here measuring whether
 the extended lexicon actually beats the default. It plainly fixes the specific failures
 above; the general claim is untested, and §9 says so.</p>
+<p>That is also why the assistant (§7) no longer leads with the score. It is shown each headline
+with its source and date, and the VADER aggregate comes last, labelled as a rough hint: a
+language model reading &quot;Tesla deliveries fall short of estimates&quot; judges it better than a
+word list does, and putting the score first anchored its answers to the score.</p>
 <hr />
 <h2 id="6-security">6. Security<a class="anchor" href="#6-security" aria-label="Link to this section">#</a></h2>
 <p>Passwords are hashed with PBKDF2 via werkzeug. Sessions are signed bearer tokens issued
@@ -266,19 +274,50 @@ returns nothing and a bug that returns another user's holdings. CORS is restrict
 explicit origin allowlist from the environment rather than a wildcard.</p>
 <hr />
 <h2 id="7-the-assistant-and-what-grounded-means">7. The assistant, and what &quot;grounded&quot; means<a class="anchor" href="#7-the-assistant-and-what-grounded-means" aria-label="Link to this section">#</a></h2>
-<p>The dashboard includes Ski, a Q&amp;A assistant backed by Claude. The engineering that makes it
-useful is not the prompt; it is what goes into the context window before the prompt.</p>
+<p>The dashboard includes Ski, a Q&amp;A assistant backed by Claude Haiku 5.5. The engineering that
+makes it useful is not the prompt. It is what the model is given, what it can look up, and
+whether anyone checks what it says.</p>
 <p>A general financial chatbot can explain what a P/E ratio is. That is worth very little
 inside a dashboard, because the user is looking at their own screen and their question is
-about <em>their</em> position. So each request assembles a context block first: the user's current
-holdings with market values, the live macro snapshot from FRED, and the scored news
-headlines for the relevant symbols — each formatted by a dedicated <code>format_*_context</code>
-function. Only then is the model called.</p>
-<p>The result is that &quot;am I overexposed to tech?&quot; is answered against the user's actual
-allocation. The model is doing language work; the application is doing the retrieval.</p>
+about <em>their</em> position. So each request starts with a context block: the user's holdings with
+weights, P&amp;L and risk metrics, the live FRED snapshot, recent headlines for the charted
+symbol, and the chart's latest indicator values.</p>
+<p><strong>The first version stopped there, and that made it a wrapper.</strong> Everything Ski knew was one
+paste of text. Asked about NVDA while viewing AAPL, it had no NVDA data at all. It saw
+&quot;RSI 64&quot; with no way to tell whether that was rising or falling. Worse, the prompt claimed
+data it never received (ATR, stochastic, alerts) and taught it to read VIX and options flow
+that were never supplied, which invites invented numbers. It also called MACD a &quot;bullish
+crossover&quot; whenever MACD sat above its signal line, which is wrong: a crossover is the bar
+where the histogram changes sign.</p>
+<p><strong>Now the model decides what to look up, and code computes every number</strong>
+(<a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/ski_tools.py"><code>ski_tools.py</code></a>). Ski has six tools built on the same cached
+fetchers and hand-written indicators as the dashboard:</p>
+<ul>
+<li>a price summary for any ticker (returns, distance from the 52-week range, realised
+volatility, and indicators now and five days ago)</li>
+<li>fundamentals and headlines for any ticker</li>
+<li>return correlation aligned on common trading days</li>
+<li>a what-if that recomputes weights, Sharpe, beta and volatility after hypothetical trades</li>
+<li>the recent history of a FRED series</li>
+</ul>
+<p>Web search covers what the tools don't. The loop allows at most four rounds of tool calls,
+then requires an answer. If the API rejects a tool feature, the loop drops web search, then
+all tools, rather than failing the chat.</p>
+<p><strong>Grounding is checked, not assumed</strong> (<a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/ski_grounding.py"><code>ski_grounding.py</code></a>).
+After each answer, every figure in the reply is matched, at the reply's own rounding, against
+the numbers Ski was actually shown. A figure that matches nothing is either invented or
+calculated by the model itself, and is logged. This is a heuristic. It skips counts, dates
+and indicator lengths, and it needed a rule for textbook levels: the first live answer was
+flagged for &quot;70&quot; in &quot;approaching overbought (typically 70+)&quot;, which is a rule of thumb, not
+data. For now it only logs.</p>
+<p><strong>Quality is meant to be measured, not asserted.</strong> <code>tests/ski_eval/</code> asks 19 questions
+through the real endpoint against fixed fixture data, in three groups: lookups, portfolio
+risk, and honesty traps (put/call ratio, short interest, tomorrow's close). Grading is
+deterministic, with no model judging. As of this writing the eval has not been run against
+the live model, so there is no score to report; §9 says so.</p>
 <hr />
 <h2 id="8-testing">8. Testing<a class="anchor" href="#8-testing" aria-label="Link to this section">#</a></h2>
-<p>121 tests across 16 files run on every push through GitHub Actions, alongside flake8 linting.
+<p>164 tests across 20 files run on every push through GitHub Actions, alongside flake8 linting.
 Coverage is weighted toward the code where correctness is checkable rather than the code
 that is merely tedious: indicator boundary conditions, authentication and token handling,
 database access and user scoping, the FRED and news clients against recorded payloads, the
@@ -312,6 +351,11 @@ application is already fetching. Every Sharpe ratio is therefore slightly wrong 
 direction that changes with the rate environment.</p>
 <p><strong>Sentiment is unvalidated.</strong> See §5. The lexicon extension is a fix for named failures,
 not a measured improvement.</p>
+<p><strong>The assistant's quality is unmeasured.</strong> The eval in §7 exists and its harness is tested
+end to end with a scripted model, but it has not yet been run against the real one. Until it
+is, &quot;Ski answers better with tools&quot; is a design argument, not a result. The grounding check
+is a heuristic too: an invented figure that happens to equal a number in the data, or a
+textbook level, gets through it.</p>
 <p><strong>There is no backtesting and no strategy evaluation.</strong> Tradeski shows you the present. The
 question of whether any indicator on the screen predicts anything is deliberately out of
 scope here — that question is the entire subject of
@@ -333,6 +377,9 @@ risk-free rate from FRED. Delete <code>tracker/main.py</code>. Either validate t
 against a labeled set or relabel the panel as a heuristic. And either give the regression
 forecast an honest error estimate or remove it — of everything on the dashboard it is the
 element that most looks like a claim and least is one.</p>
+<p>For the assistant, I would have written the eval before the first prompt rather than after
+the feature shipped. Until then, Ski was judged by reading answers and deciding they looked
+right, and that is how a prompt claiming data it never received went unnoticed.</p>
 
   </article>
 </main>

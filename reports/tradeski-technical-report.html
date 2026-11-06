@@ -114,7 +114,7 @@ a specific user's holdings so its answers are about them.</p>
 </tr>
 <tr>
 <td>Tests</td>
-<td>164, across 20 files, run in GitHub Actions with flake8</td>
+<td>183, across 21 files, run in GitHub Actions with flake8</td>
 </tr>
 <tr>
 <td>Assistant</td>
@@ -294,12 +294,26 @@ where the histogram changes sign.</p>
 fetchers and hand-written indicators as the dashboard:</p>
 <ul>
 <li>a price summary for any ticker (returns, distance from the 52-week range, realised
-volatility, and indicators now and five days ago)</li>
+volatility, and indicators now and five days ago), with its excess return over the S&amp;P 500
+and its beta, so &quot;is it the stock or the market?&quot; is answered by code, not by the model
+subtracting two numbers</li>
 <li>fundamentals and headlines for any ticker</li>
+<li>a what-if that recomputes weights, Sharpe, beta and volatility after hypothetical trades,
+and reports the change in each</li>
 <li>return correlation aligned on common trading days</li>
-<li>a what-if that recomputes weights, Sharpe, beta and volatility after hypothetical trades</li>
 <li>the recent history of a FRED series</li>
 </ul>
+<p><strong>Fundamentals were blank in production, and the fix computes them from filings.</strong> Yahoo's
+fundamentals endpoint is blocked from Render, so all 29 screener rows had no P/E or market
+cap, and Ski's fundamentals tool returned empty fields (and a &quot;—&quot; placeholder as the sector).
+Blank fields are now dropped, and Ski is told to say so when P/E is unavailable. With
+<code>SEC_USER_AGENT</code> set, <a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/sec_fundamentals.py"><code>sec_fundamentals.py</code></a> computes trailing
+EPS, P/E, market cap, revenue growth and net margin from SEC EDGAR filings. 10-K filings report
+only the full year, so the fourth quarter is derived as the year minus its first three quarters,
+and a window with a missing quarter is refused rather than summed. The screener table uses the
+same figures for its blank P/E and market cap columns, but only from cache: one throttled
+background warm-up fetches the filings, so the page never waits on EDGAR. Each reply also lists what
+Ski looked up (&quot;NVDA price and chart · web search&quot;), so a reader can tell data from prose.</p>
 <p>Web search covers what the tools don't. The loop allows at most four rounds of tool calls,
 then requires an answer. If the API rejects a tool feature, the loop drops web search, then
 all tools, rather than failing the chat.</p>
@@ -310,14 +324,14 @@ calculated by the model itself, and is logged. This is a heuristic. It skips cou
 and indicator lengths, and it needed a rule for textbook levels: the first live answer was
 flagged for &quot;70&quot; in &quot;approaching overbought (typically 70+)&quot;, which is a rule of thumb, not
 data. For now it only logs.</p>
-<p><strong>Quality is meant to be measured, not asserted.</strong> <code>tests/ski_eval/</code> asks 19 questions
+<p><strong>Quality is meant to be measured, not asserted.</strong> <code>tests/ski_eval/</code> asks 21 questions
 through the real endpoint against fixed fixture data, in three groups: lookups, portfolio
 risk, and honesty traps (put/call ratio, short interest, tomorrow's close). Grading is
 deterministic, with no model judging. As of this writing the eval has not been run against
 the live model, so there is no score to report; §9 says so.</p>
 <hr />
 <h2 id="8-testing">8. Testing<a class="anchor" href="#8-testing" aria-label="Link to this section">#</a></h2>
-<p>164 tests across 20 files run on every push through GitHub Actions, alongside flake8 linting.
+<p>183 tests across 21 files run on every push through GitHub Actions, alongside flake8 linting.
 Coverage is weighted toward the code where correctness is checkable rather than the code
 that is merely tedious: indicator boundary conditions, authentication and token handling,
 database access and user scoping, the FRED and news clients against recorded payloads, the

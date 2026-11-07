@@ -102,7 +102,7 @@ a specific user's holdings so its answers are about them.</p>
 <tbody>
 <tr>
 <td>Backend</td>
-<td>Python 3.12, Flask + Flask-SocketIO on gevent, 29 HTTP endpoints</td>
+<td>Python 3.12, Flask + Flask-SocketIO on gevent, 28 HTTP endpoints</td>
 </tr>
 <tr>
 <td>Frontend</td>
@@ -114,7 +114,7 @@ a specific user's holdings so its answers are about them.</p>
 </tr>
 <tr>
 <td>Tests</td>
-<td>247, across 24 files, run in GitHub Actions with flake8</td>
+<td>264, across 26 files, run in GitHub Actions with flake8</td>
 </tr>
 <tr>
 <td>Assistant</td>
@@ -179,9 +179,22 @@ eviction on read (<a href="https://github.com/Danny-397/Tradeski/blob/main/Plotl
 are discussed in §9. What matters is that the TTL is a per-source decision rather than a
 global constant, and that per-route rate limiting sits in front of the expensive endpoints:
 registration at 10/hour, login at 10/minute, the assistant at 20/hour and 50/day.</p>
-<p>The screener fans out across a 29-symbol universe — 27 stocks spanning technology,
-financials, healthcare, energy and consumer staples, plus SPY and QQQ — through an
-eight-worker thread pool, so 29 sequential network round-trips become roughly four waves.</p>
+<p>The screener used to fan out across a 29-symbol universe through an eight-worker thread
+pool. That was a demo, not a screener, and it could not grow: every symbol was another
+request from a 512 MB free-tier server that Yahoo often refuses. It now covers every
+US-listed common stock (about 5,500) by moving the work out of the request path entirely.
+A GitHub Actions job runs after each close. It reads Nasdaq Trader's public symbol
+directory, downloads a year of daily prices for the whole universe in batches of 200,
+computes every technical column itself, and refreshes fundamentals for the 1,000 companies
+whose figures are oldest, large caps first. The first full run showed why that cap exists:
+Yahoo answered about 1,000 company lookups from one address and then refused, so the job
+backs off once, then stops and keeps the previous values. Fundamentals change quarterly, so
+a six-day turnover costs nothing. Ratios that move with
+the price (P/E, market cap, P/S, P/B, yield, target upside) are recomputed from that day's
+close. The output is published as one static file on a data branch whose single commit is
+replaced each run, so a few megabytes of daily prices never accumulate in git history. The
+browser downloads it once and filters locally: about 40 filters over 5,500 rows takes
+milliseconds, and the backend is never involved.</p>
 <hr />
 <h2 id="2-architecture">2. Architecture<a class="anchor" href="#2-architecture" aria-label="Link to this section">#</a></h2>
 <pre><code>browser (static HTML/JS, Plotly.js)
@@ -238,11 +251,13 @@ figure; and beta as <code>cov(portfolio, SPY) / var(SPY)</code>.</p>
 or an untraded position — makes the Sharpe denominator zero, so the endpoint reports that
 it cannot be computed rather than dividing. And beta falls back to 1.0 if SPY's variance is
 degenerate. Both return an explicit reason to the client instead of a number.</p>
-<p>The 90-day correlation heatmap covers 11 tracked symbols, computed as Pearson correlation
-across their aligned daily return series — not price levels, which would report near-1.0
-correlation for any two assets that both drift upward.</p>
+<p>Correlation is computed on aligned daily <em>returns</em>, not price levels, which would report
+near-1.0 correlation for any two assets that both drift upward. It is available through
+Ski's correlation tool for any tickers, the user's holdings included. An earlier heatmap
+showed the same calculation for a fixed list of 11 symbols, whatever the user owned or was
+looking at. It answered a question nobody had asked, so it was removed.</p>
 <h3 id="options-priced-here-not-taken-from-the-feed">Options: priced here, not taken from the feed<a class="anchor" href="#options-priced-here-not-taken-from-the-feed" aria-label="Link to this section">#</a></h3>
-<p>The Options window (<a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/options.py"><code>tracker/options.py</code></a>) shows a chain, builds
+<p>The Options page (<code>/options</code>, maths in <a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/options.py"><code>tracker/options.py</code></a>) shows a chain, builds
 strategies and scans for cash-secured puts and covered calls. Its numbers follow the same
 rule as Ski's tools: the code computes them, and nothing is taken on trust from the feed.</p>
 <p>The data source does report an implied volatility per contract, but out of hours it is
@@ -277,8 +292,15 @@ event type in equity news is invisible to the default model.</p>
 scored on title plus description, aggregated to a mean compound score with bullish /
 neutral / bearish counts at a ±0.05 threshold.</p>
 <p>Query construction matters too. NewsAPI searched for the bare ticker <code>META</code> returns
-articles about metadata and metaphysics; searching <code>&quot;Meta stock&quot;</code> does not. Each tracked
-symbol carries an explicit descriptive query string rather than its ticker.</p>
+articles about metadata and metaphysics. The first fix, a descriptive query like
+<code>&quot;Apple stock&quot;</code>, was not enough: NewsAPI's default search covers the whole article body,
+and sorted by date it returned whatever mentioned Apple anywhere. One live check of AAPL
+turned up a political column, a list of iOS app deals and a history piece. The query is now
+the company's name (from the dashboard's ticker index, so any listed company has one) or
+its ticker, matched in the <strong>title</strong>, first on about twenty financial news sites. Only when
+those return fewer than four headlines does the search widen to any source, still by
+title. One-letter and two-letter tickers are left out of the query, because &quot;ALL&quot;, &quot;IT&quot;
+and &quot;ON&quot; are words.</p>
 <p><strong>This is a hand-tuned heuristic, not a validated model.</strong> The polarities are my judgment,
 not fitted values, and there is no labeled financial-headline set here measuring whether
 the extended lexicon actually beats the default. It plainly fixes the specific failures
@@ -356,7 +378,7 @@ deterministic, with no model judging. As of this writing the eval has not been r
 the live model, so there is no score to report; §9 says so.</p>
 <hr />
 <h2 id="8-testing">8. Testing<a class="anchor" href="#8-testing" aria-label="Link to this section">#</a></h2>
-<p>247 tests across 24 files run on every push through GitHub Actions, alongside flake8 linting.
+<p>264 tests across 26 files run on every push through GitHub Actions, alongside flake8 linting.
 Coverage is weighted toward the code where correctness is checkable rather than the code
 that is merely tedious: indicator boundary conditions, authentication and token handling,
 database access and user scoping, the FRED and news clients against recorded payloads, the

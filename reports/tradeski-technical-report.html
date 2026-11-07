@@ -102,11 +102,11 @@ a specific user's holdings so its answers are about them.</p>
 <tbody>
 <tr>
 <td>Backend</td>
-<td>Python 3.12, Flask + Flask-SocketIO on gevent, 25 HTTP endpoints</td>
+<td>Python 3.12, Flask + Flask-SocketIO on gevent, 29 HTTP endpoints</td>
 </tr>
 <tr>
 <td>Frontend</td>
-<td>Static HTML/CSS/JS, ~6,100 lines (<code>dashboard.js</code> alone is 2,690), Plotly.js, no framework and no build step</td>
+<td>Static HTML/CSS/JS, ~7,000 lines (<code>dashboard.js</code> alone is 2,750), Plotly.js, no framework and no build step</td>
 </tr>
 <tr>
 <td>Indicators</td>
@@ -114,11 +114,11 @@ a specific user's holdings so its answers are about them.</p>
 </tr>
 <tr>
 <td>Tests</td>
-<td>164, across 20 files, run in GitHub Actions with flake8</td>
+<td>247, across 24 files, run in GitHub Actions with flake8</td>
 </tr>
 <tr>
 <td>Assistant</td>
-<td>Claude Haiku 5.5 with 6 Tradeski tools + web search, a figure-grounding check, and a 19-question eval</td>
+<td>Claude Haiku 5.5 with 8 Tradeski tools + web search, a figure-grounding check, and a 23-question eval</td>
 </tr>
 <tr>
 <td>Deployment</td>
@@ -206,8 +206,9 @@ inserts it onto <code>sys.path</code> explicitly so the process works regardless
 <h2 id="3-indicators-from-first-principles">3. Indicators from first principles<a class="anchor" href="#3-indicators-from-first-principles" aria-label="Link to this section">#</a></h2>
 <p>Every technical indicator is implemented directly on NumPy arrays rather than pulled from
 TA-Lib or pandas: SMA, EMA, RSI with Wilder smoothing, MACD, Bollinger Bands, ATR, the
-Stochastic Oscillator, rolling Z-score, rolling volatility, and a least-squares linear
-regression forecast (<a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/analyzer.py"><code>analyzer.py</code></a>).</p>
+Stochastic Oscillator, rolling Z-score and rolling volatility
+(<a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/analyzer.py"><code>analyzer.py</code></a>). A least-squares &quot;next value&quot; extrapolation is
+still in the module, but it is no longer computed for the dashboard (see §9).</p>
 <p>The point of writing them by hand is not that the libraries are wrong. It is that the
 boundary conditions are where indicators are actually wrong, and you only meet them if you
 write the code.</p>
@@ -240,6 +241,28 @@ degenerate. Both return an explicit reason to the client instead of a number.</p
 <p>The 90-day correlation heatmap covers 11 tracked symbols, computed as Pearson correlation
 across their aligned daily return series — not price levels, which would report near-1.0
 correlation for any two assets that both drift upward.</p>
+<h3 id="options-priced-here-not-taken-from-the-feed">Options: priced here, not taken from the feed<a class="anchor" href="#options-priced-here-not-taken-from-the-feed" aria-label="Link to this section">#</a></h3>
+<p>The Options window (<a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/options.py"><code>tracker/options.py</code></a>) shows a chain, builds
+strategies and scans for cash-secured puts and covered calls. Its numbers follow the same
+rule as Ski's tools: the code computes them, and nothing is taken on trust from the feed.</p>
+<p>The data source does report an implied volatility per contract, but out of hours it is
+often stale, and for deep in-the-money strikes it is close to meaningless. So Tradeski
+solves IV itself, by bisection on Black-Scholes, from each contract's bid/ask midpoint.
+That uses the dividend yield and the 3-month Treasury yield from FRED, and time runs to
+4pm New York on the expiry date. A midpoint outside the no-arbitrage bounds (below
+intrinsic value, or above the stock price) gets no IV rather than a nonsense one. The feed's
+figure is used only as a labelled fallback when there is no two-sided quote. The volatility
+curve plots only the out-of-the-money side at each strike, because in-the-money quotes are
+mostly intrinsic value.</p>
+<p>A strategy's payoff at expiry is piecewise linear, so its extremes and break-evens are
+exact. Max profit and loss are read at zero and at each strike. The slope above the top
+strike says whether either is unlimited. Break-evens are the roots on each segment.
+&quot;Chance of profit&quot; integrates a lognormal at the ATM implied volatility over the price
+intervals where the payoff is positive. That is the probability the market's prices imply
+under risk-neutral drift, and the window says so: it is not a forecast. The same figure
+appears in the scanner and the builder for the same trade. An earlier version used the
+contract's own IV in one and the ATM IV in the other, and showed 73% and 76% for the same
+put.</p>
 <hr />
 <h2 id="5-news-sentiment-why-general-purpose-scoring-fails-here">5. News sentiment: why general-purpose scoring fails here<a class="anchor" href="#5-news-sentiment-why-general-purpose-scoring-fails-here" aria-label="Link to this section">#</a></h2>
 <p>Sentiment is VADER, extended with roughly 45 finance-specific terms
@@ -294,12 +317,26 @@ where the histogram changes sign.</p>
 fetchers and hand-written indicators as the dashboard:</p>
 <ul>
 <li>a price summary for any ticker (returns, distance from the 52-week range, realised
-volatility, and indicators now and five days ago)</li>
+volatility, and indicators now and five days ago), with its excess return over the S&amp;P 500
+and its beta, so &quot;is it the stock or the market?&quot; is answered by code, not by the model
+subtracting two numbers</li>
 <li>fundamentals and headlines for any ticker</li>
+<li>a what-if that recomputes weights, Sharpe, beta and volatility after hypothetical trades,
+and reports the change in each</li>
 <li>return correlation aligned on common trading days</li>
-<li>a what-if that recomputes weights, Sharpe, beta and volatility after hypothetical trades</li>
 <li>the recent history of a FRED series</li>
 </ul>
+<p><strong>Fundamentals were blank in production, and the fix computes them from filings.</strong> Yahoo's
+fundamentals endpoint is blocked from Render, so all 29 screener rows had no P/E or market
+cap, and Ski's fundamentals tool returned empty fields (and a &quot;—&quot; placeholder as the sector).
+Blank fields are now dropped, and Ski is told to say so when P/E is unavailable. With
+<code>SEC_USER_AGENT</code> set, <a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/sec_fundamentals.py"><code>sec_fundamentals.py</code></a> computes trailing
+EPS, P/E, market cap, revenue growth and net margin from SEC EDGAR filings. 10-K filings report
+only the full year, so the fourth quarter is derived as the year minus its first three quarters,
+and a window with a missing quarter is refused rather than summed. The screener table uses the
+same figures for its blank P/E and market cap columns, but only from cache: one throttled
+background warm-up fetches the filings, so the page never waits on EDGAR. Each reply also lists what
+Ski looked up (&quot;NVDA price and chart · web search&quot;), so a reader can tell data from prose.</p>
 <p>Web search covers what the tools don't. The loop allows at most four rounds of tool calls,
 then requires an answer. If the API rejects a tool feature, the loop drops web search, then
 all tools, rather than failing the chat.</p>
@@ -310,14 +347,16 @@ calculated by the model itself, and is logged. This is a heuristic. It skips cou
 and indicator lengths, and it needed a rule for textbook levels: the first live answer was
 flagged for &quot;70&quot; in &quot;approaching overbought (typically 70+)&quot;, which is a rule of thumb, not
 data. For now it only logs.</p>
-<p><strong>Quality is meant to be measured, not asserted.</strong> <code>tests/ski_eval/</code> asks 19 questions
-through the real endpoint against fixed fixture data, in three groups: lookups, portfolio
-risk, and honesty traps (put/call ratio, short interest, tomorrow's close). Grading is
+<p><strong>Quality is meant to be measured, not asserted.</strong> <code>tests/ski_eval/</code> asks 23 questions
+through the real endpoint against fixed fixture data (including a fixture option chain),
+in three groups: lookups, portfolio risk, and honesty traps (short interest, trade-level
+options flow, tomorrow's close). The put/call ratio used to be a trap; with the options
+tools it is now a lookup. Grading is
 deterministic, with no model judging. As of this writing the eval has not been run against
 the live model, so there is no score to report; §9 says so.</p>
 <hr />
 <h2 id="8-testing">8. Testing<a class="anchor" href="#8-testing" aria-label="Link to this section">#</a></h2>
-<p>164 tests across 20 files run on every push through GitHub Actions, alongside flake8 linting.
+<p>247 tests across 24 files run on every push through GitHub Actions, alongside flake8 linting.
 Coverage is weighted toward the code where correctness is checkable rather than the code
 that is merely tedious: indicator boundary conditions, authentication and token handling,
 database access and user scoping, the FRED and news clients against recorded payloads, the
@@ -338,6 +377,17 @@ compared the <em>set</em> of namespaces each event was emitted on, and a dead co
 emitted <code>price_update</code> correctly on the default namespace masked the live one that did not.
 Checking each emit site individually, rather than unioning them per event, is the whole
 difference between a test that catches this and a test that looks like it does.</p>
+<p>The same blind spot hid a second dead feature, found much later. <strong>Alerts never fired.</strong> The
+form saved them, the panel listed them, and nothing ever checked them: the function that
+would broadcast a triggered alert was defined and never called, and the background tracker
+only pushed prices. The stream contract test passed throughout, because that dead function
+was the &quot;somewhere&quot; it found <code>alert_triggered</code> emitted. A test that asks whether code exists
+cannot tell you whether it runs. Alerts are now checked by
+<a href="https://github.com/Danny-397/Tradeski/blob/main/tracker/alert_eval.py"><code>alert_eval.py</code></a> against the price history since each alert was
+set, which also suits a backend that sleeps: a crossing that happened while it was asleep is
+caught on the next check, with the time it happened. <code>tests/test_alerts.py</code> asserts that an
+alert actually fires, end to end through <code>/alerts</code>, which is the property the old tests never
+checked.</p>
 <hr />
 <h2 id="9-limitations">9. Limitations<a class="anchor" href="#9-limitations" aria-label="Link to this section">#</a></h2>
 <p>Stated plainly, because a report that lists only strengths is marketing.</p>
@@ -346,11 +396,28 @@ multiple gunicorn workers each holds an independent copy — so the effective up
 rate is the intended rate multiplied by the worker count, and two users can see figures that
 differ by one TTL. Correct for a single-worker deployment, which is what runs; wrong the
 moment it scales horizontally. Redis is the obvious fix and is not implemented.</p>
-<p><strong>The risk-free rate is hardcoded at 4.5%.</strong> It should come from the FRED series the
-application is already fetching. Every Sharpe ratio is therefore slightly wrong in a
-direction that changes with the rate environment.</p>
-<p><strong>Sentiment is unvalidated.</strong> See §5. The lexicon extension is a fix for named failures,
-not a measured improvement.</p>
+<p><strong>The risk-free rate is the fed funds rate, which is an approximation.</strong> The Sharpe ratio
+used to subtract a hardcoded 4.5%, so it was wrong by however far rates had moved. It now
+uses the effective federal funds rate from the FRED snapshot the dashboard already fetches,
+falls back to 4.5% only when FRED is unavailable, and reports which rate it used. A
+three-month Treasury bill yield would be the textbook choice.</p>
+<p><strong>In production, option quotes are end-of-day.</strong> Yahoo refuses option requests from
+Render's servers (as it does company fundamentals) but answers GitHub's runners, so the
+daily snapshot job saves closing chains for twelve symbols and the backend falls back to
+them. The window says so and dates them. Any other symbol has no options on the live site
+until a data source that serves this host is wired in.</p>
+<p><strong>Options values are model values.</strong> Black-Scholes treats every option as European. US
+equity options are American, so values are approximate where early exercise matters: deep
+in-the-money puts, and calls just before an ex-dividend date. Quotes are delayed about 15
+minutes and priced at the midpoint, and real fills are usually worse. The builder reports
+what crossing the spread would cost, but no slippage beyond that. No free source has IV
+history, so Tradeski records its own after each close, starting 2026-11-06. For the first
+20 trading days there is no percentile at all, and for the first year it covers less than a
+year, so it is labelled with its length rather than called an IV rank.</p>
+<p><strong>Sentiment is unvalidated, and is now labelled that way.</strong> See §5. The lexicon extension is
+a fix for named failures, not a measured improvement, so the news panel shows &quot;Headline
+tone&quot; (positive, neutral, negative) with a note that it is a word-list score, not a call on
+the stock.</p>
 <p><strong>The assistant's quality is unmeasured.</strong> The eval in §7 exists and its harness is tested
 end to end with a scripted model, but it has not yet been run against the real one. Until it
 is, &quot;Ski answers better with tools&quot; is a design argument, not a result. The grounding check
@@ -362,21 +429,21 @@ scope here — that question is the entire subject of
 <a href="https://github.com/Danny-397/Alphaglyph">AlphaGlyph</a>, and the honest answer it arrives at
 is mostly &quot;no&quot;. Reading the two projects together is the intended experience: this one
 displays the indicators, that one measures whether displaying them means anything.</p>
-<p><strong><code>tracker/main.py</code> is dead code.</strong> It is a legacy standalone CLI tracker from before the
-web dashboard existed, and it no longer imports — it references a <code>dashboard</code> module that
-does not exist under that name. It is 467 lines of the repository that no execution path
-reaches, and it should be deleted rather than left to imply it runs.</p>
-<p><strong>The linear-regression &quot;prediction&quot; is a trend extrapolation, not a forecast.</strong> It fits a
-least-squares line to the recent window and reads off the next point. It is labeled as a
-prediction in the UI, which oversells it; it carries no error bars and no evaluation of
-whether it beats the naive &quot;tomorrow equals today&quot; baseline. It almost certainly does not.</p>
+<p><strong>Dead code has been removed, and it hid a dead feature.</strong> <code>tracker/main.py</code>, a CLI tracker
+from before the web dashboard that no longer imported, is gone, with the four modules only
+it used (the old tick-based alert rules, a scheduler, a daily summary and a pruning job) and
+the <code>apscheduler</code> dependency. The old alert rules looked like the dashboard's alert engine,
+which made it easy to assume alerts worked; they did not (§8).</p>
+<p><strong>The linear-regression &quot;prediction&quot; is no longer sent.</strong> It fitted a least-squares line and
+read off the next point: a trend extrapolation with no error bars and no test against the
+naive &quot;tomorrow equals today&quot; baseline. The dashboard had stopped displaying it, yet
+<code>/price_history</code> still computed and shipped it. It is no longer computed there.</p>
 <hr />
 <h2 id="10-what-i-would-do-differently">10. What I would do differently<a class="anchor" href="#10-what-i-would-do-differently" aria-label="Link to this section">#</a></h2>
-<p>Move the cache to Redis and make TTLs configuration rather than constants. Pull the
-risk-free rate from FRED. Delete <code>tracker/main.py</code>. Either validate the sentiment lexicon
-against a labeled set or relabel the panel as a heuristic. And either give the regression
-forecast an honest error estimate or remove it — of everything on the dashboard it is the
-element that most looks like a claim and least is one.</p>
+<p>Move the cache to Redis and make TTLs configuration rather than constants. Validate the
+sentiment lexicon against a labelled set of headlines, so &quot;tone&quot; could become a measured
+claim. Test features end to end from the first day: alerts were broken for months, and
+every unit test passed the whole time.</p>
 <p>For the assistant, I would have written the eval before the first prompt rather than after
 the feature shipped. Until then, Ski was judged by reading answers and deciding they looked
 right, and that is how a prompt claiming data it never received went unnoticed.</p>

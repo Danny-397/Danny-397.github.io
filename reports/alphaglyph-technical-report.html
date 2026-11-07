@@ -71,7 +71,7 @@ catch (e) { /* private mode */ }</script>
       <li><a href="#1-the-problem-a-backtest-is-a-contaminated-experiment">1. The problem: a backtest is a contaminated experiment</a></li>
       <li><a href="#2-the-demonstration-the-data-mining-lab">2. The demonstration: the Data-Mining Lab</a></li>
       <li><a href="#3-probabilistic-and-deflated-sharpe-ratios">3. Probabilistic and Deflated Sharpe Ratios</a></li>
-      <li><a href="#4-cpcv-and-the-probability-of-backtest-overfitting">4. CPCV and the Probability of Backtest Overfitting</a></li>
+      <li><a href="#4-cscv-and-the-probability-of-backtest-overfitting">4. CSCV and the Probability of Backtest Overfitting</a></li>
       <li><a href="#5-factor-decomposition">5. Factor decomposition</a></li>
       <li><a href="#6-calibration-and-the-forward-ledger">6. Calibration and the forward ledger</a></li>
       <li><a href="#7-results">7. Results</a></li>
@@ -99,7 +99,7 @@ overfitting</strong> (SPY, run 2026-08-01) — the in-sample winner lands in the
 out-of-sample more often than not. That is the headline result, and it is a negative
 one.</p>
 <ul>
-<li>15 REST endpoints, 195 automated tests in CI</li>
+<li>15 REST endpoints, 208 automated tests in CI</li>
 <li>Indicators implemented from first principles (SMA, EMA, RSI, MACD, ADX, Bollinger)</li>
 <li>Live at <a href="https://alphaglyph.org">alphaglyph.org</a></li>
 </ul>
@@ -180,9 +180,12 @@ you have. Without rescaling for T, the deflation is applied at the wrong magnitu
 the test is miscalibrated. With <code>n_strategies = 1</code>, DSR reduces exactly to PSR against
 a zero benchmark, which is the correct degenerate case and is asserted in the tests.</p>
 <hr />
-<h2 id="4-cpcv-and-the-probability-of-backtest-overfitting">4. CPCV and the Probability of Backtest Overfitting<a class="anchor" href="#4-cpcv-and-the-probability-of-backtest-overfitting" aria-label="Link to this section">#</a></h2>
+<h2 id="4-cscv-and-the-probability-of-backtest-overfitting">4. CSCV and the Probability of Backtest Overfitting<a class="anchor" href="#4-cscv-and-the-probability-of-backtest-overfitting" aria-label="Link to this section">#</a></h2>
 <p><code>backend/cpcv.py</code>. Method from Bailey, Borwein, López de Prado &amp; Zhu (2017), via
-Combinatorially-Symmetric Cross-Validation.</p>
+Combinatorially-Symmetric Cross-Validation (CSCV). An earlier version of this report called it
+CPCV, which is a different method: López de Prado's Combinatorial <em>Purged</em> CV builds many
+backtest paths, while CSCV measures how often the in-sample winner fails out of sample. The
+module and the <code>/api/research/cpcv</code> route keep the old name so existing links work.</p>
 <h3 id="41-the-strategy-grid">4.1 The strategy grid<a class="anchor" href="#41-the-strategy-grid" aria-label="Link to this section">#</a></h3>
 <p>The grid is deliberately made of strategies people actually tune, not strawmen:</p>
 <ul>
@@ -230,6 +233,57 @@ means the in-sample edge mostly evaporates.</li>
 <li><strong>Probability of OOS loss</strong> — how often the selected strategy actually loses money.</li>
 <li>Logit histogram, IS-vs-OOS scatter, and a split diagram for the interface.</li>
 </ul>
+<h3 id="46-calibrated-by-simulation">4.6 Calibrated by simulation<a class="anchor" href="#46-calibrated-by-simulation" aria-label="Link to this section">#</a></h3>
+<p>Checking a formula on one worked example shows the code matches the paper. It does not show
+the statistic does its job. <code>backend/tests/test_stats_calibration.py</code> checks the property each
+statistic exists for, on simulated data where the right answer is known (seeded, two years of
+daily returns):</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Should be</th>
+<th>Measured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PSR at 95% calls pure noise significant (normal returns, 2,000 draws)</td>
+<td>about 5%</td>
+<td><strong>5.05%</strong></td>
+</tr>
+<tr>
+<td>Same, fat-tailed returns (Student-t, 4 df)</td>
+<td>about 5%</td>
+<td><strong>5.1%</strong></td>
+</tr>
+<tr>
+<td>Best of 20 noise strategies: PSR calls the winner significant</td>
+<td>often (selection bias)</td>
+<td><strong>63%</strong></td>
+</tr>
+<tr>
+<td>Best of 20 noise strategies: DSR calls the winner significant</td>
+<td>under 5%</td>
+<td><strong>0.5%</strong></td>
+</tr>
+<tr>
+<td>PBO when all 30 strategies are noise</td>
+<td>about 0.5</td>
+<td><strong>0.49</strong></td>
+</tr>
+<tr>
+<td>PBO when one of 30 has a real edge (Sharpe ≈ 2.4)</td>
+<td>near 0</td>
+<td><strong>0.07</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>The middle rows are the reason the Deflated Sharpe Ratio exists: picking the best of 20 coin
+flips and testing it as if it were the only one fools the plain test most of the time. DSR is
+conservative here, because it tests against the <em>expected</em> best of N. To make the simulation
+possible, PBO's core was split from the price-driven grid into <code>pbo_from_matrix</code>, which
+accepts any matrix of strategy returns.</p>
 <hr />
 <h2 id="5-factor-decomposition">5. Factor decomposition<a class="anchor" href="#5-factor-decomposition" aria-label="Link to this section">#</a></h2>
 <p>A strategy can post real returns and still have no alpha, if it is merely capturing
@@ -266,14 +320,31 @@ forward record that cannot be retro-fitted.</p>
 <p>Calibration measures the model on historical out-of-sample data already in hand; the
 ledger measures it on the future, one real day at a time. Grading is lazy — a plain
 GET matures any elapsed rows, so the record stays current without a cron job.</p>
+<p><strong>The live ledger turned out not to accrue.</strong> After three months it held three graded
+calls. The backend runs on Render's free tier with no database configured, so the table
+lived in a SQLite file on an ephemeral disk that every redeploy wiped, and it only
+recorded predictions a visitor happened to ask for. A forward record that resets is not
+a forward record.</p>
+<p><strong>So the forward record now lives in git</strong> (<a href="https://github.com/Danny-397/Alphaglyph/blob/main/tools/forward_ledger.py"><code>tools/forward_ledger.py</code></a>,
+run by <code>.github/workflows/forward-ledger.yml</code>). Every trading day near the close, the live
+Predictor is asked about a fixed basket of ten tickers (SPY, QQQ and eight large caps), and
+each call is appended to <code>frontend/data/forward_ledger.csv</code> and committed. Calls whose
+horizon has passed are graded against the first close on or after the due date and filled
+in once. The commit history is the audit trail: each call sits in a commit dated before its
+outcome existed. The first scheduled runs started about three hours late, and a logging
+window that closed at 16:15 ET would have recorded nothing. Calls are now accepted from
+15:15 ET until midnight New York time, priced at that day's close, which is still days
+before the outcome. A third, later schedule is a backup. Both records grade with the same rules
+(<a href="https://github.com/Danny-397/Alphaglyph/blob/main/backend/track_record.py"><code>track_record.py</code></a>), and <code>/health</code> now reports which database
+the live ledger is using.</p>
 <hr />
 <h2 id="7-results">7. Results<a class="anchor" href="#7-results" aria-label="Link to this section">#</a></h2>
 <blockquote>
-<p><strong>Reproduce before citing.</strong> CPCV runs live against a rolling window of fetched
+<p><strong>Reproduce before citing.</strong> CSCV runs live against a rolling window of fetched
 price data, so PBO is a function of the window it was run on. Every figure below
 carries the date it was produced.</p>
 </blockquote>
-<p><strong>CPCV on SPY — 42 variants, 10 groups, 252 splits, 1,050 rows after warm-up,
+<p><strong>CSCV on SPY — 42 variants, 10 groups, 252 splits, 1,050 rows after warm-up,
 embargo 5. Run 2026-08-01:</strong></p>
 <p><em>Reproducible from committed data:</em> the window this run used (SPY closes,
 2021-08-02 → 2026-07-31) is committed at
@@ -367,15 +438,16 @@ different number.</li>
 exposure profiles, rank-based comparison is less meaningful.</li>
 <li><strong>Transaction costs are modelled, not measured.</strong> Real fills, slippage and market
 impact are not simulated.</li>
-<li><strong>The forward ledger is young.</strong> A track record is only as good as its length, and
-this one accrues one day at a time.</li>
+<li><strong>The forward record is young.</strong> It accrues ten calls a trading day from November
+2026. Until it holds a few hundred graded calls, its hit rate and Brier skill are
+noise, and a single market regime dominates it.</li>
 </ul>
 <hr />
 <h2 id="9-reproducing">9. Reproducing<a class="anchor" href="#9-reproducing" aria-label="Link to this section">#</a></h2>
 <pre><code class="language-bash">git clone https://github.com/Danny-397/Alphaglyph
 cd Alphaglyph/backend
 pip install -r requirements.txt
-pytest                     # 195 tests
+pytest                     # 208 tests
 python app.py              # http://localhost:5000
 </code></pre>
 <p>Architecture: the browser holds all UI state and the backend is a stateless compute

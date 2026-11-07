@@ -102,7 +102,7 @@ a specific user's holdings so its answers are about them.</p>
 <tbody>
 <tr>
 <td>Backend</td>
-<td>Python 3.12, Flask + Flask-SocketIO on gevent, 28 HTTP endpoints</td>
+<td>Python 3.12, Flask + Flask-SocketIO on gevent, 29 HTTP endpoints</td>
 </tr>
 <tr>
 <td>Frontend</td>
@@ -114,7 +114,7 @@ a specific user's holdings so its answers are about them.</p>
 </tr>
 <tr>
 <td>Tests</td>
-<td>264, across 26 files, run in GitHub Actions with flake8</td>
+<td>276, across 26 files, run in GitHub Actions with flake8</td>
 </tr>
 <tr>
 <td>Assistant</td>
@@ -278,6 +278,16 @@ under risk-neutral drift, and the window says so: it is not a forecast. The same
 appears in the scanner and the builder for the same trade. An earlier version used the
 contract's own IV in one and the ATM IV in the other, and showed 73% and 76% for the same
 put.</p>
+<p>The page is built to answer &quot;which strategy, and what happens if…?&quot; rather than only
+&quot;what does this strategy do?&quot;. Given a target price, <code>compare_strategies</code> prices all nine
+presets and ranks them. Positions that make money at the target come first, ordered by
+profit at the target per dollar they can lose. Positions with unlimited loss come last
+among equals, because a high payoff at one price says nothing about the tail. An
+<code>iv_shift</code> re-values the position before expiry with every option's IV moved by that many
+points. This isolates the effect beginners most often miss: around earnings, IV routinely
+falls 10 to 30 points. In the AAPL example, a straddle held over earnings that cost $4,078
+was worth $2,133 less after a 15-point drop, with the stock unchanged. The next earnings date comes from Yahoo's chain response, using its estimate of
+the next report rather than its timestamp of the last one.</p>
 <hr />
 <h2 id="5-news-sentiment-why-general-purpose-scoring-fails-here">5. News sentiment: why general-purpose scoring fails here<a class="anchor" href="#5-news-sentiment-why-general-purpose-scoring-fails-here" aria-label="Link to this section">#</a></h2>
 <p>Sentiment is VADER, extended with roughly 45 finance-specific terms
@@ -378,7 +388,7 @@ deterministic, with no model judging. As of this writing the eval has not been r
 the live model, so there is no score to report; §9 says so.</p>
 <hr />
 <h2 id="8-testing">8. Testing<a class="anchor" href="#8-testing" aria-label="Link to this section">#</a></h2>
-<p>264 tests across 26 files run on every push through GitHub Actions, alongside flake8 linting.
+<p>276 tests across 26 files run on every push through GitHub Actions, alongside flake8 linting.
 Coverage is weighted toward the code where correctness is checkable rather than the code
 that is merely tedious: indicator boundary conditions, authentication and token handling,
 database access and user scoping, the FRED and news clients against recorded payloads, the

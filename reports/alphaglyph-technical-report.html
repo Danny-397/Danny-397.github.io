@@ -76,8 +76,9 @@ catch (e) { /* private mode */ }</script>
       <li><a href="#6-calibration-and-the-forward-ledger">6. Calibration and the forward ledger</a></li>
       <li><a href="#7-results">7. Results</a></li>
       <li><a href="#8-limitations">8. Limitations</a></li>
-      <li><a href="#9-reproducing">9. Reproducing</a></li>
-      <li><a href="#10-references">10. References</a></li>
+      <li><a href="#9-options-strategy-backtests">9. Options strategy backtests</a></li>
+      <li><a href="#10-reproducing">10. Reproducing</a></li>
+      <li><a href="#11-references">11. References</a></li>
     </ol>
   </nav>
   <article class="prose-doc">
@@ -99,7 +100,7 @@ overfitting</strong> (SPY, run 2026-08-01) — the in-sample winner lands in the
 out-of-sample more often than not. That is the headline result, and it is a negative
 one.</p>
 <ul>
-<li>15 REST endpoints, 208 automated tests in CI</li>
+<li>18 REST endpoints, 245 automated tests in CI</li>
 <li>Indicators implemented from first principles (SMA, EMA, RSI, MACD, ADX, Bollinger)</li>
 <li>Live at <a href="https://alphaglyph.org">alphaglyph.org</a></li>
 </ul>
@@ -438,16 +439,122 @@ different number.</li>
 exposure profiles, rank-based comparison is less meaningful.</li>
 <li><strong>Transaction costs are modelled, not measured.</strong> Real fills, slippage and market
 impact are not simulated.</li>
+<li><strong>Option prices in the options backtester are modelled.</strong> Black-Scholes with a modelled
+volatility level, skew and term structure, no dividends and no early assignment (§9).</li>
 <li><strong>The forward record is young.</strong> It accrues ten calls a trading day from November
 2026. Until it holds a few hundred graded calls, its hit rate and Brier skill are
 noise, and a single market regime dominates it.</li>
 </ul>
 <hr />
-<h2 id="9-reproducing">9. Reproducing<a class="anchor" href="#9-reproducing" aria-label="Link to this section">#</a></h2>
+<h2 id="9-options-strategy-backtests">9. Options strategy backtests<a class="anchor" href="#9-options-strategy-backtests" aria-label="Link to this section">#</a></h2>
+<p>The options backtester extends the same question, whether an edge is real, to option
+strategies. It holds one position at a time on one underlying: it opens the legs, marks
+them to market at every close, closes on the first of expiry, a days-before-expiry rule,
+a profit target or a stop loss, and opens the next position the same day. Units are sized
+so that each position's worst case at expiry (or, for uncovered short calls, the loss on a
+30% rally) uses at most a set share of the account. Idle cash earns the 3-month T-bill.</p>
+<p><strong>Prices are modelled, and this is the central limitation.</strong> No free source has
+historical option quotes, so each leg is priced with Black-Scholes on that day's close.
+Three choices keep the prices close to real chains:</p>
+<ol>
+<li><em>Level.</em> For SPY, at-the-money implied volatility is 0.87 × the VIX: the VIX is a
+variance-swap rate that includes the skew, and 30-day at-the-money IV usually sits
+about that far below it. Other tickers use their own 21-day realized volatility times
+the market's implied-to-realized ratio that day (clipped to 0.8-2.0), so their IV rises
+in fearful markets, as real IV does.</li>
+<li><em>Skew.</em> IV changes with standardized moneyness, by 0.40 per standard deviation on the
+put side and 0.15 on the call side: a 16-delta put trades near 1.4 × at-the-money IV and
+a 16-delta call near 0.85 ×. An early version used the raw VIX with a mild symmetric
+skew and flattered short-premium trades badly: at the same sizing, an SPY iron condor
+showed a 26% CAGR over 2021-2025. With the VIX adjustment and the asymmetric skew it
+fell to about 12%.</li>
+<li><em>Term structure.</em> IV at other maturities scales with (T / 30 days)^β, where β falls
+from about +0.10 in calm markets to below zero in panics. Without it, a calendar spread
+bought a 60-day option at the 30-day volatility and showed a 26% CAGR; with it, the
+calendar roughly breaks even.</li>
+</ol>
+<p>Each of those corrections moved results toward what is known about these strategies,
+which is evidence the model is directionally right, but it is still a model. Calendars and
+far out-of-the-money wings depend most on the modelled shapes, so they are the least
+reliable results. Every result in the UI carries a &quot;model-priced&quot; banner and the
+volatility source.</p>
+<p>On SPY over 2021-11-08 → 2026-11-06 (30 days to expiry, default sizing and costs):</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Strategy (legs)</th>
+<th style="text-align:right">Return</th>
+<th style="text-align:right">CAGR</th>
+<th style="text-align:right">Sharpe</th>
+<th style="text-align:right">Max drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Buy and hold SPY</td>
+<td style="text-align:right">+67.7%</td>
+<td style="text-align:right">+10.9%</td>
+<td style="text-align:right">0.46</td>
+<td style="text-align:right">−24.5%</td>
+</tr>
+<tr>
+<td>Cash-secured put (1)</td>
+<td style="text-align:right">+62.2%</td>
+<td style="text-align:right">+10.2%</td>
+<td style="text-align:right">0.95</td>
+<td style="text-align:right">−7.9%</td>
+</tr>
+<tr>
+<td>Covered call (2)</td>
+<td style="text-align:right">+61.3%</td>
+<td style="text-align:right">+10.1%</td>
+<td style="text-align:right">0.52</td>
+<td style="text-align:right">−17.4%</td>
+</tr>
+<tr>
+<td>Iron condor (4)</td>
+<td style="text-align:right">+31.7%</td>
+<td style="text-align:right">+5.7%</td>
+<td style="text-align:right">0.18</td>
+<td style="text-align:right">−21.9%</td>
+</tr>
+<tr>
+<td>Protective collar (3)</td>
+<td style="text-align:right">+10.5%</td>
+<td style="text-align:right">+2.0%</td>
+<td style="text-align:right">−0.17</td>
+<td style="text-align:right">−22.0%</td>
+</tr>
+<tr>
+<td>Long call (1)</td>
+<td style="text-align:right">+4.2%</td>
+<td style="text-align:right">+0.8%</td>
+<td style="text-align:right">0.12</td>
+<td style="text-align:right">−50.3%</td>
+</tr>
+<tr>
+<td>Long straddle (2)</td>
+<td style="text-align:right">−42.1%</td>
+<td style="text-align:right">−10.4%</td>
+<td style="text-align:right">−0.43</td>
+<td style="text-align:right">−50.7%</td>
+</tr>
+</tbody>
+</table></div>
+<p>None beat buy-and-hold on return in a window where SPY rose 68%. The short-premium
+strategies earned most of the market's return with a third to two-thirds of its drawdown;
+the long-premium ones paid theta every month. The tests check the parts that do not
+depend on the volatility model: Black-Scholes against a textbook value and put-call
+parity, expiries on Fridays, delta strikes, offsets that always form a spread, the capital
+rule for each structure, no look-ahead (changing later prices leaves the first trade
+unchanged), costs that only ever lower the result, and an exact accounting identity:
+final equity equals starting capital plus the sum of every trade's P&amp;L.</p>
+<hr />
+<h2 id="10-reproducing">10. Reproducing<a class="anchor" href="#10-reproducing" aria-label="Link to this section">#</a></h2>
 <pre><code class="language-bash">git clone https://github.com/Danny-397/Alphaglyph
 cd Alphaglyph/backend
 pip install -r requirements.txt
-pytest                     # 208 tests
+pytest                     # 245 tests
 python app.py              # http://localhost:5000
 </code></pre>
 <p>Architecture: the browser holds all UI state and the backend is a stateless compute
@@ -455,7 +562,7 @@ layer; the ML model is trained offline and shipped as a portable ONNX artifact. 
 resolves through a three-stage cascade — Tiingo, then yfinance, then Stooq — so a
 single upstream outage does not take the system down.</p>
 <hr />
-<h2 id="10-references">10. References<a class="anchor" href="#10-references" aria-label="Link to this section">#</a></h2>
+<h2 id="11-references">11. References<a class="anchor" href="#11-references" aria-label="Link to this section">#</a></h2>
 <ol>
 <li>Bailey, D. H., Borwein, J. M., López de Prado, M., &amp; Zhu, Q. J. <em>The Probability of
 Backtest Overfitting.</em> <strong>Journal of Computational Finance, 20(4), 39–70 (2017).</strong>

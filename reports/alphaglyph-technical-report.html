@@ -100,7 +100,7 @@ overfitting</strong> (SPY, run 2026-08-01) — the in-sample winner lands in the
 out-of-sample more often than not. That is the headline result, and it is a negative
 one.</p>
 <ul>
-<li>18 REST endpoints, 245 automated tests in CI</li>
+<li>18 REST endpoints, 246 automated tests in CI</li>
 <li>Indicators implemented from first principles (SMA, EMA, RSI, MACD, ADX, Bollinger)</li>
 <li>Live at <a href="https://alphaglyph.org">alphaglyph.org</a></li>
 </ul>
@@ -427,6 +427,110 @@ only by data revisions.)</p>
 the most work to build, cannot predict next-week direction. It is reported at 0.51
 rather than quietly dropped, because a system whose entire premise is honest
 measurement does not get to hide its own null results.</p>
+<h3 id="a-modality-ablation-do-macro-and-news-inputs-help">A modality ablation: do macro and news inputs help?<a class="anchor" href="#a-modality-ablation-do-macro-and-news-inputs-help" aria-label="Link to this section">#</a></h3>
+<p>The forecaster is a transformer over 60-day windows with three input blocks: price
+features, macro series from FRED, and GDELT news tone. The shipped checkpoint had been
+trained with the macro and news blocks zero-filled, so the multi-modal design had never
+been tested. The ablation (<code>ml/ablation.py</code>, output in <code>ml/ablation.json</code>) retrains the
+same architecture, with the same splits and early stopping, on three input sets: price
+only, price + macro, and all three. Each is trained from three seeds, and the seeds'
+probabilities are averaged. An L2 logistic regression on the last day's 13 features is
+the baseline a deep model has to beat.</p>
+<p>Training data runs to 2020-12-23 and validation to 2023-11-29, with a 10-day purge at
+each boundary. Every figure below is on the test split after that: 85 tickers, 5-day
+direction, 60,945 windows, 54.2% of them up. Nothing was tuned on it. Uncertainty comes
+from a moving-block bootstrap over test dates (20-trading-day blocks, 1,000 resamples),
+not over rows. The 85 tickers on one day share a market and the 5-day labels overlap,
+so resampling rows would make every interval far too narrow. Arms are compared on the
+same resampled dates. News tone is lagged one day, because GDELT buckets by UTC day and
+a same-day value would leak. It was found for 57 of the 85 tickers, which is 67% of test
+windows.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Inputs</th>
+<th style="text-align:right">Test AUC (3-seed ensemble)</th>
+<th style="text-align:right">95% CI</th>
+<th style="text-align:right">Resamples with AUC ≤ 0.5</th>
+<th style="text-align:right">Validation AUC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Price only</td>
+<td style="text-align:right">0.509</td>
+<td style="text-align:right">0.492 – 0.527</td>
+<td style="text-align:right">18%</td>
+<td style="text-align:right">0.525</td>
+</tr>
+<tr>
+<td>Price + macro</td>
+<td style="text-align:right">0.502</td>
+<td style="text-align:right">0.477 – 0.527</td>
+<td style="text-align:right">44%</td>
+<td style="text-align:right">0.529</td>
+</tr>
+<tr>
+<td>Price + macro + news</td>
+<td style="text-align:right">0.508</td>
+<td style="text-align:right">0.487 – 0.532</td>
+<td style="text-align:right">22%</td>
+<td style="text-align:right">0.525</td>
+</tr>
+<tr>
+<td>Logistic regression (last day's features)</td>
+<td style="text-align:right">0.513</td>
+<td style="text-align:right">0.493 – 0.537</td>
+<td style="text-align:right">9%</td>
+<td style="text-align:right">0.528</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Comparison (same resampled dates)</th>
+<th style="text-align:right">AUC difference</th>
+<th style="text-align:right">95% CI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Adding macro to price</td>
+<td style="text-align:right">−0.008</td>
+<td style="text-align:right">−0.027 – +0.015</td>
+</tr>
+<tr>
+<td>Adding news to price + macro</td>
+<td style="text-align:right">+0.007</td>
+<td style="text-align:right">−0.007 – +0.020</td>
+</tr>
+<tr>
+<td>All three vs price only</td>
+<td style="text-align:right">−0.001</td>
+<td style="text-align:right">−0.015 – +0.017</td>
+</tr>
+<tr>
+<td>Transformer (all three) vs logistic regression</td>
+<td style="text-align:right">−0.005</td>
+<td style="text-align:right">−0.024 – +0.013</td>
+</tr>
+</tbody>
+</table></div>
+<p>Three findings, all null:</p>
+<ol>
+<li><strong>Neither extra input helps.</strong> Every paired difference is under 0.01 AUC, and every
+interval spans zero.</li>
+<li><strong>The transformer does not beat a linear model.</strong> The logistic regression has the
+highest test AUC (0.513), though not by a margin the intervals can tell apart.</li>
+<li><strong>Validation chose the worst arm.</strong> Price + macro had the highest validation AUC and
+the lowest test AUC. With differences this small, picking on validation is
+close to picking at random, which is the selection problem of §4 in miniature.</li>
+</ol>
+<p>The rule for this experiment was set before it ran: report the result whatever it is,
+and replace the shipped model only if validation picked a different input set <em>and</em> its
+test interval was clear of the current model's. Neither held, so the shipped model, the
+price-only network, is unchanged.</p>
 <hr />
 <h2 id="8-limitations">8. Limitations<a class="anchor" href="#8-limitations" aria-label="Link to this section">#</a></h2>
 <ul>
@@ -554,7 +658,7 @@ final equity equals starting capital plus the sum of every trade's P&amp;L.</p>
 <pre><code class="language-bash">git clone https://github.com/Danny-397/Alphaglyph
 cd Alphaglyph/backend
 pip install -r requirements.txt
-pytest                     # 245 tests
+pytest                     # 246 tests
 python app.py              # http://localhost:5000
 </code></pre>
 <p>Architecture: the browser holds all UI state and the backend is a stateless compute

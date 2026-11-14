@@ -44,10 +44,10 @@ HEADERS = {
     "rl-chess-technical-report": {
         "eyebrow": "Technical report",
         "title": "An AlphaZero-Style Chess Engine, Built From Scratch",
-        "subtitle": "Implementation, a controlled study of the training plateau I call the "
-                    "draw cycle, and the diagnosis that it is a signal problem, not a "
-                    "compute ceiling.",
-        "date": "July 2026",
+        "subtitle": "Implementation, the training plateau I call the draw cycle, and "
+                    "three experimental arms measured against the network they started "
+                    "from, including a correction to the first analysis.",
+        "date": "July 2026, revised November 2026",
         "site": "rlchess.xyz",
         "repo_pdf": "docs/RL-Chess-Technical-Report.pdf",
     },
@@ -55,8 +55,9 @@ HEADERS = {
         "eyebrow": "Experiment log",
         "title": "Self-Play Scaling Experiments: Per-Iteration Results",
         "subtitle": "The full empirical record behind the draw-cycle study — every training "
-                    "iteration, evaluation match, and Elo estimate from the 9.8-hour GPU run.",
-        "date": "July 2026",
+                    "iteration, evaluation match, and Elo estimate from the 9.8-hour GPU run, "
+                    "with 95% intervals and a starting-network control.",
+        "date": "July 2026, revised November 2026",
         "site": "rlchess.xyz",
         "repo_pdf": "docs/RL-Chess-Experiment-Results.pdf",
     },

@@ -867,7 +867,7 @@ catch (e) { /* private mode */ }</script>
         <dd>projects deployed to a public URL — not just a repository</dd>
       </div>
       <div>
-        <dt>1,779</dt>
+        <dt>1,782</dt>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
@@ -1398,11 +1398,11 @@ catch (e) { /* private mode */ }</script>
         </div>
         <h3>AlphaZero-style Chess Engine</h3>
         <p class="lede">
-          An engine given the rules of chess and nothing else &mdash; no openings, no human games, no
-          evaluation function &mdash; that learns entirely from playing itself. You can play the
-          trained network in your browser.
+          An AlphaZero-style engine that learns by playing itself &mdash; a policy/value network, tree
+          search and a self-play loop, written from scratch, with no openings or human games. You can
+          play it in your browser.
         </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>The plateau was a training-signal problem, not compute: 10&times; more self-play moved Elo from &minus;21 to &minus;7; a material signal reached +28.</p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Self-play collapses into a draw cycle that 10&times; compute does not escape. Measured against the network it started from, only the material-assisted run got stronger, and only just.</p>
       </div>
 
       <figure class="plate">
@@ -1420,15 +1420,15 @@ catch (e) { /* private mode */ }</script>
         </div>
         <figcaption>
           <span class="chip">Screen recording &middot; self-play in the browser</span>
-          <b>The network playing itself, client-side.</b> Candidate moves and their evaluations appear on
+          <b>The engine playing itself, client-side.</b> Candidate moves and their evaluations appear on
           the left as the search runs; the move list and captured material fill in as the game goes. The
-          same page lets you take White and play the trained network yourself.
+          same page lets you take White and play it yourself.
         </figcaption>
       </figure>
 
       <dl class="figs">
         <div><dt>Self-play games trained</dt><dd>1,000 <small>~9.8h on 2&times;T4</small></dd></div>
-        <div><dt>Elo vs. random baseline</dt><dd>&minus;21 &rarr; +28</dd></div>
+        <div><dt>Gain over starting network</dt><dd>+31 Elo <small>95% CI +3 to +60, one seed</small></dd></div>
         <div><dt>Policy head</dt><dd>4,672 <small>move logits</small></dd></div>
       </dl>
 
@@ -1443,11 +1443,13 @@ catch (e) { /* private mode */ }</script>
       <div class="finding">
         <p class="eyebrow">Reported finding</p>
         <p>
-          Scaling self-play 10&times; barely moved the needle: 92% of games were still non-decisive and
-          Elo went from &minus;21 to only &minus;7. Adding a material signal reached +28. The diagnosis in
-          the writeup is that this is <em>&ldquo;a self-play signal problem, not a compute ceiling&rdquo;</em>
-          &mdash; draw-heavy self-play starves the value head of gradient. The classical alpha-beta
-          engine built as a control beat the random baseline 10&ndash;0, confirming the harness itself was sound.
+          From iteration 3, every baseline self-play game ends in threefold repetition: with every outcome
+          a draw, the value head learns that every position is even. Ten times the self-play leaves 88%
+          of games undecided. Measured against the seed-42 network all three runs started from, the
+          baseline changed by &minus;22 Elo (95% CI &minus;56 to +12), the 10&times; run by +10 (&minus;26 to +45),
+          and the material-assisted run by +31 (+3 to +60). An earlier headline, &ldquo;a signal problem, not
+          a compute ceiling&rdquo; (&minus;21 &rarr; +28), was withdrawn: it compared runs evaluated with
+          different searches, without that starting-network control or intervals.
         </p>
       </div>
 
@@ -1458,13 +1460,13 @@ catch (e) { /* private mode */ }</script>
             <li>Modular by component so each piece is testable in isolation: <code>chess_game.py</code> (rules and encoding), <code>model.py</code> (network), <code>mcts.py</code> (search), <code>self_play.py</code> / <code>training.py</code> (the learning loop), <code>evaluation.py</code> (strength measurement).</li>
             <li>Trained with cross-entropy loss against the MCTS visit distribution and mean-squared error against the final game outcome.</li>
             <li>Three ways in: a browser UI, a console client, and a FastAPI HTTP API.</li>
-            <li>41-test pytest suite on GitHub Actions, including an ONNX-vs-PyTorch parity check on the exported network.</li>
+            <li>44-test pytest suite on GitHub Actions, including an ONNX-vs-PyTorch parity check on the exported network.</li>
           </ul>
         </div>
       </details>
 
       <div class="stack">
-        <span>PyTorch</span><span>Python 3.10+</span><span>FastAPI</span><span>ONNX Runtime Web</span><span>chessboard.js</span><span>Vercel</span>
+        <span>PyTorch</span><span>Python 3.10+</span><span>FastAPI</span><span>ONNX Runtime Web</span><span>chess.js</span><span>Vercel</span>
       </div>
       <div class="links">
         <a class="primary" href="https://rlchess.xyz/#play">Play the engine &rarr;</a>

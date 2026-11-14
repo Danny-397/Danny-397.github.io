@@ -6,7 +6,7 @@ move; a rerun on a later date can legitimately differ, and the source files say
 how. Test counts are not listed here: they change with every commit, so the
 site reads them from each repository's CI instead.
 
-*Compiled 2026-10-28; RL-Trader rows updated 2026-11-14 (v2.3.0).*
+*Compiled 2026-10-28; RL-Trader rows updated 2026-11-14 (v2.3.0); chess rows corrected 2026-11-14.*
 
 ## How RL agents fool you (RL-Trader)
 
@@ -42,7 +42,9 @@ site reads them from each repository's CI instead.
 
 | Claim | Figure | Source | Reproduce |
 |---|---|---|---|
-| The plateau was a training-signal problem, not compute | Elo vs a random player: baseline **−21**, 10× self-play **−7**, material signal **+28** | docs/experiment-results.md | `python run_experiment.py --device cuda` (9.8 h on 2× T4) |
+| Self-play collapses into a draw cycle | Baseline self-play: **100%** threefold repetition from iteration 3; 10× self-play still **88%** undecided | docs/data/gpu_run_2026-07-14.json | `python run_experiment.py --device cuda` (9.8 h on 2× T4) |
+| Only the material-assisted run measurably improved | Change vs the seed-42 starting network, Elo vs random (95% CI): baseline **−22** [−56, +12], 10× **+10** [−26, +45], assisted **+31** [+3, +60] | docs/data/start_network_control.json, docs/technical-report.md §5.4 | `python tools/no_learning_control.py --seed-values 42 --games 100` (~1 h CPU) |
+| *Withdrawn 2026-11-14:* "a signal problem, not compute" (Elo −21 → +28) | Compared runs evaluated with different searches, without a starting-network control or intervals | docs/technical-report.md §5.4 | — |
 | Strength of the classical control engine | Easy (depth 2) ≈ **1390** [1284, 1512] on Stockfish's engine scale: +14 =8 −8 vs Stockfish 19 at `UCI_Elo 1320` | docs/data/stockfish_rating_d2_e1320.json | `python tools/stockfish_rating.py --stockfish <path> --depth 2 --games 30` |
 
 ## Tradeski and Neural Canvas

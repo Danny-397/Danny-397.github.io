@@ -6,16 +6,19 @@ move; a rerun on a later date can legitimately differ, and the source files say
 how. Test counts are not listed here: they change with every commit, so the
 site reads them from each repository's CI instead.
 
-*Compiled 2026-10-28.*
+*Compiled 2026-10-28; RL-Trader rows updated 2026-11-14 (v2.3.0).*
 
 ## How RL agents fool you (RL-Trader)
 
 | Claim | Figure | Source | Reproduce |
 |---|---|---|---|
-| A single favourable run was not an edge | crypto agent **+56.8%** [+16.3%, +106.3%] across 10 seeds vs buy-and-hold +33.5%, permutation **p = 0.79** | RESULTS.md §5 | `python tools/real_significance.py --seeds 10 --timesteps 150000` |
-| The stock agent is reliably worse than holding | **−19.1%** [−26.7%, −11.2%] vs +239.5%, **p = 0.0021** | RESULTS.md §5 | same command |
-| Memorisation, and the fix | held-out return single-asset → across tickers: stocks **−25% → +31%**, crypto **−44% → +187%** (10 seeds, all four intervals exclude zero) | RESULTS.md §1 | `python tools/ablation_multiseed.py --seeds 42 43 44 45 46 47 48 49 50 51 --timesteps 60000` |
-| Pre-registered replication | predictions committed (commit `d344b4e`) before running seeds 200–209; **all four held** (stock p = 0.0021, crypto p = 0.88). Not replicated: the crypto mean's interval now includes zero, +26.7% [−13.8%, +70.4%] | docs/preregistration/ | command in the registration file; input data archived by SHA-256 |
+| A single favourable run was not an edge | crypto agent **−40.5%** [−51.5%, −27.7%] across 30 seeds vs buy-and-hold +10.3%; behind on 5 of 6 coins, permutation **p = 0.19** | RESULTS.md §10h | `python tools/real_significance.py --seeds 30 --timesteps 150000` |
+| The stock agent is reliably worse than holding | **−29.8%** [−35.0%, −24.3%] vs +239.5%, behind in all 300 runs, **p = 0.0021** | RESULTS.md §10h | same command |
+| It holds across history | retrained in four periods: stocks behind in **4 of 4**, crypto in **3 of 4** (the fourth was a −46% crash it lost less in) | RESULTS.md §10h | `python tools/basket_walk_forward.py` (see RESULTS.md §12) |
+| Why: no directional information | daily long-or-short calls right **50.0%** of the time (crypto; 49.8% stocks); daily turnover 0.52 of equity | RESULTS.md §10h | from the 30-seed command |
+| The study survived an audit | pre-registered audit (2026-11-13): a repaired PPO matches Stable-Baselines3 on 3 of 4 benchmarks; a calendar leak in the crypto split fixed; no implementation, algorithm, budget or universe beats buy-and-hold | RESULTS.md §10 | `.github/workflows/rigor.yml` |
+| Memorisation, and the fix | on simulated paths, held-out return one fixed path → a fresh path every episode: equity-like **−25% → +31%**, crypto-like **−44% → +187%** (10 seeds, all four intervals exclude zero) | RESULTS.md §1 | `python tools/ablation_multiseed.py --seeds 42 43 44 45 46 47 48 49 50 51 --timesteps 60000` |
+| Pre-registered predictions | depth study (2026-11-14): **5 of 6 held**; failed: "never better in any period" (crypto, the 2025–26 crash) | docs/preregistration/2026-11-14-depth.results.md | `rigor.yml` job `depth` |
 
 ## QuantumSafe Scan
 

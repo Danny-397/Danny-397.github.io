@@ -867,7 +867,7 @@ catch (e) { /* private mode */ }</script>
         <dd>projects deployed to a public URL — not just a repository</dd>
       </div>
       <div>
-        <dt>1,770</dt>
+        <dt>1,779</dt>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
@@ -939,9 +939,9 @@ catch (e) { /* private mode */ }</script>
         <p class="lede">
           PPO implemented from scratch, then pointed at a deliberately brutal testbed &mdash; financial
           markets &mdash; to ask one question: does an agent that looks brilliant in a single run survive
-          being run five times?
+          being run thirty times?
         </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>A +275% single run was luck: across 10 seeds the edge over buy-and-hold is not significant (p&nbsp;=&nbsp;0.79).</p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>A +275% single run was luck: across 30 seeds and four periods of history the agent never reliably beats buy-and-hold, and its daily calls are right 50.0% of the time.</p>
       </div>
 
       <figure class="plate">
@@ -968,8 +968,8 @@ catch (e) { /* private mode */ }</script>
 
       <dl class="figs">
         <div><dt>The run I nearly published</dt><dd>+275% <small>vs. +19% &middot; superseded v1, commit d4c0ef9</small></dd></div>
-        <div><dt>Rebuilt, 10 seeds</dt><dd>+57% <small>vs. +34% buy-and-hold &middot; p = 0.79</small></dd></div>
-        <div><dt>Domain randomization, held-out</dt><dd>&minus;25% &rarr; +31% <small>stocks, 10 seeds</small></dd></div>
+        <div><dt>Crypto, 30 seeds</dt><dd>−40% <small>vs. +10% buy-and-hold &middot; behind on 5 of 6 coins</small></dd></div>
+        <div><dt>Stocks, 30 seeds</dt><dd>−30% <small>vs. +240% buy-and-hold &middot; behind in all 300 runs</small></dd></div>
       </dl>
 
       <figure class="viz reveal">
@@ -982,7 +982,7 @@ catch (e) { /* private mode */ }</script>
           </p>
         </div>
         <div class="viz-wrap">
-      <svg viewBox="0 0 700 200" role="img" aria-label="Excess return over buy-and-hold for each of ten training seeds, per market. The ten crypto seeds scatter across zero and their mean interval includes zero; every one of the ten stock seeds sits far below zero.">
+      <svg viewBox="0 0 700 200" role="img" aria-label="Excess return over buy-and-hold for each of thirty training seeds, per market. Most crypto seeds sit below zero and their mean interval lies below it; every one of the thirty stock seeds sits far below zero.">
         <g class="ax" text-anchor="middle">
           <line class="grid" x1="14.0" y1="34" x2="14.0" y2="172"/>
           <text x="14.0" y="188">-300%</text>
@@ -999,54 +999,94 @@ catch (e) { /* private mode */ }</script>
         </g>
         <line class="zero" x1="405.5" y1="28" x2="405.5" y2="172" stroke-width="1.5"/>
         <text class="lbl-em" x="405.5" y="22" text-anchor="middle">ties buy-and-hold</text>
-        <text class="lbl" x="14" y="60">Crypto · 10 seeds</text>
-        <text class="lbl-em" x="686" y="60" text-anchor="end">mean +23% · 95% CI [-17%, +73%] · p = 0.79</text>
-        <line class="ci" x1="383.1" y1="80" x2="500.5" y2="80" opacity=".45"/>
-        <line class="ci" x1="383.1" y1="74" x2="383.1" y2="86"/>
-        <line class="ci" x1="500.5" y1="74" x2="500.5" y2="86"/>
-        <circle class="dot" cx="656.0" cy="82.5" r="4.5"/><circle class="dot-hit" cx="656.0" cy="82.5" r="12" data-tip="seed 42: +192% vs buy-and-hold"/>
-        <circle class="dot" cx="537.9" cy="75.1" r="4.5"/><circle class="dot-hit" cx="537.9" cy="75.1" r="12" data-tip="seed 43: +102% vs buy-and-hold"/>
-        <circle class="dot" cx="357.3" cy="87.3" r="4.5"/><circle class="dot-hit" cx="357.3" cy="87.3" r="12" data-tip="seed 44: -37% vs buy-and-hold"/>
-        <circle class="dot" cx="324.2" cy="77.5" r="4.5"/><circle class="dot-hit" cx="324.2" cy="77.5" r="12" data-tip="seed 45: -62% vs buy-and-hold"/>
-        <circle class="dot" cx="453.3" cy="84.9" r="4.5"/><circle class="dot-hit" cx="453.3" cy="84.9" r="12" data-tip="seed 46: +37% vs buy-and-hold"/>
-        <circle class="dot" cx="468.4" cy="72.7" r="4.5"/><circle class="dot-hit" cx="468.4" cy="72.7" r="12" data-tip="seed 47: +48% vs buy-and-hold"/>
-        <circle class="dot" cx="343.0" cy="82.5" r="4.5"/><circle class="dot-hit" cx="343.0" cy="82.5" r="12" data-tip="seed 48: -48% vs buy-and-hold"/>
-        <circle class="dot" cx="401.0" cy="75.1" r="4.5"/><circle class="dot-hit" cx="401.0" cy="75.1" r="12" data-tip="seed 49: -3% vs buy-and-hold"/>
-        <circle class="dot" cx="396.8" cy="87.3" r="4.5"/><circle class="dot-hit" cx="396.8" cy="87.3" r="12" data-tip="seed 50: -7% vs buy-and-hold"/>
-        <circle class="dot" cx="420.5" cy="77.5" r="4.5"/><circle class="dot-hit" cx="420.5" cy="77.5" r="12" data-tip="seed 51: +12% vs buy-and-hold"/>
-        <circle class="mean" cx="435.8" cy="80" r="6"/>
-        <text class="lbl" x="14" y="126">Stocks · 10 seeds</text>
-        <text class="lbl-em" x="686" y="126" text-anchor="end">mean -259% · 95% CI [-266%, -251%] · p = 0.002</text>
-        <line class="ci" x1="58.1" y1="146" x2="78.2" y2="146" opacity=".45"/>
-        <line class="ci" x1="58.1" y1="140" x2="58.1" y2="152"/>
-        <line class="ci" x1="78.2" y1="140" x2="78.2" y2="152"/>
-        <circle class="dot" cx="65.6" cy="148.5" r="4.5"/><circle class="dot-hit" cx="65.6" cy="148.5" r="12" data-tip="seed 42: -260% vs buy-and-hold"/>
-        <circle class="dot" cx="62.1" cy="141.1" r="4.5"/><circle class="dot-hit" cx="62.1" cy="141.1" r="12" data-tip="seed 43: -263% vs buy-and-hold"/>
-        <circle class="dot" cx="77.0" cy="153.3" r="4.5"/><circle class="dot-hit" cx="77.0" cy="153.3" r="12" data-tip="seed 44: -252% vs buy-and-hold"/>
-        <circle class="dot" cx="73.9" cy="143.5" r="4.5"/><circle class="dot-hit" cx="73.9" cy="143.5" r="12" data-tip="seed 45: -254% vs buy-and-hold"/>
-        <circle class="dot" cx="45.3" cy="150.9" r="4.5"/><circle class="dot-hit" cx="45.3" cy="150.9" r="12" data-tip="seed 46: -276% vs buy-and-hold"/>
-        <circle class="dot" cx="44.8" cy="138.7" r="4.5"/><circle class="dot-hit" cx="44.8" cy="138.7" r="12" data-tip="seed 47: -276% vs buy-and-hold"/>
-        <circle class="dot" cx="98.2" cy="148.5" r="4.5"/><circle class="dot-hit" cx="98.2" cy="148.5" r="12" data-tip="seed 48: -235% vs buy-and-hold"/>
-        <circle class="dot" cx="87.2" cy="141.1" r="4.5"/><circle class="dot-hit" cx="87.2" cy="141.1" r="12" data-tip="seed 49: -244% vs buy-and-hold"/>
-        <circle class="dot" cx="72.3" cy="153.3" r="4.5"/><circle class="dot-hit" cx="72.3" cy="153.3" r="12" data-tip="seed 50: -255% vs buy-and-hold"/>
-        <circle class="dot" cx="53.9" cy="143.5" r="4.5"/><circle class="dot-hit" cx="53.9" cy="143.5" r="12" data-tip="seed 51: -269% vs buy-and-hold"/>
-        <circle class="mean" cx="68.0" cy="146" r="6"/>
+        <text class="lbl" x="14" y="60">Crypto · 30 seeds</text>
+        <text class="lbl-em" x="686" y="60" text-anchor="end">mean -51% · 95% CI [-62%, -38%] · p = 0.19</text>
+        <line class="ci" x1="324.9" y1="80" x2="355.9" y2="80" opacity=".45"/>
+        <line class="ci" x1="324.9" y1="74" x2="324.9" y2="86"/>
+        <line class="ci" x1="355.9" y1="74" x2="355.9" y2="86"/>
+        <circle class="dot" cx="337.6" cy="82.5" r="4"/><circle class="dot-hit" cx="337.6" cy="82.5" r="10" data-tip="seed 100: -52% vs buy-and-hold"/>
+        <circle class="dot" cx="301.8" cy="75.1" r="4"/><circle class="dot-hit" cx="301.8" cy="75.1" r="10" data-tip="seed 101: -80% vs buy-and-hold"/>
+        <circle class="dot" cx="304.8" cy="87.3" r="4"/><circle class="dot-hit" cx="304.8" cy="87.3" r="10" data-tip="seed 102: -77% vs buy-and-hold"/>
+        <circle class="dot" cx="318.0" cy="77.5" r="4"/><circle class="dot-hit" cx="318.0" cy="77.5" r="10" data-tip="seed 103: -67% vs buy-and-hold"/>
+        <circle class="dot" cx="310.2" cy="84.9" r="4"/><circle class="dot-hit" cx="310.2" cy="84.9" r="10" data-tip="seed 104: -73% vs buy-and-hold"/>
+        <circle class="dot" cx="337.3" cy="72.7" r="4"/><circle class="dot-hit" cx="337.3" cy="72.7" r="10" data-tip="seed 105: -52% vs buy-and-hold"/>
+        <circle class="dot" cx="376.1" cy="82.5" r="4"/><circle class="dot-hit" cx="376.1" cy="82.5" r="10" data-tip="seed 106: -23% vs buy-and-hold"/>
+        <circle class="dot" cx="356.0" cy="75.1" r="4"/><circle class="dot-hit" cx="356.0" cy="75.1" r="10" data-tip="seed 107: -38% vs buy-and-hold"/>
+        <circle class="dot" cx="368.1" cy="87.3" r="4"/><circle class="dot-hit" cx="368.1" cy="87.3" r="10" data-tip="seed 108: -29% vs buy-and-hold"/>
+        <circle class="dot" cx="328.6" cy="77.5" r="4"/><circle class="dot-hit" cx="328.6" cy="77.5" r="10" data-tip="seed 109: -59% vs buy-and-hold"/>
+        <circle class="dot" cx="493.9" cy="84.9" r="4"/><circle class="dot-hit" cx="493.9" cy="84.9" r="10" data-tip="seed 110: +68% vs buy-and-hold"/>
+        <circle class="dot" cx="349.3" cy="72.7" r="4"/><circle class="dot-hit" cx="349.3" cy="72.7" r="10" data-tip="seed 111: -43% vs buy-and-hold"/>
+        <circle class="dot" cx="315.3" cy="82.5" r="4"/><circle class="dot-hit" cx="315.3" cy="82.5" r="10" data-tip="seed 112: -69% vs buy-and-hold"/>
+        <circle class="dot" cx="428.5" cy="75.1" r="4"/><circle class="dot-hit" cx="428.5" cy="75.1" r="10" data-tip="seed 113: +18% vs buy-and-hold"/>
+        <circle class="dot" cx="297.9" cy="87.3" r="4"/><circle class="dot-hit" cx="297.9" cy="87.3" r="10" data-tip="seed 114: -82% vs buy-and-hold"/>
+        <circle class="dot" cx="323.8" cy="77.5" r="4"/><circle class="dot-hit" cx="323.8" cy="77.5" r="10" data-tip="seed 115: -63% vs buy-and-hold"/>
+        <circle class="dot" cx="390.3" cy="84.9" r="4"/><circle class="dot-hit" cx="390.3" cy="84.9" r="10" data-tip="seed 116: -12% vs buy-and-hold"/>
+        <circle class="dot" cx="308.9" cy="72.7" r="4"/><circle class="dot-hit" cx="308.9" cy="72.7" r="10" data-tip="seed 117: -74% vs buy-and-hold"/>
+        <circle class="dot" cx="298.7" cy="82.5" r="4"/><circle class="dot-hit" cx="298.7" cy="82.5" r="10" data-tip="seed 118: -82% vs buy-and-hold"/>
+        <circle class="dot" cx="370.6" cy="75.1" r="4"/><circle class="dot-hit" cx="370.6" cy="75.1" r="10" data-tip="seed 119: -27% vs buy-and-hold"/>
+        <circle class="dot" cx="334.0" cy="87.3" r="4"/><circle class="dot-hit" cx="334.0" cy="87.3" r="10" data-tip="seed 120: -55% vs buy-and-hold"/>
+        <circle class="dot" cx="289.9" cy="77.5" r="4"/><circle class="dot-hit" cx="289.9" cy="77.5" r="10" data-tip="seed 121: -89% vs buy-and-hold"/>
+        <circle class="dot" cx="308.3" cy="84.9" r="4"/><circle class="dot-hit" cx="308.3" cy="84.9" r="10" data-tip="seed 122: -74% vs buy-and-hold"/>
+        <circle class="dot" cx="310.6" cy="72.7" r="4"/><circle class="dot-hit" cx="310.6" cy="72.7" r="10" data-tip="seed 123: -73% vs buy-and-hold"/>
+        <circle class="dot" cx="313.1" cy="82.5" r="4"/><circle class="dot-hit" cx="313.1" cy="82.5" r="10" data-tip="seed 124: -71% vs buy-and-hold"/>
+        <circle class="dot" cx="371.6" cy="75.1" r="4"/><circle class="dot-hit" cx="371.6" cy="75.1" r="10" data-tip="seed 125: -26% vs buy-and-hold"/>
+        <circle class="dot" cx="306.6" cy="87.3" r="4"/><circle class="dot-hit" cx="306.6" cy="87.3" r="10" data-tip="seed 126: -76% vs buy-and-hold"/>
+        <circle class="dot" cx="385.0" cy="77.5" r="4"/><circle class="dot-hit" cx="385.0" cy="77.5" r="10" data-tip="seed 127: -16% vs buy-and-hold"/>
+        <circle class="dot" cx="336.8" cy="84.9" r="4"/><circle class="dot-hit" cx="336.8" cy="84.9" r="10" data-tip="seed 128: -53% vs buy-and-hold"/>
+        <circle class="dot" cx="306.0" cy="72.7" r="4"/><circle class="dot-hit" cx="306.0" cy="72.7" r="10" data-tip="seed 129: -76% vs buy-and-hold"/>
+        <circle class="mean" cx="339.3" cy="80" r="6"/>
+        <text class="lbl" x="14" y="126">Stocks · 30 seeds</text>
+        <text class="lbl-em" x="686" y="126" text-anchor="end">mean -269% · 95% CI [-274%, -264%] · p = 0.002</text>
+        <line class="ci" x1="47.4" y1="146" x2="61.3" y2="146" opacity=".45"/>
+        <line class="ci" x1="47.4" y1="140" x2="47.4" y2="152"/>
+        <line class="ci" x1="61.3" y1="140" x2="61.3" y2="152"/>
+        <circle class="dot" cx="54.5" cy="148.5" r="4"/><circle class="dot-hit" cx="54.5" cy="148.5" r="10" data-tip="seed 100: -269% vs buy-and-hold"/>
+        <circle class="dot" cx="35.3" cy="141.1" r="4"/><circle class="dot-hit" cx="35.3" cy="141.1" r="10" data-tip="seed 101: -284% vs buy-and-hold"/>
+        <circle class="dot" cx="65.6" cy="153.3" r="4"/><circle class="dot-hit" cx="65.6" cy="153.3" r="10" data-tip="seed 102: -261% vs buy-and-hold"/>
+        <circle class="dot" cx="60.9" cy="143.5" r="4"/><circle class="dot-hit" cx="60.9" cy="143.5" r="10" data-tip="seed 103: -264% vs buy-and-hold"/>
+        <circle class="dot" cx="35.5" cy="150.9" r="4"/><circle class="dot-hit" cx="35.5" cy="150.9" r="10" data-tip="seed 104: -284% vs buy-and-hold"/>
+        <circle class="dot" cx="50.8" cy="138.7" r="4"/><circle class="dot-hit" cx="50.8" cy="138.7" r="10" data-tip="seed 105: -272% vs buy-and-hold"/>
+        <circle class="dot" cx="45.1" cy="148.5" r="4"/><circle class="dot-hit" cx="45.1" cy="148.5" r="10" data-tip="seed 106: -276% vs buy-and-hold"/>
+        <circle class="dot" cx="76.1" cy="141.1" r="4"/><circle class="dot-hit" cx="76.1" cy="141.1" r="10" data-tip="seed 107: -253% vs buy-and-hold"/>
+        <circle class="dot" cx="101.0" cy="153.3" r="4"/><circle class="dot-hit" cx="101.0" cy="153.3" r="10" data-tip="seed 108: -233% vs buy-and-hold"/>
+        <circle class="dot" cx="60.1" cy="143.5" r="4"/><circle class="dot-hit" cx="60.1" cy="143.5" r="10" data-tip="seed 109: -265% vs buy-and-hold"/>
+        <circle class="dot" cx="40.6" cy="150.9" r="4"/><circle class="dot-hit" cx="40.6" cy="150.9" r="10" data-tip="seed 110: -280% vs buy-and-hold"/>
+        <circle class="dot" cx="50.0" cy="138.7" r="4"/><circle class="dot-hit" cx="50.0" cy="138.7" r="10" data-tip="seed 111: -273% vs buy-and-hold"/>
+        <circle class="dot" cx="36.6" cy="148.5" r="4"/><circle class="dot-hit" cx="36.6" cy="148.5" r="10" data-tip="seed 112: -283% vs buy-and-hold"/>
+        <circle class="dot" cx="66.6" cy="141.1" r="4"/><circle class="dot-hit" cx="66.6" cy="141.1" r="10" data-tip="seed 113: -260% vs buy-and-hold"/>
+        <circle class="dot" cx="72.5" cy="153.3" r="4"/><circle class="dot-hit" cx="72.5" cy="153.3" r="10" data-tip="seed 114: -255% vs buy-and-hold"/>
+        <circle class="dot" cx="47.3" cy="143.5" r="4"/><circle class="dot-hit" cx="47.3" cy="143.5" r="10" data-tip="seed 115: -275% vs buy-and-hold"/>
+        <circle class="dot" cx="44.8" cy="150.9" r="4"/><circle class="dot-hit" cx="44.8" cy="150.9" r="10" data-tip="seed 116: -277% vs buy-and-hold"/>
+        <circle class="dot" cx="77.9" cy="138.7" r="4"/><circle class="dot-hit" cx="77.9" cy="138.7" r="10" data-tip="seed 117: -251% vs buy-and-hold"/>
+        <circle class="dot" cx="31.3" cy="148.5" r="4"/><circle class="dot-hit" cx="31.3" cy="148.5" r="10" data-tip="seed 118: -287% vs buy-and-hold"/>
+        <circle class="dot" cx="37.9" cy="141.1" r="4"/><circle class="dot-hit" cx="37.9" cy="141.1" r="10" data-tip="seed 119: -282% vs buy-and-hold"/>
+        <circle class="dot" cx="103.6" cy="153.3" r="4"/><circle class="dot-hit" cx="103.6" cy="153.3" r="10" data-tip="seed 120: -231% vs buy-and-hold"/>
+        <circle class="dot" cx="57.4" cy="143.5" r="4"/><circle class="dot-hit" cx="57.4" cy="143.5" r="10" data-tip="seed 121: -267% vs buy-and-hold"/>
+        <circle class="dot" cx="39.8" cy="150.9" r="4"/><circle class="dot-hit" cx="39.8" cy="150.9" r="10" data-tip="seed 122: -280% vs buy-and-hold"/>
+        <circle class="dot" cx="32.3" cy="138.7" r="4"/><circle class="dot-hit" cx="32.3" cy="138.7" r="10" data-tip="seed 123: -286% vs buy-and-hold"/>
+        <circle class="dot" cx="32.2" cy="148.5" r="4"/><circle class="dot-hit" cx="32.2" cy="148.5" r="10" data-tip="seed 124: -286% vs buy-and-hold"/>
+        <circle class="dot" cx="43.1" cy="141.1" r="4"/><circle class="dot-hit" cx="43.1" cy="141.1" r="10" data-tip="seed 125: -278% vs buy-and-hold"/>
+        <circle class="dot" cx="58.3" cy="153.3" r="4"/><circle class="dot-hit" cx="58.3" cy="153.3" r="10" data-tip="seed 126: -266% vs buy-and-hold"/>
+        <circle class="dot" cx="25.8" cy="143.5" r="4"/><circle class="dot-hit" cx="25.8" cy="143.5" r="10" data-tip="seed 127: -291% vs buy-and-hold"/>
+        <circle class="dot" cx="75.7" cy="150.9" r="4"/><circle class="dot-hit" cx="75.7" cy="150.9" r="10" data-tip="seed 128: -253% vs buy-and-hold"/>
+        <circle class="dot" cx="67.6" cy="138.7" r="4"/><circle class="dot-hit" cx="67.6" cy="138.7" r="10" data-tip="seed 129: -259% vs buy-and-hold"/>
+        <circle class="mean" cx="54.2" cy="146" r="6"/>
       </svg>
           <div class="viz-tt" id="tt-seeds"></div>
         </div>
         <p class="viz-sub">
-          <b>The crypto cloud straddles zero</b> &mdash; its interval includes &ldquo;no edge at all,&rdquo;
-          which is what p&nbsp;=&nbsp;0.79 means. <b>Every stock seed lands far left of it:</b> that arm is
-          not inconclusive, it is reliably worse than holding the index. A single dot from the right-hand
-          tail, reported alone, would have looked like a discovery.
+          <b>2 of 30 crypto seeds beat holding</b>, and a single one of them, reported alone,
+          would have looked like a discovery. The mean sits below zero, though with six coins the test
+          cannot call it significant (p&nbsp;=&nbsp;0.19). <b>Every stock seed lands far left:</b>
+          that arm is not inconclusive, it is reliably worse than holding the index.
         </p>
         <details>
           <summary>Table view</summary>
       <table>
         <thead><tr><th>Market</th><th>Worst seed</th><th>Best seed</th><th>Mean excess</th><th>95% CI</th><th>p</th></tr></thead>
         <tbody>
-          <tr><td>Crypto</td><td>-62%</td><td>+192%</td><td>+23%</td><td>[-17%, +73%]</td><td>0.79</td></tr>
-          <tr><td>Stocks</td><td>-276%</td><td>-235%</td><td>-259%</td><td>[-266%, -251%]</td><td>0.002</td></tr>
+          <tr><td>Crypto</td><td>-89%</td><td>+68%</td><td>-51%</td><td>[-62%, -38%]</td><td>0.19</td></tr>
+          <tr><td>Stocks</td><td>-291%</td><td>-231%</td><td>-269%</td><td>[-274%, -264%]</td><td>0.002</td></tr>
         </tbody>
       </table>
         </details>
@@ -1063,18 +1103,19 @@ catch (e) { /* private mode */ }</script>
 
       <figure class="plate">
         <div class="plate-frame plate-scroll">
-          <img src="media/rltrader-arms.webp" width="1400" height="514" loading="lazy" decoding="async"
-               alt="Two panels compared. Trained on one asset, tagged memorised: training return +87k% to +4.0M% across 10 seeds, held-out return minus 44% with a 95% confidence interval of minus 59% to minus 21%. Trained across the basket, tagged generalised: training return +24% to +460%, held-out return +187% with a 95% confidence interval of +147% to +229%.">
+          <img src="media/rltrader-arms.webp" width="1400" height="530" loading="lazy" decoding="async"
+               alt="Two panels compared, on simulated price paths. Trained on one fixed path, tagged memorised: training return +87k% to +4.0M% across 10 seeds, held-out return minus 44% with a 95% confidence interval of minus 59% to minus 21%. A fresh path every episode, tagged generalised: training return +24% to +460%, held-out return +187% with a 95% confidence interval of +147% to +229%.">
           <a class="plate-cover" href="https://rl-for-crypto-and-stocks.vercel.app/#result">
             <span class="plate-cta">See the full result &nearr;</span>
           </a>
         </div>
         <figcaption>
           <span class="chip">Screenshot &middot; the finding</span>
-          <b>The whole argument in one figure.</b> Both arms were trained identically and scored on the
-          same held-out paths; the only difference is how many assets they saw. The overfit arm's
-          in-sample return of <code>+4.0M%</code> becomes <code>&minus;44%</code> the moment it meets
-          data it has never seen. Each dot is one seed.
+          <b>The whole argument in one figure.</b> On simulated crypto-like paths, both arms were trained
+          identically and scored on the same held-out paths; the only difference is whether they saw one
+          fixed path or a fresh one every episode. The overfit arm's in-sample return of
+          <code>+4.0M%</code> becomes <code>&minus;44%</code> the moment it meets data it has never seen.
+          Each dot is one seed.
          <span class="plate-hint">Scroll it sideways to read the detail.</span>
         </figcaption>
       </figure>
@@ -1085,19 +1126,20 @@ catch (e) { /* private mode */ }</script>
           <strong>No seed-robust edge over buy-and-hold.</strong> One favorable run returned +275% against a
           +19% benchmark, and that was the version I nearly wrote up as the finding &mdash; it is
           superseded, and the project site cites the commit
-          (<code>d4c0ef9</code>, test window ending 2026&#8209;06&#8209;17) rather than quoting it as current.
-          Rebuilt and rerun under ten seeds, individual returns ranged from &minus;29% to +226%; the mean,
-          +57% [+16%, +106%], cannot be distinguished from buy-and-hold's +34% (p = 0.79). The stock agent
-          returned &minus;19% [&minus;27%, &minus;11%] against buy-and-hold's +240% &mdash; significantly
-          <em>worse</em>, at p = 0.002. Retrained across four separate slices of Bitcoin's history, it lost
-          money in every one. A replication on ten fresh seeds, with its predictions committed before the
-          run, held on all four counts (stock p = 0.002; crypto p = 0.88); the one figure that did not
-          survive was the crypto mean's interval, which now includes zero.
-          Separately, an agent trained on a single price path memorizes it catastrophically; training on a
-          freshly generated synthetic path each episode flips held-out return from &minus;25% to +31% on
-          equities and from &minus;44% to +187% on crypto &mdash; across ten seeds, with all four confidence
-          intervals excluding zero. Reported as a distribution rather than a single run, because the
-          in-sample figure that version quoted swings by an order of magnitude between seeds.
+          (<code>d4c0ef9</code>) rather than quoting it as current. I then audited my own study against
+          current deep-RL practice, with every prediction committed before the runs. The audit found two
+          real flaws &mdash; my PPO trailed a reference library on two of four benchmarks, and the crypto
+          split leaked across coins in calendar time &mdash; and fixing both left the conclusion unchanged.
+          At thirty seeds the stock agent trails buy-and-hold in all 300 runs (p = 0.002); the crypto agent
+          trails on five of six coins, which six coins cannot make significant (p = 0.19). Retrained across
+          four periods of history, it trails in every period on stocks and in three of four on crypto; the
+          fourth was a crash it lost less in, and I report that registered prediction as failed. The reason
+          is plain once you look at its positions: its daily long-or-short calls are right 50.0% of the time,
+          and reversing them almost every day costs about as much as it loses.
+          Separately, on simulated market paths, an agent trained on one fixed path memorizes it
+          catastrophically, while a fresh path every episode flips held-out return from &minus;25% to +31%
+          (equity-like paths) and from &minus;44% to +187% (crypto-like) &mdash; across ten seeds, with all
+          four confidence intervals excluding zero.
           The result reproduces Henderson et al. (2018) on the unreliability of
           single-run RL evaluation, in a domain where the incentive to publish the lucky seed is strongest.
         </p>
@@ -1109,7 +1151,8 @@ catch (e) { /* private mode */ }</script>
           <ul>
             <li><strong>Observation space.</strong> 28 engineered features spanning momentum horizons, trend indicators, oscillators, volatility-regime signals, volume microstructure and cross-asset context. Continuous action targeting a position fraction (long / short / flat).</li>
             <li><strong>Leakage control.</strong> Chronological train/validation/test splits with feature scalers fit on training data only.</li>
-            <li><strong>Statistics.</strong> Bootstrap confidence intervals across seeds, paired permutation tests against buy-and-hold, rolling multi-fold walk-forward evaluation. Results are reported as distributions, never single runs.</li>
+            <li><strong>Statistics.</strong> Bootstrap confidence intervals across seeds, paired permutation tests against buy-and-hold, interquartile means, Holm-adjusted p-values, and walk-forward evaluation over four periods of history. Results are reported as distributions, never single runs.</li>
+            <li><strong>Pre-registration.</strong> Two studies committed their predictions before running: an audit (a repaired PPO checked against Stable-Baselines3, a leak-free split, SAC, budgets to 1M steps, a hindsight-free stock universe) and a depth study (30 seeds, walk-forward, a full hyper-parameter sweep). Every prediction is reported as held or failed.</li>
             <li><strong>Replication.</strong> The harder cross-sectional problem &mdash; allocating portfolio weights rather than timing one asset &mdash; reaches identical conclusions.</li>
             <li><strong>Deployment.</strong> The trained policy is exported to NumPy archives so the inference API runs with no PyTorch dependency.</li>
           </ul>
@@ -1124,6 +1167,7 @@ catch (e) { /* private mode */ }</script>
         <a class="secondary" href="https://rl-for-crypto-and-stocks.vercel.app/#lab">Interactive lab</a>
         <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-/blob/main/RESULTS.md">Full results</a>
         <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-/tree/main/paper">Paper</a>
+        <a class="secondary" href="https://rl-for-crypto-and-stocks.vercel.app/assets/rl-trader-summary.pdf">One-page summary</a>
         <a class="secondary" href="https://doi.org/10.5281/zenodo.23843503">DOI</a>
         <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-">Source</a>
       </div>

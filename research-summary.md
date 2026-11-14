@@ -27,14 +27,16 @@ Exports SARIF and CycloneDX CBOM, so it drops into real CI.
 
 **RL-Trader** · [4-page paper](reports/RL-Trader-Paper.pdf) · [DOI](https://doi.org/10.5281/zenodo.23843503) — PPO from scratch, aimed
 at markets as a hostile testbed, asking whether an agent that looks brilliant once
-survives ten runs. It doesn't. One seed showed **+275%** against a **+19%** benchmark;
-across ten, individual returns span −29% to +226% and the mean, **+57%** [+16%, +106%],
-is indistinguishable from buy-and-hold's +34% (p = 0.79) — and significantly *worse* on
-equities (p = 0.002). Retrained over four slices of Bitcoin's history, it lost money in
-all four. Its own
-significance tooling caught the false positive a naive version ships, reproducing
-Henderson et al. (2018) in a new domain. Adds an original surrogate-data test
-separating "the agent is weak" from "there is no signal."
+survives thirty runs. It doesn't. One seed showed **+275%** against a **+19%** benchmark.
+Two pre-registered studies then audited the result: they found and fixed two real flaws
+(a PPO that trailed a reference library, a crypto split that leaked across coins), and
+the conclusion held. Over 30 seeds the stock agent trails buy-and-hold in **all 300 runs**
+(p = 0.002); the crypto agent trails on five of six coins (p = 0.19). Retrained across four
+periods of history, it trails in every period on stocks and three of four on crypto. Its
+daily long-or-short calls are right **50.0%** of the time. Its own significance tooling
+caught the false positive a naive version ships, reproducing Henderson et al. (2018) in a
+new domain. Adds an original surrogate-data test separating "the agent is weak" from
+"there is no signal."
 
 **AlphaZero-style Chess Engine** · [rlchess.xyz](https://rlchess.xyz) — Rules only: no
 openings, no human games, no evaluation function. Dual-headed ResNet, PUCT tree search,

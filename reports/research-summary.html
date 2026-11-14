@@ -89,14 +89,16 @@ over 50 seeded cases. Audited 11,275 files; of 37 PyPI packages, 86% had a findi
 Exports SARIF and CycloneDX CBOM, so it drops into real CI.</p>
 <p><strong>RL-Trader</strong> · <a href="RL-Trader-Paper.pdf">4-page paper</a> · <a href="https://doi.org/10.5281/zenodo.23843503">DOI</a> — PPO from scratch, aimed
 at markets as a hostile testbed, asking whether an agent that looks brilliant once
-survives ten runs. It doesn't. One seed showed <strong>+275%</strong> against a <strong>+19%</strong> benchmark;
-across ten, individual returns span −29% to +226% and the mean, <strong>+57%</strong> [+16%, +106%],
-is indistinguishable from buy-and-hold's +34% (p = 0.79) — and significantly <em>worse</em> on
-equities (p = 0.002). Retrained over four slices of Bitcoin's history, it lost money in
-all four. Its own
-significance tooling caught the false positive a naive version ships, reproducing
-Henderson et al. (2018) in a new domain. Adds an original surrogate-data test
-separating &quot;the agent is weak&quot; from &quot;there is no signal.&quot;</p>
+survives thirty runs. It doesn't. One seed showed <strong>+275%</strong> against a <strong>+19%</strong> benchmark.
+Two pre-registered studies then audited the result: they found and fixed two real flaws
+(a PPO that trailed a reference library, a crypto split that leaked across coins), and
+the conclusion held. Over 30 seeds the stock agent trails buy-and-hold in <strong>all 300 runs</strong>
+(p = 0.002); the crypto agent trails on five of six coins (p = 0.19). Retrained across four
+periods of history, it trails in every period on stocks and three of four on crypto. Its
+daily long-or-short calls are right <strong>50.0%</strong> of the time. Its own significance tooling
+caught the false positive a naive version ships, reproducing Henderson et al. (2018) in a
+new domain. Adds an original surrogate-data test separating &quot;the agent is weak&quot; from
+&quot;there is no signal.&quot;</p>
 <p><strong>AlphaZero-style Chess Engine</strong> · <a href="https://rlchess.xyz">rlchess.xyz</a> — Rules only: no
 openings, no human games, no evaluation function. Dual-headed ResNet, PUCT tree search,
 4,672-move policy head, playable in-browser via ONNX Runtime Web. Scaling self-play 10×

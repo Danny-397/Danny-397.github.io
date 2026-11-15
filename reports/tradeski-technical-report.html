@@ -118,7 +118,7 @@ a specific user's holdings so its answers are about them.</p>
 </tr>
 <tr>
 <td>Assistant</td>
-<td>Claude Haiku 5.5 with 9 Tradeski tools + web search, a figure-grounding check, and a 24-question eval</td>
+<td>Claude Haiku 5.5 with 9 Tradeski tools + web search, a figure-grounding check, and a 32-question eval (89% main / 79% held-out)</td>
 </tr>
 <tr>
 <td>Deployment</td>
@@ -391,16 +391,33 @@ calculated by the model itself, and is logged. This is a heuristic. It skips cou
 and indicator lengths, and it needed a rule for textbook levels: the first live answer was
 flagged for &quot;70&quot; in &quot;approaching overbought (typically 70+)&quot;, which is a rule of thumb, not
 data. For now it only logs.</p>
-<p><strong>Quality is meant to be measured, not asserted.</strong> <code>tests/ski_eval/</code> asks 23 questions
-through the real endpoint against fixed fixture data (including a fixture option chain),
-in three groups: lookups, portfolio risk, and honesty traps (short interest, trade-level
-options flow, tomorrow's close). The put/call ratio used to be a trap; with the options
-tools it is now a lookup. Grading is
-deterministic, with no model judging. As of this writing the eval has not been run against
-the live model, so there is no score to report; §9 says so.</p>
+<p><strong>Quality is measured, not asserted.</strong> <code>tests/ski_eval/</code> asks 24 questions through the
+real endpoint against fixed fixture data (including a fixture option chain), in three groups:
+lookups, portfolio risk, and honesty traps (short interest, trade-level options flow,
+tomorrow's close), plus 8 held-out questions written before any fix was made. Grading is
+deterministic, with no model judging.</p>
+<p>The first run against the real model (2026-11-15, three runs per case) scored 41/72, and
+most of that was the grader: it rejected a bold &quot;<strong>Bottom line:</strong>&quot; the chat card renders
+fine, and the grounding check didn't recognise &quot;37%&quot; as the probability 0.3684, or a
+difference of two figures quoted in the same sentence. With those fixed, and each fix tested
+so that an invented figure still fails, Ski as it was scored 66/72 on the main set and 16/24
+held-out. The rule for shown arithmetic was measured before it was adopted: on run 1's
+replies, figures perturbed by 2–20% passed 39% of the time under &quot;any two figures may add
+up&quot;, and 0.4% under the rule used (same unit, two decimals, inputs grounded and quoted).</p>
+<p>The run found two real faults. For signed-out visitors, the prompt said risk metrics were
+&quot;not computed for the sample, so do not mention them&quot;, so Ski never called
+<code>portfolio_what_if</code> and did the maths itself; after the fix it called the tool on 9 of 9
+what-if questions, up from 3. And web answers repeated themselves: Ski paraphrased a result,
+then wrote the cited passage as a block of its own; such a block is now dropped (4 replies
+to 0), and the chat card links the cited pages. After the fixes: 64/72 main (no real change;
+three runs per case can't separate two replies) and 19/24 held-out, the gain all from the
+what-if fix. Of the 13 failures left, one is a wrong figure the check caught (a spread priced
+at &quot;$8.50 a share&quot; when its legs give $2.52), nine are correct calculations the check refuses
+by design, and three are web figures it can't verify. Results and run links:
+<a href="https://github.com/Danny-397/Tradeski/blob/main/docs/ski-eval/README.md"><code>docs/ski-eval/</code></a>.</p>
 <hr />
 <h2 id="8-testing">8. Testing<a class="anchor" href="#8-testing" aria-label="Link to this section">#</a></h2>
-<p>304 tests across 27 files run on every push through GitHub Actions, alongside flake8 linting.
+<p>321 tests across 27 files run on every push through GitHub Actions, alongside flake8 linting.
 Coverage is weighted toward the code where correctness is checkable rather than the code
 that is merely tedious: indicator boundary conditions, authentication and token handling,
 database access and user scoping, the FRED and news clients against recorded payloads, the
@@ -464,11 +481,12 @@ year, so it is labelled with its length rather than called an IV rank.</p>
 a fix for named failures, not a measured improvement, so the news panel shows &quot;Headline
 tone&quot; (positive, neutral, negative) with a note that it is a word-list score, not a call on
 the stock.</p>
-<p><strong>The assistant's quality is unmeasured.</strong> The eval in §7 exists and its harness is tested
-end to end with a scripted model, but it has not yet been run against the real one. Until it
-is, &quot;Ski answers better with tools&quot; is a design argument, not a result. The grounding check
-is a heuristic too: an invented figure that happens to equal a number in the data, or a
-textbook level, gets through it.</p>
+<p><strong>The assistant's eval is small.</strong> 32 hand-written questions on fixture data, three runs
+each, measure whether Ski uses its tools and quotes what they return; they say nothing about
+whether its commentary is good, and they can't resolve a change of a few replies. The
+grounding check is a heuristic: an invented figure that happens to equal a number in the
+data, a textbook level, or the sum of two quoted figures gets through it, and web figures
+are checked only against what the API returns of a citation (about 150 characters).</p>
 <p><strong>There is no backtesting and no strategy evaluation.</strong> Tradeski shows you the present. The
 question of whether any indicator on the screen predicts anything is deliberately out of
 scope here — that question is the entire subject of
@@ -491,8 +509,11 @@ sentiment lexicon against a labelled set of headlines, so &quot;tone&quot; could
 claim. Test features end to end from the first day: alerts were broken for months, and
 every unit test passed the whole time.</p>
 <p>For the assistant, I would have written the eval before the first prompt rather than after
-the feature shipped. Until then, Ski was judged by reading answers and deciding they looked
-right, and that is how a prompt claiming data it never received went unnoticed.</p>
+the feature shipped, and run it the day it was written. Ski was judged by reading answers and
+deciding they looked right, which is how a prompt claiming data it never received went
+unnoticed, and how one prompt line kept signed-out visitors from ever reaching the what-if tool. The first real
+run also showed the grader needs testing as much as the model: most of its failures were
+the grader's.</p>
 
   </article>
 </main>

@@ -114,11 +114,13 @@ window-dependent, and the report documents that instability rather than quoting 
 friendlier run. 367 tests in CI.</p>
 <p><strong>Tradeski</strong> · <a href="https://www.tradeski.dev/">tradeski.dev</a> — Live market, macro, and
 sentiment data in one dashboard: 11 ticker symbols, 7 FRED series hourly, a 29-symbol
-screener, a retrieval-grounded assistant, 306 tests. Its most useful lesson was a bug:
+screener, a retrieval-grounded assistant, 321 tests. Its most useful lesson was a bug:
 live prices never reached the browser because the server emitted on one Socket.IO
 namespace while the client listened on another. Both halves were correct alone, and all
 71 tests passed throughout — every one of them tested a pure function, so no test
-covered a contract <em>between</em> components. One now does.</p>
+covered a contract <em>between</em> components. One now does. The assistant is measured the same
+way: a 32-question eval scores 79% on held-out questions written before any fix, and its
+first run (57%) mostly measured a broken grader, not the model.</p>
 <p><strong>Neural Canvas</strong> · <a href="https://github.com/Danny-397/neural-canvas">github.com/Danny-397/neural-canvas</a>
 — Painting by hand gesture through a webcam: 21 3-D landmarks per hand at ~60
 inferences/second, fully on-device, one HTML file, no build step, no server. The hard

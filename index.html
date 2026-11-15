@@ -867,7 +867,7 @@ catch (e) { /* private mode */ }</script>
         <dd>projects deployed to a public URL — not just a repository</dd>
       </div>
       <div>
-        <dt>1,812</dt>
+        <dt>1,827</dt>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
@@ -1513,8 +1513,8 @@ catch (e) { /* private mode */ }</script>
 
       <dl class="figs">
         <div><dt>Symbols tracked live</dt><dd>11 <small>ticker + correlation matrix</small></dd></div>
-        <div><dt>Fed series, hourly refresh</dt><dd>7 <small>via FRED API</small></dd></div>
-        <div><dt>Tests in CI</dt><dd>112 <small>across 14 files</small></dd></div>
+        <div><dt>Assistant eval, held-out</dt><dd>79% <small>19 of 24, questions written before any fix</small></dd></div>
+        <div><dt>Tests in CI</dt><dd>321 <small>across 27 files</small></dd></div>
       </dl>
 
       <p class="prose">
@@ -1532,7 +1532,7 @@ catch (e) { /* private mode */ }</script>
           <ul>
             <li><strong>Risk metrics.</strong> Sharpe ratio, beta against the S&amp;P 500 and annualized volatility computed from a year of daily returns weighted by current market value, plus a 90-day pairwise return-correlation heatmap across all tracked symbols.</li>
             <li><strong>Sentiment.</strong> VADER extended with roughly 30 finance-specific terms &mdash; <code>beats &rarr; +2.0</code>, <code>bankruptcy &rarr; &minus;3.0</code> &mdash; because general-purpose sentiment models misread earnings language.</li>
-            <li><strong>Assistant.</strong> Grounded in the user's live macro, portfolio and news context before the model is called, so answers are about their actual holdings.</li>
+            <li><strong>Assistant.</strong> Claude Haiku 5.5 with nine Tradeski tools and web search, grounded in the user's portfolio and macro context. Every figure in a reply is checked against the data it was shown. A 32-question eval with deterministic grading scores 89% on the main set and 79% on held-out questions; its first run found a prompt line that had kept signed-out visitors from ever reaching the what-if tool.</li>
             <li><strong>Security.</strong> PBKDF2 password hashing, signed bearer tokens, and per-user row scoping isolating portfolios, alerts and watchlists.</li>
             <li><strong>Screener.</strong> A 29-symbol universe &mdash; 27 stocks across five sectors plus SPY and QQQ &mdash; fetched concurrently through an 8-worker thread pool.</li>
           </ul>
@@ -1540,7 +1540,7 @@ catch (e) { /* private mode */ }</script>
       </details>
 
       <div class="stack">
-        <span>Python 3.12</span><span>Flask-SocketIO</span><span>gevent</span><span>Plotly.js</span><span>FRED API</span><span>NewsAPI</span><span>Claude Haiku 4.5</span><span>Postgres</span>
+        <span>Python 3.12</span><span>Flask-SocketIO</span><span>gevent</span><span>Plotly.js</span><span>FRED API</span><span>NewsAPI</span><span>Claude Haiku 5.5</span><span>Postgres</span>
       </div>
       <div class="links">
         <a class="primary" href="https://www.tradeski.dev/">Open the project &rarr;</a>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AlphaZero Chess — Technical Report — Dan Lichtenberger</title>
-<meta name="description" content="Network, MCTS, self-play loop, and the training curve.">
+<meta name="description" content="Network, MCTS, self-play loop, the draw cycle, and a corrected analysis.">
 <meta name="author" content="Dan Lichtenberger">
 <link rel="canonical" href="https://danny-397.github.io/reports/rl-chess-technical-report.html">
 
@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="Dan Lichtenberger">
 <meta property="og:url" content="https://danny-397.github.io/reports/rl-chess-technical-report.html">
 <meta property="og:title" content="AlphaZero Chess — Technical Report">
-<meta property="og:description" content="Network, MCTS, self-play loop, and the training curve.">
+<meta property="og:description" content="Network, MCTS, self-play loop, the draw cycle, and a corrected analysis.">
 <meta property="og:image" content="https://danny-397.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -20,7 +20,7 @@
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AlphaZero Chess — Technical Report">
-<meta name="twitter:description" content="Network, MCTS, self-play loop, and the training curve.">
+<meta name="twitter:description" content="Network, MCTS, self-play loop, the draw cycle, and a corrected analysis.">
 <meta name="twitter:image" content="https://danny-397.github.io/og-image.png">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1319'/><text x='50' y='54' font-size='58' font-family='Georgia,serif' fill='%237FA6E8' text-anchor='middle' dominant-baseline='central'>D</text></svg>">
@@ -59,7 +59,7 @@ catch (e) { /* private mode */ }</script>
 <main id="doc" class="wrap doc">
   <p class="eyebrow">RL-Chess-Engine &middot; technical report</p>
   <h1>AlphaZero Chess — Technical Report</h1>
-  <p class="standfirst">Network, MCTS, self-play loop, and the training curve.</p>
+  <p class="standfirst">Network, MCTS, self-play loop, the draw cycle, and a corrected analysis.</p>
   <p class="doclinks">
     <a class="doclink" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/technical-report.md">Source markdown &nearr;</a>
     <a class="doclink" href="RL-Chess-Technical-Report.pdf">PDF &darr;</a>
@@ -108,7 +108,10 @@ gain, and only just. Ten times the compute leaves 88% of self-play games undecid
 <p>An earlier version of this report claimed the assist &quot;flips Elo from −21 to +28&quot; and that
 the plateau is &quot;primarily a signal problem.&quot; That comparison was confounded (the arms
 were evaluated with different searches), had no starting-network reference and no
-intervals; §5.4 explains the correction and the control experiments behind it. The
+intervals; §5.4 explains the correction and the control experiments behind it. Two later
+checks sharpen the picture: draws were detected with a rule that ended games when a repetition
+was merely available (§5.5, now fixed), and a direct probe of the shipped value head shows it
+barely distinguishes up a queen from down a queen (§5.6). The
 project also ships a deployed web app: a classical alpha-beta engine (about 1390 against
 strength-limited Stockfish) as an honestly labelled opponent, and the trained network
 running in the browser via ONNX behind a JavaScript↔Python encoding self-check.</p>
@@ -306,7 +309,7 @@ signs flipped consistently up the tree. Tested by
 promotions. Tested by <code>test_move_encoding_roundtrip_white</code> /
 <code>_promotions</code> and <code>test_move_index_in_range_for_all_legal_start_moves</code>.</li>
 </ul>
-<p>The full suite (44 tests, run in CI) also covers terminal values
+<p>The full suite (50 tests, run in CI) also covers terminal values
 (<code>test_terminal_value_checkmate</code>, <code>test_stalemate_is_a_draw</code>,
 <code>test_insufficient_material_is_a_draw</code>), search behaviour
 (<code>test_mcts_returns_valid_distribution</code>, <code>test_mcts_is_deterministic_without_noise</code>,
@@ -503,12 +506,112 @@ under the search it was evaluated with:</p>
 does not escape it. Neither unassisted arm measurably changed strength. The assisted arm
 gained a little over its own start: +31 Elo, just clear of zero, from one training seed.
 It cannot rank compute against signal; the earlier claim that it could is withdrawn.</p>
-<h3 id="55-what-would-settle-it">5.5 What would settle it<a class="anchor" href="#55-what-would-settle-it" aria-label="Link to this section">#</a></h3>
-<p>Three training seeds per arm; every network evaluated with <code>material_weight = 0</code> as well
-as under its training search; the combined arm (10× compute with the assist); and a
-stronger reference opponent than random once a network can score against one.
-<code>run_experiment.py --seed N</code> now writes each seed to its own directory and evaluates every
-assisted arm both ways, so this is one command per seed.</p>
+<h3 id="55-a-rule-artifact-in-draw-detection">5.5 A rule artifact in draw detection<a class="anchor" href="#55-a-rule-artifact-in-draw-detection" aria-label="Link to this section">#</a></h3>
+<p><code>ChessGame.is_terminal()</code> used <code>board.is_game_over(claim_draw=True)</code>. In python-chess a
+threefold-repetition claim is valid not only when a position has occurred three times but
+also when the side to move <em>has a move</em> that would make it occur a third time (the
+fifty-move claim works the same way). So every self-play and evaluation game in §5.1–§5.4
+ended the moment a repetition became available, before anyone repeated, and the search
+scored every leaf where a repeat was available as a dead draw, even for the side that was
+winning. That is a mechanical push towards the draw cycle, and it inflates the
+&quot;threefold repetition&quot; counts in <code>experiment-results.md</code>.</p>
+<p>Replaying six self-play games from the shipped checkpoint under the old rule: in five the
+final position had occurred twice, and in one only once. The rule is now the actual one
+(a position has occurred three times, or the fifty-move counter has reached 100), with
+<code>END_ON_CLAIMABLE_DRAWS</code> / <code>--legacy-draw-claims</code> to reproduce the July run, and tests for
+both. Under the corrected rule the same checkpoint still ends all six games in a real
+threefold repetition, after 25–36 plies, so the behaviour is genuine; how much of the
+<em>rate</em> the rule caused is what the seed-1 legacy-rule run in §5.8 measures. All numbers in
+§5.1–§5.4 used the old rule throughout, so their comparisons are internally consistent.</p>
+<h3 id="56-the-value-head-measured-directly">5.6 The value head, measured directly<a class="anchor" href="#56-the-value-head-measured-directly" aria-label="Link to this section">#</a></h3>
+<p>The draw-cycle explanation is a claim about the value head, so <code>tools/value_probe.py</code>
+measures it rather than inferring it from the loss. It builds 300 roughly level positions
+(10–40 random plies from the start) and two variants of each with one queen removed, so
+the side to move is up or down a queen, and records the value head's output on all three:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Network</th>
+<th>Up a queen</th>
+<th>Level</th>
+<th>Down a queen</th>
+<th>Up − down (95% CI)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>untrained (seed 42)</td>
+<td>−0.113</td>
+<td>−0.113</td>
+<td>−0.113</td>
+<td>−0.000 (−0.000, −0.000)</td>
+</tr>
+<tr>
+<td>shipped checkpoint (iteration 2, short CPU run)</td>
+<td>−0.057</td>
+<td>−0.058</td>
+<td>−0.060</td>
+<td>+0.003 (+0.003, +0.004)</td>
+</tr>
+</tbody>
+</table></div>
+<p>On a −1 to +1 scale, being a queen up should read close to +1. The shipped network's value
+head separates the two by 0.003: it has learned almost nothing about material, exactly
+what a value target of 0 everywhere predicts. This is one early checkpoint; §5.8 runs the
+probe on every trained network.</p>
+<h3 id="57-a-sturdier-yardstick">5.7 A sturdier yardstick<a class="anchor" href="#57-a-sturdier-yardstick" aria-label="Link to this section">#</a></h3>
+<p>Random is a weak yardstick here: most games against it are drawn, so an untrained network
+can land anywhere from about −7 to +120 Elo. <code>evaluation.MaterialGreedyAgent</code> is a sturdier
+one: it mates when it can, otherwise plays the move that leaves it the most material, and looks
+no further, so any search that sees two plies ahead can beat it. Untrained networks, under the
+corrected draw rule (<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/tools/no_learning_control.py"><code>tools/no_learning_control.py --opponent greedy</code></a>):</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Starting network</th>
+<th>Material w</th>
+<th>W / D / L</th>
+<th>Elo vs greedy (95% CI)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>seed 42 (100 games)</td>
+<td>0</td>
+<td>0 / 13 / 87</td>
+<td>−463 (−592, −386)</td>
+</tr>
+<tr>
+<td>seed 42 (100 games)</td>
+<td>0.30</td>
+<td>2 / 47 / 51</td>
+<td>−186 (−238, −141)</td>
+</tr>
+<tr>
+<td>seeds 1–3 pooled (150 games)</td>
+<td>0</td>
+<td>3 / 32 / 115</td>
+<td>−335 (−405, −282)</td>
+</tr>
+<tr>
+<td>seeds 1–3 pooled (150 games)</td>
+<td>0.30</td>
+<td>7 / 57 / 86</td>
+<td>−203 (−252, −161)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Untrained networks lose most games outright, so there is room to measure improvement and the
+games are mostly decisive. Seed still matters without the blend (per seed, about −460 to −315),
+less with it (−220 to −186); multiple seeds remain necessary. The trained July networks no longer
+exist, so this yardstick applies from the rerun (§5.8) onward.</p>
+<h3 id="58-what-would-settle-it">5.8 What would settle it<a class="anchor" href="#58-what-would-settle-it" aria-label="Link to this section">#</a></h3>
+<p>Three training seeds per arm, under the corrected draw rule; every network evaluated
+against random with and without the material blend and against the greedy opponent; each
+seed's starting network under the same evaluations; the value probe on every trained
+network; and one legacy-rule run for the rule's own effect.
+<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/notebooks/seeds_rerun.ipynb"><code>notebooks/seeds_rerun.ipynb</code></a> does all of this on a
+Kaggle T4 in about nine hours and writes a summary of each arm against its own start.</p>
 <hr />
 <h2 id="6-the-draw-cycle">6. The Draw Cycle<a class="anchor" href="#6-the-draw-cycle" aria-label="Link to this section">#</a></h2>
 <p>The central empirical finding, and the report's intellectual core.</p>
@@ -585,7 +688,9 @@ random across init seeds (§5.4). Three seeds per arm is the minimum for any ran
 transcribed from captured output. Code history begins on 2026-07-18, four days after
 the run, so the seed-42 starting network is reconstructed on the assumption that the
 initialisation code did not change in between.</li>
-<li><strong>A weak yardstick.</strong> Random separates broken from working, not good from better.</li>
+<li><strong>A weak yardstick.</strong> Random separates broken from working, not good from better
+(§5.7 adds a greedy opponent).</li>
+<li><strong>The draw rule.</strong> All July numbers ended games on a merely claimable repetition (§5.5).</li>
 <li><strong>The playable network is not a GPU network.</strong> The site serves <code>checkpoints/best.pt</code>,
 iteration 2 of a short CPU run.</li>
 <li><strong>Move-history planes (the encoding hypothesis).</strong> Real AlphaZero stacks the last
@@ -612,7 +717,7 @@ compute does not escape it, and the material assist is the only arm with a measu
 marginal gain. The next step is not a bigger run but three seeds per arm.</p>
 <h2 id="10-reproducibility">10. Reproducibility<a class="anchor" href="#10-reproducibility" aria-label="Link to this section">#</a></h2>
 <p><strong>Repository.</strong> <a href="https://github.com/Danny-397/RL-Chess-Engine">https://github.com/Danny-397/RL-Chess-Engine</a> (MIT). The code is
-~4,200 lines (excluding tests); the 44-test suite runs in CI on every push.</p>
+~4,200 lines (excluding tests); the 50-test suite runs in CI on every push.</p>
 <p><strong>Environment.</strong> <code>pip install -r requirements-train.txt</code> (adds PyTorch to the
 light runtime deps in <code>requirements.txt</code>). The GPU results in §5 were produced on
 Kaggle with 2× Tesla T4.</p>

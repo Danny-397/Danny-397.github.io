@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AlphaZero Chess — Experiment Results — Dan Lichtenberger</title>
-<meta name="description" content="What the engine learned, measured against fixed opponents.">
+<meta name="description" content="Every iteration and evaluation of the GPU run, with intervals and a starting-network control.">
 <meta name="author" content="Dan Lichtenberger">
 <link rel="canonical" href="https://danny-397.github.io/reports/rl-chess-experiment-results.html">
 
@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="Dan Lichtenberger">
 <meta property="og:url" content="https://danny-397.github.io/reports/rl-chess-experiment-results.html">
 <meta property="og:title" content="AlphaZero Chess — Experiment Results">
-<meta property="og:description" content="What the engine learned, measured against fixed opponents.">
+<meta property="og:description" content="Every iteration and evaluation of the GPU run, with intervals and a starting-network control.">
 <meta property="og:image" content="https://danny-397.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -20,7 +20,7 @@
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AlphaZero Chess — Experiment Results">
-<meta name="twitter:description" content="What the engine learned, measured against fixed opponents.">
+<meta name="twitter:description" content="Every iteration and evaluation of the GPU run, with intervals and a starting-network control.">
 <meta name="twitter:image" content="https://danny-397.github.io/og-image.png">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1319'/><text x='50' y='54' font-size='58' font-family='Georgia,serif' fill='%237FA6E8' text-anchor='middle' dominant-baseline='central'>D</text></svg>">
@@ -59,7 +59,7 @@ catch (e) { /* private mode */ }</script>
 <main id="doc" class="wrap doc">
   <p class="eyebrow">RL-Chess-Engine &middot; technical report</p>
   <h1>AlphaZero Chess — Experiment Results</h1>
-  <p class="standfirst">What the engine learned, measured against fixed opponents.</p>
+  <p class="standfirst">Every iteration and evaluation of the GPU run, with intervals and a starting-network control.</p>
   <p class="doclinks">
     <a class="doclink" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md">Source markdown &nearr;</a>
     <a class="doclink" href="RL-Chess-Experiment-Results.pdf">PDF &darr;</a>
@@ -143,6 +143,13 @@ untrained networks alone span −7 to +120 Elo across init seeds
 </tr>
 </tbody>
 </table></div>
+<ol start="4">
+<li><strong>Draw rule (found later the same day).</strong> Games ended as soon as a repetition could be
+<em>claimed</em>, which python-chess allows when the side to move merely has a repeating move
+available. Every &quot;REP&quot; count below includes games that ended before anyone repeated; the
+search also scored those positions as draws. All arms shared the rule, so comparisons hold,
+but the rates are inflated. The rule is fixed; see technical report §5.5.</li>
+</ol>
 <p>What holds: the draw cycle in self-play (the termination tables in §A are unaffected),
 and a small, marginal gain for the assisted arm over its own start, from one training
 seed. Neither unassisted arm measurably changed strength. The repo assumes the code was

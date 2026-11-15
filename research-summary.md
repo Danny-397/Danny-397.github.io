@@ -38,12 +38,13 @@ caught the false positive a naive version ships, reproducing Henderson et al. (2
 new domain. Adds an original surrogate-data test separating "the agent is weak" from
 "there is no signal."
 
-**AlphaZero-style Chess Engine** · [rlchess.xyz](https://rlchess.xyz) — Rules only: no
-openings, no human games, no evaluation function. Dual-headed ResNet, PUCT tree search,
-4,672-move policy head, playable in-browser via ONNX Runtime Web. Scaling self-play 10×
-bought **14 Elo**. Diagnosed as a self-play *signal* problem, not a compute ceiling —
-92% of games ended non-decisive, starving the value head of gradient. A classical
-alpha-beta control beat the random baseline 10–0, confirming the harness was sound.
+**AlphaZero-style Chess Engine** · [rlchess.xyz](https://rlchess.xyz) — Self-play from
+the rules, with no openings or human games. Dual-headed ResNet, PUCT tree search,
+4,672-move policy head, playable in-browser via ONNX Runtime Web. Self-play collapses into
+a **draw cycle** (all threefold repetition from iteration 3), and 10× the self-play leaves
+88% of games undecided. Measured against the network every run started from, only the
+material-assisted run improved: **+31 Elo** (95% CI +3 to +60, one seed). An earlier
+"signal, not compute" headline was withdrawn after a confound in its evaluation was found.
 
 **AlphaGlyph** · [alphaglyph.org](https://alphaglyph.org) — Symbolic-regression alpha
 discovery, evaluated against its own overfitting. Combinatorial Purged Cross-Validation

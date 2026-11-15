@@ -239,9 +239,9 @@ catch (e) { /* private mode */ }</script>
       <div>
         <h2><a href="reports/rl-chess-technical-report.html">An AlphaZero-Style Chess Engine, Built From Scratch</a></h2>
         <p class="pull">
-          Scaling self-play 10&times; bought 14 Elo. The diagnosis is that this is a self-play
-          <em>signal</em> problem, not a compute ceiling &mdash; draw-heavy self-play starves the
-          value head of gradient.
+          Draw-heavy self-play starves the value head: every game ends in repetition, so it learns
+          that every position is even. Measured against its starting network, only the
+          material-assisted run got stronger &mdash; and the report corrects its own first analysis.
         </p>
         <p>
           The longest document here. Network, PUCT search and training loop from first

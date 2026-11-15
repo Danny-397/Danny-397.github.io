@@ -92,6 +92,62 @@ regenerate one). The figures below are plotted directly from the per-iteration
 numbers transcribed in this file.</p>
 </blockquote>
 <p><img src="../assets/draw_cycle.png" alt="The draw cycle — non-decisive rate and Elo vs. random across the three stages" /></p>
+<p><em>Rebuilt by <a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/tools/plot_draw_cycle.py"><code>tools/plot_draw_cycle.py</code></a> from
+<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/data/gpu_run_2026-07-14.json"><code>data/gpu_run_2026-07-14.json</code></a> (this file's tables, machine-readable)
+and <a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/data/start_network_control.json"><code>data/start_network_control.json</code></a>.</em></p>
+<blockquote>
+<p><strong>Re-analysis, 2026-11-14 — read this first.</strong> The original conclusions below
+(&quot;the signal lever flips Elo from −21 to +28; the draw cycle is primarily a
+signal problem&quot;) do not survive a closer look:</p>
+<ol>
+<li><strong>Confound.</strong> Each network was evaluated with the search it trained under, so
+the assisted network's Elo was measured <em>with</em> the material heuristic in its
+search and the baseline's without. Arms were never compared under the same search.</li>
+<li><strong>No starting-network reference.</strong> All three arms trained from the same seed-42
+initial network. Rebuilt and evaluated under the same settings, it scores
+<strong>0 (95% CI −31, +31)</strong> against random with <code>material_weight = 0</code> and
+<strong>−10 (−31, +10)</strong> with 0.30 (<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/tools/no_learning_control.py"><code>tools/no_learning_control.py</code></a>,
+<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/data/start_network_control.json">data</a>). The heuristic on its own does not beat random.</li>
+<li><strong>No intervals.</strong> A 50-game match against random is about ±40 Elo at 95%, and
+untrained networks alone span −7 to +120 Elo across init seeds
+(<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/data/no_learning_control.json">data</a>).</li>
+</ol>
+<p>Change against the starting network, pooling each arm's five checkpoints (250 games):</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Arm</th>
+<th>Trained, pooled</th>
+<th>Starting network</th>
+<th>Change (95% CI)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td>−22 (−38, −7)</td>
+<td>0 (w = 0)</td>
+<td>−22 (−56, +12)</td>
+</tr>
+<tr>
+<td>scaled (10×)</td>
+<td>+10 (−8, +28)</td>
+<td>0 (w = 0)</td>
+<td>+10 (−26, +45)</td>
+</tr>
+<tr>
+<td>assisted</td>
+<td>+21 (+1, +41)</td>
+<td>−10 (w = 0.30)</td>
+<td><strong>+31 (+3, +60)</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>What holds: the draw cycle in self-play (the termination tables in §A are unaffected),
+and a small, marginal gain for the assisted arm over its own start, from one training
+seed. Neither unassisted arm measurably changed strength. The repo assumes the code was
+unchanged between this run and the first commit (2026-07-18), which is when history begins.</p>
+</blockquote>
 <h2 id="run-configuration">Run configuration<a class="anchor" href="#run-configuration" aria-label="Link to this section">#</a></h2>
 <p>All three stages share the identical code and network (4 residual blocks, 64
 channels); they differ only in the variable under test.</p>
@@ -169,9 +225,10 @@ differ sharply (see §A).</p>
 </tr>
 </tbody>
 </table></div>
-<p><strong>Result.</strong> 10× the self-play raises Elo (−21 → −7) and produces more checkmates in
-aggregate (8/100 = 8% → 120/1000 = 12%), but the cycle is not broken: the network
-still cannot reliably convert, and Elo stays negative.</p>
+<p><strong>Result.</strong> 10× the self-play produces more checkmates in aggregate (8/100 = 8% →
+120/1000 = 12%), but the cycle is not broken. The Elo difference (−21 → −7 on the final
+50-game matches) is well inside the ±40 Elo noise of a single match; against the starting
+network the scaled arm's change is +10 (95% CI −26, +45).</p>
 <h3 id="experiment-b-self-play-signal-at-fixed-compute-same-budget-as-baseline">Experiment B — self-play signal at fixed compute (same budget as baseline)<a class="anchor" href="#experiment-b-self-play-signal-at-fixed-compute-same-budget-as-baseline" aria-label="Link to this section">#</a></h3>
 <div class="tablewrap"><table>
 <thead>
@@ -204,13 +261,15 @@ still cannot reliably convert, and Elo stays negative.</p>
 </tbody>
 </table></div>
 <p><strong>Result.</strong> Blending a 0.30 material term into self-play leaf evaluation — at the
-<em>same</em> compute as the baseline — drops the final-iteration non-decisive rate to 70%,
-raises the aggregate checkmate count to 19/100, and flips Elo from −21 to <strong>+28</strong>.
-The engine now beats random. This is the more cost-effective lever.</p>
+<em>same</em> compute as the baseline — drops the final-iteration non-decisive rate to 70% and
+raises the aggregate checkmate count to 19/100. (The heuristic is active during self-play,
+so some of those checkmates come from it directly.) The Elo comparison with the baseline
+is confounded, because the two were evaluated with different searches; against its own
+starting network under the same search, the assisted arm gained +31 Elo (95% CI +3, +60).</p>
 <h3 id="reading-the-two-together">Reading the two together<a class="anchor" href="#reading-the-two-together" aria-label="Link to this section">#</a></h3>
-<p>Both levers move the metrics, so the plateau is driven by <strong>both</strong> limited compute
-<em>and</em> an impoverished self-play signal (the &quot;yes | yes&quot; row of the §5.3 reading
-matrix) — but the signal lever does more per unit of compute.</p>
+<p>Only the assisted arm shows a measurable strength gain over its starting point, and only
+just. This run cannot rank the two levers: one training seed per arm, and the arms differ
+by less than seed-to-seed variation.</p>
 <hr />
 <h2 id="a-per-iteration-self-play-termination">A. Per-iteration self-play termination<a class="anchor" href="#a-per-iteration-self-play-termination" aria-label="Link to this section">#</a></h2>
 <p>Counts are games ending by each reason. <strong>CM</strong> checkmate · <strong>ST</strong> stalemate ·
@@ -773,6 +832,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <th>L</th>
 <th>Score</th>
 <th>Elo</th>
+<th>95% CI</th>
 </tr>
 </thead>
 <tbody>
@@ -783,6 +843,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>5</td>
 <td>47.0%</td>
 <td>−21</td>
+<td>−57 to +15</td>
 </tr>
 <tr>
 <td>4</td>
@@ -791,6 +852,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>6</td>
 <td>44.0%</td>
 <td>−42</td>
+<td>−74 to −10</td>
 </tr>
 <tr>
 <td>6</td>
@@ -799,6 +861,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>5</td>
 <td>48.0%</td>
 <td>−14</td>
+<td>−53 to +24</td>
 </tr>
 <tr>
 <td>8</td>
@@ -807,6 +870,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>4</td>
 <td>47.0%</td>
 <td>−21</td>
+<td>−51 to +9</td>
 </tr>
 <tr>
 <td>10</td>
@@ -815,6 +879,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>4</td>
 <td>48.0%</td>
 <td>−14</td>
+<td>−47 to +19</td>
 </tr>
 </tbody>
 </table></div>
@@ -828,6 +893,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <th>L</th>
 <th>Score</th>
 <th>Elo</th>
+<th>95% CI</th>
 </tr>
 </thead>
 <tbody>
@@ -838,6 +904,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>2</td>
 <td>56.0%</td>
 <td>+42</td>
+<td>+0 to +85</td>
 </tr>
 <tr>
 <td>10</td>
@@ -846,6 +913,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>3</td>
 <td>55.0%</td>
 <td>+35</td>
+<td>−9 to +80</td>
 </tr>
 <tr>
 <td>15</td>
@@ -854,6 +922,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>3</td>
 <td>47.0%</td>
 <td>−21</td>
+<td>−44 to +2</td>
 </tr>
 <tr>
 <td>20</td>
@@ -862,6 +931,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>4</td>
 <td>52.0%</td>
 <td>+14</td>
+<td>−29 to +57</td>
 </tr>
 <tr>
 <td>25</td>
@@ -870,6 +940,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>6</td>
 <td>47.0%</td>
 <td>−21</td>
+<td>−62 to +20</td>
 </tr>
 </tbody>
 </table></div>
@@ -883,6 +954,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <th>L</th>
 <th>Score</th>
 <th>Elo</th>
+<th>95% CI</th>
 </tr>
 </thead>
 <tbody>
@@ -893,6 +965,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>5</td>
 <td>51.0%</td>
 <td>+7</td>
+<td>−38 to +52</td>
 </tr>
 <tr>
 <td>4</td>
@@ -901,6 +974,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>4</td>
 <td>52.0%</td>
 <td>+14</td>
+<td>−29 to +57</td>
 </tr>
 <tr>
 <td>6</td>
@@ -909,6 +983,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>3</td>
 <td>52.0%</td>
 <td>+14</td>
+<td>−24 to +53</td>
 </tr>
 <tr>
 <td>8</td>
@@ -917,6 +992,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>3</td>
 <td>54.0%</td>
 <td>+28</td>
+<td>−15 to +71</td>
 </tr>
 <tr>
 <td>10</td>
@@ -925,6 +1001,7 @@ during training at the stage's <code>eval_every</code> interval. W/D/L are the r
 <td>4</td>
 <td>56.0%</td>
 <td>+42</td>
+<td>−8 to +94</td>
 </tr>
 </tbody>
 </table></div>
@@ -936,7 +1013,7 @@ scaled's iter-25 checkpoint read −21 but its final match read −7) — indepe
 50-game samples of a near-even engine are noisy, which is itself worth reporting.</p>
 <hr />
 <h2 id="c-training-loss">C. Training loss<a class="anchor" href="#c-training-loss" aria-label="Link to this section">#</a></h2>
-<p><img src="../assets/training_progress.png" alt="Training dynamics of the scaled run — policy, value, and total loss" /></p>
+<p><em>(The loss figure previously shown here could not be traced to this run: it has 12 iterations, and none of the three arms has 12. It was removed; only the start and end values below were transcribed.)</em></p>
 <p>Total loss = policy cross-entropy + value MSE. Start (iter 1) → end (final iter):</p>
 <div class="tablewrap"><table>
 <thead>
@@ -976,27 +1053,22 @@ draw-cycle signature (technical report §6), not a training success.</em></p>
 <hr />
 <h2 id="key-findings">Key findings<a class="anchor" href="#key-findings" aria-label="Link to this section">#</a></h2>
 <ol>
-<li><strong>The draw cycle is real and self-reinforcing.</strong> At baseline compute the
-near-random network scores a few accidental mates in iters 1–2, then collapses to
-100% repetition draws from iter 3 on — the value target flattens to ≈0 and the
-cycle locks in.</li>
-<li><strong>Compute helps, but does not break it.</strong> 10× the self-play (100 → 1,000 games)
-lifts Elo (−21 → −7) and keeps a residual checkmate rate alive (8% → 12%
-aggregate), yet Elo stays negative and the non-decisive rate stays in the high
-80s/90s%.</li>
-<li><strong>Signal quality is the more efficient lever.</strong> <code>material_weight = 0.30</code> in
-self-play — at the <em>same</em> baseline compute — drops the final-iteration
-non-decisive rate to 70%, keeps checkmates appearing throughout training
-(19/100 aggregate), and flips Elo to <strong>+28</strong>. The engine beats random.</li>
-<li><strong>Both levers help</strong> (&quot;yes | yes&quot; in the §5.3 reading matrix): compute helps
-<em>and</em> signal helps, each measured on its own. Whether they <em>compound</em> (stacking
-them beats either alone) is untested until a combined scaled-plus-assisted run;
-it is ready to run on Kaggle as <a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/notebooks/experiment_c.ipynb"><code>notebooks/experiment_c.ipynb</code></a>
-(<code>python run_experiment.py --device cuda --only-combined</code>).</li>
-<li><strong><code>material_weight = 0.30</code> is the recommended self-play default</strong>, now set via
-<code>MCTSConfig.material_weight</code> and exposed as <code>run_experiment.py --assist-weight</code>.</li>
+<li><strong>The draw cycle is real and self-reinforcing.</strong> At baseline compute the network
+scores a few accidental mates in iters 1–2, then 100% of self-play games end in
+threefold repetition from iter 3 on, and the value loss collapses toward 0.</li>
+<li><strong>10× compute does not break it.</strong> Aggregate checkmates rise from 8% to 12%; the
+non-decisive rate stays in the high 80s/90s, and strength against random is
+indistinguishable from the starting network (+10, 95% CI −26, +45).</li>
+<li><strong>The material assist keeps decisive games in self-play</strong> (19% checkmates, final
+iteration 30%) and is the only arm with a measurable gain over its start: +31 Elo
+(95% CI +3, +60), from a single training seed.</li>
+<li><strong>The original headline is withdrawn.</strong> &quot;Signal, not compute: −21 → +28&quot; compared
+arms evaluated under different searches, without a starting-network reference or
+intervals (see the re-analysis note at the top).</li>
+<li><strong>What would settle it:</strong> three training seeds per arm, every network also evaluated
+with <code>material_weight = 0</code>, and the combined arm. <code>run_experiment.py --seed N</code> now
+writes each seed to its own directory and evaluates every arm both ways.</li>
 </ol>
-<hr />
 <h2 id="reproducibility">Reproducibility<a class="anchor" href="#reproducibility" aria-label="Link to this section">#</a></h2>
 <pre><code class="language-bash"># All three stages on a GPU (this run):
 python run_experiment.py --device cuda

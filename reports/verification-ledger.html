@@ -81,7 +81,7 @@ reproduces it. Figures are dated because data sources and package versions
 move; a rerun on a later date can legitimately differ, and the source files say
 how. Test counts are not listed here: they change with every commit, so the
 site reads them from each repository's CI instead.</p>
-<p><em>Compiled 2026-10-28; RL-Trader rows updated 2026-11-14 (v2.3.0).</em></p>
+<p><em>Compiled 2026-10-28; RL-Trader rows updated 2026-11-14 (v2.3.0); chess rows corrected 2026-11-14.</em></p>
 <h2 id="how-rl-agents-fool-you-rl-trader">How RL agents fool you (RL-Trader)<a class="anchor" href="#how-rl-agents-fool-you-rl-trader" aria-label="Link to this section">#</a></h2>
 <div class="tablewrap"><table>
 <thead>
@@ -223,10 +223,22 @@ site reads them from each repository's CI instead.</p>
 </thead>
 <tbody>
 <tr>
-<td>The plateau was a training-signal problem, not compute</td>
-<td>Elo vs a random player: baseline <strong>−21</strong>, 10× self-play <strong>−7</strong>, material signal <strong>+28</strong></td>
-<td>docs/experiment-results.md</td>
+<td>Self-play collapses into a draw cycle</td>
+<td>Baseline self-play: <strong>100%</strong> threefold repetition from iteration 3; 10× self-play still <strong>88%</strong> undecided</td>
+<td>docs/data/gpu_run_2026-07-14.json</td>
 <td><code>python run_experiment.py --device cuda</code> (9.8 h on 2× T4)</td>
+</tr>
+<tr>
+<td>Only the material-assisted run measurably improved</td>
+<td>Change vs the seed-42 starting network, Elo vs random (95% CI): baseline <strong>−22</strong> [−56, +12], 10× <strong>+10</strong> [−26, +45], assisted <strong>+31</strong> [+3, +60]</td>
+<td>docs/data/start_network_control.json, docs/technical-report.md §5.4</td>
+<td><code>python tools/no_learning_control.py --seed-values 42 --games 100</code> (~1 h CPU)</td>
+</tr>
+<tr>
+<td><em>Withdrawn 2026-11-14:</em> &quot;a signal problem, not compute&quot; (Elo −21 → +28)</td>
+<td>Compared runs evaluated with different searches, without a starting-network control or intervals</td>
+<td>docs/technical-report.md §5.4</td>
+<td>—</td>
 </tr>
 <tr>
 <td>Strength of the classical control engine</td>

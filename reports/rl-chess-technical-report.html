@@ -77,7 +77,7 @@ catch (e) { /* private mode */ }</script>
       <li><a href="#8-limitations-and-future-work">8. Limitations and Future Work</a></li>
       <li><a href="#9-conclusion">9. Conclusion</a></li>
       <li><a href="#10-reproducibility">10. Reproducibility</a></li>
-      <li><a href="#appendix-a-logging-spec-for-the-training-run">Appendix A — Logging spec for the training run</a></li>
+      <li><a href="#11-references">11. References</a></li>
     </ol>
   </nav>
   <article class="prose-doc">
@@ -87,36 +87,31 @@ implementation, a controlled study of the training plateau I call the <em>draw
 cycle</em>, and the engineering decisions behind a deployed, honest demo. All
 empirical figures in §5 come from a real GPU run (Kaggle, 2× Tesla T4,
 2026-07-14, ~9.8 h training); the full per-iteration data is in
-<a href="rl-chess-experiment-results.html"><code>experiment-results.md</code></a>.</p>
+<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md"><code>experiment-results.md</code></a>.</p>
 </blockquote>
 <hr />
 <h2 id="1-abstract">1. Abstract<a class="anchor" href="#1-abstract" aria-label="Link to this section">#</a></h2>
 <p>I implemented an AlphaZero-style chess engine from first principles in ~4,200 lines
-of Python and PyTorch — the policy/value network, PUCT Monte-Carlo Tree Search, and
-the self-play training loop — with <strong>no reinforcement-learning libraries</strong>;
-<code>python-chess</code> supplies only the rules. The machinery works: training drives the
-policy loss down by roughly 5× and the self-play loop generates and learns from its
-own games. Yet strength plateaus in a characteristic way — the engine wins material
-but cannot <em>convert</em>, so games decay into repetition draws. I name this the <strong>draw
-cycle</strong> and argue it is not a bug but a property of how the value head learns: when
-almost every self-play game is drawn, the outcome target <code>z ≈ 0</code> everywhere, so the
-value head can only learn &quot;the position is even,&quot; which removes the search's
-incentive to convert, which keeps games drawn — a self-reinforcing trap. Because
-&quot;my code is wrong&quot; and &quot;my code is right but under-resourced&quot; are externally
-indistinguishable, I test the cause with <strong>two controlled experiments</strong> that hold
-the code fixed and vary one thing each. <em>Experiment A (compute):</em> scaling self-play
-10× (100 → 1,000 games) raises Elo vs. random from −21 to −7 but does not break the
-cycle. <em>Experiment B (signal, at fixed compute):</em> blending a 0.30 material term into
-self-play leaf evaluation drops the final-iteration non-decisive rate from 100% to
-70% and flips Elo from −21 to <strong>+28</strong> — beating random at the <em>same</em> compute as the
-baseline. The plateau is driven by <strong>both</strong> limited compute and an impoverished
-self-play signal, with the signal the cheaper lever. Alongside the science, the
-project ships as a deployed web app under real constraints: a second, classical
-alpha-beta engine provides an honestly-labeled strong opponent, and the trained
-network runs in the browser via ONNX behind a JavaScript↔Python encoding self-check.
-The contribution is not the (well-known) algorithm but the <strong>diagnosis and
-controlled test of a specific failure mode</strong>, and the engineering judgment to ship
-something honest around it.</p>
+of Python and PyTorch: the policy/value network, PUCT Monte-Carlo tree search and the
+self-play training loop, with no reinforcement-learning libraries (<code>python-chess</code>
+supplies only the rules). Training runs and the losses fall, but self-play quickly
+collapses into what I call the <strong>draw cycle</strong>: when nearly every game is drawn, the
+value target is 0 everywhere, the value head learns that every position is even, and a
+search guided by it has no reason to convert an advantage. In the baseline run every
+self-play game from iteration 3 onward ends in threefold repetition.</p>
+<p>I ran three arms on a GPU (one training seed each): a baseline, 10× the self-play, and
+a 0.30 material term blended into the search's leaf value. Evaluated against a random
+mover and compared with <strong>the network they all started from</strong>, under the same search:
+the baseline changes by −22 Elo (95% CI −56, +12), the 10× arm by +10 (−26, +45), and
+the material-assisted arm by <strong>+31 (+3, +60)</strong>. Only the assisted arm shows a measurable
+gain, and only just. Ten times the compute leaves 88% of self-play games undecided.</p>
+<p>An earlier version of this report claimed the assist &quot;flips Elo from −21 to +28&quot; and that
+the plateau is &quot;primarily a signal problem.&quot; That comparison was confounded (the arms
+were evaluated with different searches), had no starting-network reference and no
+intervals; §5.4 explains the correction and the control experiments behind it. The
+project also ships a deployed web app: a classical alpha-beta engine (about 1390 against
+strength-limited Stockfish) as an honestly labelled opponent, and the trained network
+running in the browser via ONNX behind a JavaScript↔Python encoding self-check.</p>
 <h2 id="2-introduction">2. Introduction<a class="anchor" href="#2-introduction" aria-label="Link to this section">#</a></h2>
 <p>AlphaZero is famous for a startling claim: starting from random weights and playing
 only against itself, with <strong>zero human strategic knowledge</strong> beyond the rules, a
@@ -128,17 +123,17 @@ win. Building from first principles is also the only way to meet the parts of
 AlphaZero that are conceptually simple but genuinely subtle: a value sign flipped at
 the wrong ply, or a board not mirrored for Black, does not crash — it silently stops
 the network from learning. Confronting those is where the understanding lives.</p>
-<p>The honest outcome is more interesting than a clean success. The engine learned —
-loss fell, self-play fed itself — and then plateaued into the draw cycle. Rather
+<p>The honest outcome is more interesting than a clean success. The machinery ran —
+loss fell, self-play fed itself — and then stalled in the draw cycle. Rather
 than paper over that, I treated it as the object of study. This report makes three
 contributions:</p>
 <ol>
 <li><strong>A clean, tested, from-scratch implementation</strong> (§4) of all three AlphaZero
 components, with the silent-failure modes pinned down by unit tests.</li>
-<li><strong>A diagnosis and controlled test of the draw cycle</strong> (§5–§6): instrumentation
-that identifies the value-target collapse, and two experiments that disentangle
-<em>compute</em> from <em>self-play signal</em> as its cause — turning a plausible story
-(&quot;it just needs more compute&quot;) into evidence.</li>
+<li><strong>A diagnosis of the draw cycle</strong> (§5–§6): instrumentation that identifies the
+value-target collapse, three arms that vary compute and the self-play signal, and
+controls (§5.4) that measure each arm against the network it started from. They
+also correct this report's own earlier, confounded reading of those arms.</li>
 <li><strong>Engineering decisions under real constraints</strong> (§7): a two-engine architecture
 that keeps the demo both strong and honest, and a free-tier deployment that runs
 the trained network in the browser with a correctness self-check.</li>
@@ -311,7 +306,7 @@ signs flipped consistently up the tree. Tested by
 promotions. Tested by <code>test_move_encoding_roundtrip_white</code> /
 <code>_promotions</code> and <code>test_move_index_in_range_for_all_legal_start_moves</code>.</li>
 </ul>
-<p>The full suite (41 tests, run in CI) also covers terminal values
+<p>The full suite (44 tests, run in CI) also covers terminal values
 (<code>test_terminal_value_checkmate</code>, <code>test_stalemate_is_a_draw</code>,
 <code>test_insufficient_material_is_a_draw</code>), search behaviour
 (<code>test_mcts_returns_valid_distribution</code>, <code>test_mcts_is_deterministic_without_noise</code>,
@@ -337,173 +332,190 @@ genuinely strong, and tell the user the truth about what they are playing.</p>
 <hr />
 <h2 id="5-experiments-and-results">5. Experiments and Results<a class="anchor" href="#5-experiments-and-results" aria-label="Link to this section">#</a></h2>
 <blockquote>
-<p><strong>Provenance.</strong> The figures in §5.1–§5.3 are from a real ~9.8 h GPU run (Kaggle,
-2× Tesla T4, <code>run_experiment.py --device cuda</code>, 2026-07-14); the full
-per-iteration data — self-play termination histograms, evaluation checkpoints, and
-loss curves — is in <a href="rl-chess-experiment-results.html"><code>experiment-results.md</code></a>. Caveat: the
-committed <code>logs/training.log</code> still holds only the earlier <strong>smoke-test</strong> runs; the
-GPU run's raw per-iteration log was not recovered from the Kaggle session (its
-automatic push failed with a 403), so the numbers here are transcribed from that
-run's captured output. Reported below is what actually happened.</p>
+<p><strong>Provenance.</strong> One GPU run (Kaggle, 2× Tesla T4, <code>run_experiment.py --device cuda</code>,
+2026-07-14, ~9.8 h). Its automatic push failed, so its numbers are transcribed from
+the captured output into <a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md"><code>experiment-results.md</code></a> and, machine-readable,
+<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/data/gpu_run_2026-07-14.json"><code>data/gpu_run_2026-07-14.json</code></a>. Its raw logs and trained
+checkpoints were lost with the session. The controls in §5.4 were run on 2026-11-14 on a CPU.</p>
 </blockquote>
 <h3 id="51-training-dynamics">5.1 Training dynamics<a class="anchor" href="#51-training-dynamics" aria-label="Link to this section">#</a></h3>
-<p>Over the scaled GPU run's <strong>25 iterations / 1,000 self-play games</strong>, policy loss
-falls sharply from <strong>4.02 (iter 1) to ~0.96 (iter 25)</strong> — the network readily learns
-to imitate its own MCTS visit distribution. The telling curve is the <strong>value loss</strong>:
-it is tiny from the very start (0.16) and shrinks toward <strong>≈0.01</strong>. That is not a
-training success but the <strong>draw-cycle signature</strong> (§6): with nearly every self-play
-game drawn, the outcome target <code>z ≈ 0</code> almost everywhere, so the value head has
-almost nothing to fit. (A mild rise in total loss after iter ~8 reflects the growing
-replay buffer mixing in harder, more varied positions, not divergence.)</p>
-<p><img src="../assets/training_progress.png" alt="Training dynamics of the scaled run: policy loss falls ~4× while value loss is tiny from the start and collapses toward 0 — the draw-cycle signature." /></p>
-<h3 id="52-playing-strength">5.2 Playing strength<a class="anchor" href="#52-playing-strength" aria-label="Link to this section">#</a></h3>
-<p>Using <code>evaluation.py</code>, the greedy <code>NetworkAgent</code> plays the <code>RandomAgent</code> baseline
-over 50 games (colours alternated) for a win/draw/loss record and an implied Elo.
-A network that cannot reliably beat random has not learned to <em>play</em>, only to draw —
-and that is exactly the honest early result: the pure-network baseline sits just
-under even (<strong>47%, Elo −21</strong>), the scaled run reaches <strong>49% (Elo −7)</strong>, and the
-signal-assisted run <strong>54% (Elo +28)</strong>. Small but real separation — and the entry
-point to §6. The draws-against-random result is the symptom; §5.3 diagnoses the
-cause.</p>
-<h3 id="53-two-experiments-what-causes-the-draw-cycle">5.3 Two experiments: <em>what</em> causes the draw cycle?<a class="anchor" href="#53-two-experiments-what-causes-the-draw-cycle" aria-label="Link to this section">#</a></h3>
-<p>Rather than assert that the plateau is &quot;just a compute limit,&quot; this section runs
-<strong>two controlled experiments</strong> that isolate two competing causes. Both hold the
-code fixed and vary exactly one thing; both are produced by a single driver
-(<code>run_experiment.py</code>) and the numbers below are auto-written to
-<code>docs/experiment-results.md</code> (paste them in).</p>
-<p>The two headline metrics in both experiments are the <strong>self-play non-decisive
-rate</strong> (fraction of games <em>not</em> won by checkmate — the draw cycle on a graph) and
-<strong>Elo vs. random</strong>.</p>
-<p><img src="../assets/draw_cycle.png" alt="Left: non-decisive rate per iteration for all three stages — baseline pinned at 100%, scaled hovering ~90%, assisted pulled down to 70%. Right: Elo vs. random at 50-game checkpoints — only the material-assisted run stays positive." /></p>
-<p><strong>Experiment A — compute scaling.</strong> <em>Hypothesis: the plateau is a resource
-ceiling.</em> Run the identical pipeline at a small baseline (~100 self-play games) and a
-larger scaled run (~1,000 self-play games on GPU); the material assist is <code>0</code> in both. If
-the hypothesis holds, the scaled run's non-decisive rate falls and Elo rises where
-the baseline flatlines.</p>
 <div class="tablewrap"><table>
 <thead>
 <tr>
-<th>Run</th>
-<th>Self-play games</th>
-<th>Non-decisive rate</th>
-<th>Elo vs random</th>
+<th>Arm</th>
+<th>Policy loss (start → end)</th>
+<th>Value loss (start → end)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>baseline</td>
-<td>100</td>
-<td>100%</td>
-<td>−21</td>
+<td>4.54 → 0.81</td>
+<td>0.092 → 0.006</td>
 </tr>
 <tr>
 <td>scaled</td>
-<td>1,000</td>
-<td>92%</td>
-<td>−7</td>
+<td>4.02 → 0.96</td>
+<td>0.164 → 0.012</td>
+</tr>
+<tr>
+<td>assisted</td>
+<td>4.37 → 0.69</td>
+<td>0.101 → 0.023</td>
 </tr>
 </tbody>
 </table></div>
-<p><em>Result:</em> 10× the self-play raises Elo (−21 → −7) and keeps a residual checkmate
-rate alive (8% → 12% of games, aggregated), but the plateau holds — Elo stays
-negative and draws still dominate. Compute helps; it does not break the cycle.</p>
-<p><strong>Experiment B — self-play signal at <em>fixed</em> compute.</strong> <em>Alternative hypothesis:
-the plateau is an impoverished-signal problem, not a compute problem.</em> The draw
-cycle is ultimately a <strong>value-learning</strong> failure — if every self-play game draws,
-the value target <code>z ≈ 0</code> everywhere and the value head can only learn &quot;even&quot; (§6).
-This experiment tests whether enriching the self-play <em>search signal</em> — blending a
-material term into leaf evaluation during self-play (<code>material_weight = w</code>), so the
-search converts advantages and produces <strong>decisive</strong> games the value head can learn
-from — breaks the cycle <strong>without any extra compute</strong>. Same compute as the
-baseline; only the self-play material weight differs.</p>
+<p>Neither curve is evidence of learning to play. The policy targets are the search's own
+visit distributions, which sharpen as the network does, so a falling cross-entropy partly
+tracks falling target entropy. The value loss is small from the start and falls toward
+zero because, with almost every game drawn, the target <code>z</code> is 0 nearly everywhere: the
+draw-cycle signature (§6). Per-iteration loss curves for the GPU run were not recovered.</p>
+<h3 id="52-measuring-strength">5.2 Measuring strength<a class="anchor" href="#52-measuring-strength" aria-label="Link to this section">#</a></h3>
+<p><code>evaluation.py</code> plays a network (greedy MCTS, 50 simulations, no noise) against a
+uniformly random mover over 50 games with colours alternated and a 200-move cap, and
+converts the score <code>S</code> to Elo by <code>−400 · log10(1/S − 1)</code>. Each game scores 1, ½ or 0, so
+the interval uses the per-game variance of the observed W/D/L split
+(<code>MatchResult.score_interval</code>). With 84–90% draws, a 50-game match is about ±40 Elo at 95%.</p>
+<p>Random is a weak yardstick: it separates a broken engine from a working one, not a good
+engine from a better one. It is used here because the networks are weak enough that a
+stronger opponent would score 0%.</p>
+<h3 id="53-three-arms">5.3 Three arms<a class="anchor" href="#53-three-arms" aria-label="Link to this section">#</a></h3>
+<p>All three arms train from the same seed-42 network and differ in one variable each.</p>
 <div class="tablewrap"><table>
 <thead>
 <tr>
-<th>Run</th>
+<th>Arm</th>
 <th>Self-play games</th>
+<th>Sims / move</th>
 <th>Material w</th>
-<th>Non-decisive rate</th>
-<th>Elo vs random</th>
+<th>Checkmates in self-play</th>
+<th>Elo vs random, pooled (95% CI)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>baseline</td>
 <td>100</td>
-<td>0.00</td>
-<td>100%</td>
-<td>−21</td>
+<td>100</td>
+<td>0</td>
+<td>8%</td>
+<td>−22 (−38, −7)</td>
+</tr>
+<tr>
+<td>scaled (10×)</td>
+<td>1,000</td>
+<td>160</td>
+<td>0</td>
+<td>12%</td>
+<td>+10 (−8, +28)</td>
 </tr>
 <tr>
 <td>assisted</td>
 <td>100</td>
+<td>100</td>
 <td>0.30</td>
-<td>70%</td>
-<td>+28</td>
+<td>19%</td>
+<td>+21 (+1, +41)</td>
 </tr>
 </tbody>
 </table></div>
-<p><em>Result:</em> at the <strong>same</strong> compute as the baseline, a 0.30 material blend cuts the
-final-iteration non-decisive rate from 100% to 70% and flips Elo from −21 to <strong>+28</strong> —
-the engine now beats random. Decisive games gave the value head a real signal to
-learn from. This is the more cost-effective lever, and <code>material_weight = 0.30</code> is
-now the <code>MCTSConfig</code> default.</p>
-<p><strong>Reading the two together (the point of the design).</strong> Comparing which lever
-moves the metrics <em>distinguishes the cause</em>, rather than assuming it:</p>
+<p>Elo is pooled over each arm's five periodic checkpoints (250 games). Every individual
+checkpoint interval in the assisted arm includes zero.</p>
+<p><img src="../assets/draw_cycle.png" alt="Figure 1. Left: self-play games not ending in checkmate, per iteration. Right: Elo against random at each checkpoint (95% intervals), with the starting network as reference lines." /></p>
+<h3 id="54-a-confound-and-the-controls-that-correct-it">5.4 A confound, and the controls that correct it<a class="anchor" href="#54-a-confound-and-the-controls-that-correct-it" aria-label="Link to this section">#</a></h3>
+<p><code>NetworkAgent</code> builds its search from the run's <code>MCTSConfig</code>, so the assisted network
+was evaluated with the material blend inside its search and the baseline without it.
+The original comparison (&quot;−21 → +28&quot;) therefore set two different searches against each
+other and credited the whole difference to learning.</p>
+<p>Two controls separate the effects (<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/tools/no_learning_control.py"><code>tools/no_learning_control.py</code></a>):</p>
 <div class="tablewrap"><table>
 <thead>
 <tr>
-<th>Compute helps (A)?</th>
-<th>Signal helps (B)?</th>
-<th>Interpretation</th>
+<th>Network (never trained)</th>
+<th>Material w</th>
+<th>W / D / L</th>
+<th>Elo vs random (95% CI)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>yes</td>
-<td>no</td>
-<td>classic <strong>compute ceiling</strong></td>
+<td>starting network, seed 42 (100 games)</td>
+<td>0</td>
+<td>10 / 80 / 10</td>
+<td>0 (−31, +31)</td>
 </tr>
 <tr>
-<td>no</td>
-<td>yes</td>
-<td>an <strong>impoverished self-play signal</strong>, not raw compute</td>
+<td>starting network, seed 42 (100 games)</td>
+<td>0.30</td>
+<td>3 / 91 / 6</td>
+<td>−10 (−31, +10)</td>
 </tr>
 <tr>
-<td>yes</td>
-<td>yes</td>
-<td>both contribute (whether they compound needs a combined run)</td>
+<td>seeds 1–3 pooled (150 games)</td>
+<td>0</td>
+<td>41 / 98 / 11</td>
+<td>+70 (+39, +103)</td>
 </tr>
 <tr>
-<td>no</td>
-<td>no</td>
-<td>cause lies elsewhere — e.g. encoding (move-history planes, §8)</td>
+<td>seeds 1–3 pooled (150 games)</td>
+<td>0.30</td>
+<td>7 / 137 / 6</td>
+<td>+2 (−14, +19)</td>
 </tr>
 </tbody>
 </table></div>
-<p><strong>This run lands on the <code>yes | yes</code> row:</strong> compute helped (A) <em>and</em> the self-play
-signal helped (B), so the plateau is driven by both — but the signal is the cheaper
-lever, since it broke the cycle furthest at the <em>baseline's</em> compute budget. A
-combined scaled-plus-assisted run is the natural next experiment (§8).</p>
-<p>This turns a <em>known</em> result (&quot;AlphaZero needs compute&quot;) into an actual
-<em>investigation</em> of a specific failure mode — the contribution here is the
-diagnosis and the controlled test, not the (well-known) algorithm.</p>
-<h3 id="54-further-ablations-future-work">5.4 Further ablations <em>(future work)</em><a class="anchor" href="#54-further-ablations-future-work" aria-label="Link to this section">#</a></h3>
-<ul>
-<li><strong><code>material_weight</code></strong> blended into leaf evaluation at play time (0.0 = pure
-AlphaZero) vs. a value like 0.85 — effect on won-position conversion.</li>
-<li><strong><code>num_simulations</code></strong> per move vs. strength.</li>
-<li>Classical engine <strong>with vs. without piece-square tables</strong> (the &quot;weird openings&quot;
-fix) — a clean demonstration that a little placed domain knowledge beats brute
-force.</li>
-</ul>
+<p>Two things follow. The heuristic alone does not beat random; it turns games into draws.
+And initialisation alone moves an untrained network from about −7 (seed 3) to about +110
+(seeds 1, 2), so comparisons between single-seed arms carry far more noise than their
+match intervals suggest. The right reference for each arm is the network it started from,
+under the search it was evaluated with:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Arm</th>
+<th>Trained, pooled</th>
+<th>Starting network</th>
+<th>Change (95% CI)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td>−22</td>
+<td>0</td>
+<td>−22 (−56, +12)</td>
+</tr>
+<tr>
+<td>scaled (10×)</td>
+<td>+10</td>
+<td>0</td>
+<td>+10 (−26, +45)</td>
+</tr>
+<tr>
+<td>assisted</td>
+<td>+21</td>
+<td>−10</td>
+<td><strong>+31 (+3, +60)</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>What the data supports.</strong> The draw cycle in self-play is real, and 10× the self-play
+does not escape it. Neither unassisted arm measurably changed strength. The assisted arm
+gained a little over its own start: +31 Elo, just clear of zero, from one training seed.
+It cannot rank compute against signal; the earlier claim that it could is withdrawn.</p>
+<h3 id="55-what-would-settle-it">5.5 What would settle it<a class="anchor" href="#55-what-would-settle-it" aria-label="Link to this section">#</a></h3>
+<p>Three training seeds per arm; every network evaluated with <code>material_weight = 0</code> as well
+as under its training search; the combined arm (10× compute with the assist); and a
+stronger reference opponent than random once a network can score against one.
+<code>run_experiment.py --seed N</code> now writes each seed to its own directory and evaluates every
+assisted arm both ways, so this is one command per seed.</p>
 <hr />
 <h2 id="6-the-draw-cycle">6. The Draw Cycle<a class="anchor" href="#6-the-draw-cycle" aria-label="Link to this section">#</a></h2>
 <p>The central empirical finding, and the report's intellectual core.</p>
 <p><strong>The observation.</strong> The machinery worked — the network trained, loss fell, self-play
 fed itself — and then strength plateaued. The engine could <em>win</em> material but not
 <em>convert</em> it: up a queen, it would shuffle until the game petered out into a
-repetition draw. Against a random-move opponent it drew roughly half its games.</p>
+repetition draw. Against a random-move opponent it drew 84–90% of games and lost a few (§5.2).</p>
 <p><strong>The mechanism.</strong> This is a property of how AlphaZero learns, not a coding fault.
 The value head is trained to predict the game outcome <code>z</code>. If nearly every self-play
 game is a <strong>draw</strong>, then <code>z ≈ 0</code> for almost all training targets, so the only thing
@@ -518,9 +530,11 @@ The deeper lesson — and the hardest thing the project taught — is that <em>&
 wrong&quot;</em> and <em>&quot;my code is right but under-resourced&quot;</em> look identical from the outside;
 only instrumentation tells them apart. AlphaZero trained on tens of millions of
 games; a laptop plays under a hundred.</p>
-<p><strong>Why §5.3 is the right test.</strong> Because the two explanations are externally
-indistinguishable, the honest move is to <em>test</em> the resource hypothesis by scaling
-compute while holding the code fixed — converting a plausible story into evidence.</p>
+<p><strong>Why the arms in §5.3 are the right test, and what they need.</strong> Because the two
+explanations are externally indistinguishable, the honest move is to <em>test</em> the resource
+hypothesis by scaling compute while holding the code fixed. §5.4 shows the other half of
+that discipline: each arm has to be compared with its own starting point, under the same
+search, with intervals, before any lever gets credit.</p>
 <p><strong>A likely secondary factor.</strong> Real AlphaZero includes <strong>move-history planes</strong> in the
 board encoding, which help the network reason about repetition; their absence here
 plausibly deepens the draw cycle and is a natural future-work item (§8).</p>
@@ -565,41 +579,40 @@ a memory ceiling) was not an obstacle to hide but information that produced a be
 design.</p>
 <h2 id="8-limitations-and-future-work">8. Limitations and Future Work<a class="anchor" href="#8-limitations-and-future-work" aria-label="Link to this section">#</a></h2>
 <ul>
+<li><strong>One training seed per arm.</strong> Untrained networks alone span more than 100 Elo against
+random across init seeds (§5.4). Three seeds per arm is the minimum for any ranking.</li>
+<li><strong>Transcribed data.</strong> The GPU run's logs and checkpoints were lost; its numbers are
+transcribed from captured output. Code history begins on 2026-07-18, four days after
+the run, so the seed-42 starting network is reconstructed on the assumption that the
+initialisation code did not change in between.</li>
+<li><strong>A weak yardstick.</strong> Random separates broken from working, not good from better.</li>
+<li><strong>The playable network is not a GPU network.</strong> The site serves <code>checkpoints/best.pt</code>,
+iteration 2 of a short CPU run.</li>
 <li><strong>Move-history planes (the encoding hypothesis).</strong> Real AlphaZero stacks the last
-<em>T</em> positions in its input, which helps the network reason about repetition — a
-plausible <em>third</em> cause of the draw cycle beyond §5.3's two. Adding them here is
-non-trivial because MCTS clones the board with <code>stack=False</code> and rebuilds
-positions by replaying from the root, so pre-root history is not consistently
-available inside the search. Doing it <em>correctly</em> requires threading recent
-history through the search so self-play and leaf evaluation see the <em>same</em>
-encoding — worth doing precisely because a botched version would reintroduce the
-silent encoding bugs §4.5 guards against. This is the natural next experiment: at
-fixed compute, does adding history planes lower the non-decisive rate?</li>
-<li>Rent GPU compute <em>before</em> drawing strength conclusions.</li>
-<li>Larger network / more residual blocks; stronger baselines than random.</li>
+<em>T</em> positions in its input, which helps the network reason about repetition, a
+plausible further cause of the draw cycle. Adding them is non-trivial because MCTS
+clones the board with <code>stack=False</code> and rebuilds positions by replaying from the root,
+so pre-root history is not consistently available inside the search; it has to be
+threaded through so self-play and leaf evaluation see the same encoding.</li>
+<li><strong>Larger networks and more compute</strong>, once the seeds above make a comparison possible.</li>
 </ul>
 <h2 id="9-conclusion">9. Conclusion<a class="anchor" href="#9-conclusion" aria-label="Link to this section">#</a></h2>
-<p>Building AlphaZero from first principles taught me the three things I most wanted to
-learn, and one I did not expect. I now understand — at the level of code, not
-diagrams — how the network, the search, and the self-play loop actually fit
-together, and why the field's famous &quot;conceptually simple&quot; hides real subtlety: the
-dangerous bugs are <em>silent</em>, so the discipline is to make them loud with tests
-(§4.5). I learned that &quot;the engine did not reach grandmaster strength&quot; and &quot;the
-project failed&quot; are different statements — the learning demonstrably worked (§5.1),
-and strength is a separate, resource-bound story. And the unexpected lesson, the one
-I value most, is epistemic: &quot;my code is wrong&quot; and &quot;my code is right but
-under-resourced&quot; look identical from the outside, and only instrumentation tells
-them apart. The draw cycle taught me to <em>test the boring explanation</em> — I built two
-controlled experiments (§5.3) rather than assert a compute ceiling, and the data
-turned out to be more interesting than the assumption: the plateau is driven by both
-compute <em>and</em> an impoverished self-play signal, with the signal the cheaper fix.
-Finally, the engineering (§7) convinced me that the honest version of a project — the
-one that says what works, what doesn't, and why, and ships a demo that tells the
-truth about which engine is playing — is stronger than a polished fiction. It
-certainly taught me more.</p>
+<p>Building AlphaZero from first principles taught me how the network, the search and the
+self-play loop fit together at the level of code, and why its famous simplicity hides
+real subtlety: the dangerous bugs are silent, so the discipline is to make them loud
+with tests (§4.5).</p>
+<p>The draw cycle taught the same lesson twice. First, &quot;my code is wrong&quot; and &quot;my code is
+right but under-resourced&quot; look identical from the outside, and only instrumentation
+told them apart. Second, my own first analysis of the experiments made exactly the
+kind of error the project was supposed to guard against: it compared networks evaluated
+with different searches, without the network they started from and without intervals,
+and drew a clean conclusion from it. Rebuilding the starting network and measuring
+against it (§5.4) left a smaller and more honest result: the draw cycle is real, extra
+compute does not escape it, and the material assist is the only arm with a measurable,
+marginal gain. The next step is not a bigger run but three seeds per arm.</p>
 <h2 id="10-reproducibility">10. Reproducibility<a class="anchor" href="#10-reproducibility" aria-label="Link to this section">#</a></h2>
 <p><strong>Repository.</strong> <a href="https://github.com/Danny-397/RL-Chess-Engine">https://github.com/Danny-397/RL-Chess-Engine</a> (MIT). The code is
-~4,200 lines (excluding tests); the 41-test suite runs in CI on every push.</p>
+~4,200 lines (excluding tests); the 44-test suite runs in CI on every push.</p>
 <p><strong>Environment.</strong> <code>pip install -r requirements-train.txt</code> (adds PyTorch to the
 light runtime deps in <code>requirements.txt</code>). The GPU results in §5 were produced on
 Kaggle with 2× Tesla T4.</p>
@@ -658,74 +671,22 @@ python run_experiment.py --quick
 # Train / evaluate directly:
 python main.py --mode train --iterations N --games G --simulations S \
     --eval-every K --save-pgn --device cuda
-python main.py --mode evaluate     # trained network vs. the random baseline
+python main.py --mode eval --checkpoint checkpoints/best.pt --opponent random --eval-games 50
 
-# Regenerate the figures:
-python analyze_selfplay.py --pgn-dir pgn --label scaled \
-    --out-csv logs/term_scaled.csv --plot assets/term_scaled.png
-python plot_progress.py --out assets/progress.png
+# Rebuild Figure 1 and rerun the control:
+python tools/plot_draw_cycle.py          # from docs/data/*.json
+python tools/no_learning_control.py      # §5.4 control (CPU, about 1 hour)
 </code></pre>
-<p>Every figure in §5 and <code>docs/experiment-results.md</code> is produced by these commands;
-the run's raw per-iteration numbers are transcribed in that file.</p>
-<hr />
-<h2 id="appendix-a-logging-spec-for-the-training-run">Appendix A — Logging spec for the training run<a class="anchor" href="#appendix-a-logging-spec-for-the-training-run" aria-label="Link to this section">#</a></h2>
-<p>Capture all of the following so the results section is plug-and-play. Most already
-exist in <code>training.py</code> / <code>evaluation.py</code>; the <strong>termination histogram</strong> is the one
-piece of new instrumentation and is the direct evidence for §6.</p>
-<p><strong>Per training iteration</strong> (already logged — keep):</p>
-<ul>
-<li>iteration index, games this iteration, new examples, buffer size</li>
-<li><code>total</code>, <code>policy</code>, and <code>value</code> loss</li>
-<li>wall-clock time</li>
-</ul>
-<p><strong>Per evaluation checkpoint</strong> (set <code>eval_every &gt; 0</code>; run at both compute scales):</p>
-<ul>
-<li>Elo vs. <code>RandomAgent</code>, and the raw <strong>win / draw / loss</strong> counts</li>
-<li><strong>self-play draw rate</strong> for the iteration</li>
-</ul>
-<p><strong>New: self-play game-termination histogram</strong> — the draw-cycle evidence. For each
-self-play game, record the reason it ended and aggregate per iteration:</p>
-<ul>
-<li>checkmate · stalemate · threefold repetition · fifty-move · insufficient material
-· <strong>hit <code>max_moves</code> cap</strong>
-(A distribution dominated by repetition/50-move/max-moves is the draw cycle on a graph.)</li>
-</ul>
-<p><strong>Per run, save once:</strong></p>
-<ul>
-<li>the full <code>Config</code> used (games, <code>num_simulations</code>, <code>num_residual_blocks</code>, LR, etc.)</li>
-<li>device (CPU vs. GPU), total wall-clock, and total games played</li>
-<li>the training-curve PNG (<code>plot_progress.py</code>) and the raw metrics as CSV/JSON</li>
-</ul>
-<p><strong>The two headline series to plot for §5.3</strong> (baseline vs. scaled, overlaid):</p>
+<p>Figure 1 is rebuilt from <code>docs/data/gpu_run_2026-07-14.json</code> (the transcribed GPU
+run) and <code>docs/data/no_learning_control.json</code> (the control).</p>
+<h2 id="11-references">11. References<a class="anchor" href="#11-references" aria-label="Link to this section">#</a></h2>
 <ol>
-<li>self-play <strong>draw rate</strong> vs. iteration</li>
-<li><strong>Elo vs. random</strong> vs. iteration</li>
+<li>D. Silver et al. <em>Mastering the game of Go without human knowledge.</em> Nature 550, 354–359 (2017). AlphaGo Zero: the policy/value network, PUCT search and self-play loop used here.</li>
+<li>D. Silver et al. <em>A general reinforcement learning algorithm that masters chess, shogi, and Go through self-play.</em> Science 362, 1140–1144 (2018). AlphaZero, including the 8 × 8 × 73 move encoding and the Dirichlet root noise.</li>
+<li>C. D. Rosin. <em>Multi-armed bandits with episode context.</em> Annals of Mathematics and Artificial Intelligence 61, 203–230 (2011). The PUCT selection rule.</li>
+<li>A. E. Elo. <em>The Rating of Chessplayers, Past and Present.</em> Arco (1978). The logistic score-to-rating relation used for every Elo figure here.</li>
+<li>Leela Chess Zero contributors. <em>lc0</em> (open-source AlphaZero reproduction), https://lczero.org. A large-scale reference point for what this report's compute budget is not.</li>
 </ol>
-<p>If the scaled curve bends where the baseline flatlines, the experiment is done —
-even partially. Set a <strong>hard GPU budget cap</strong> before starting; stop when the trend
-is legible, not when the engine is &quot;good.&quot;</p>
-<h3 id="how-the-metrics-are-produced-tooling-already-in-the-repo">How the metrics are produced (tooling already in the repo)<a class="anchor" href="#how-the-metrics-are-produced-tooling-already-in-the-repo" aria-label="Link to this section">#</a></h3>
-<ul>
-<li><strong>Loss curves + Elo vs. iteration</strong> — <code>plot_progress.py</code> parses <code>logs/training.log</code>
-(loss lines + <code>[eval]</code> lines) into a PNG. Enable Elo lines by training with
-<code>--eval-every N</code>.</li>
-<li><strong>Draw cycle: non-decisive rate + termination histogram</strong> — <code>analyze_selfplay.py</code>
-reads the per-iteration PGNs written by <code>--save-pgn</code>, replays each game to its
-final position, classifies the termination (checkmate / stalemate / insufficient
-/ repetition / fifty-move / max-moves-cap), and writes a per-iteration CSV
-(+ optional chart). The headline series is the <strong>non-decisive rate</strong> (fraction of
-games <em>not</em> won by checkmate) — the draw cycle on a graph.</li>
-</ul>
-<p>Concrete commands (note the CLI uses <code>--mode</code>, e.g. <code>--mode train</code>):</p>
-<pre><code class="language-bash"># a run that captures everything §5/§6 need
-python main.py --mode train --iterations N --games G --simulations S \
-    --eval-every K --save-pgn --device cuda
-python analyze_selfplay.py --pgn-dir pgn --label scaled \
-    --out-csv logs/term_scaled.csv --plot assets/term_scaled.png
-python plot_progress.py --out assets/progress_scaled.png
-</code></pre>
-<p>Run the same two analysis commands against the baseline run's PGNs/log (with their
-own <code>--label</code>/paths) and overlay the two <code>non_decisive_rate</code> columns for §5.3.</p>
 
   </article>
 </main>

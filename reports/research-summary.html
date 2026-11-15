@@ -99,12 +99,13 @@ daily long-or-short calls are right <strong>50.0%</strong> of the time. Its own 
 caught the false positive a naive version ships, reproducing Henderson et al. (2018) in a
 new domain. Adds an original surrogate-data test separating &quot;the agent is weak&quot; from
 &quot;there is no signal.&quot;</p>
-<p><strong>AlphaZero-style Chess Engine</strong> · <a href="https://rlchess.xyz">rlchess.xyz</a> — Rules only: no
-openings, no human games, no evaluation function. Dual-headed ResNet, PUCT tree search,
-4,672-move policy head, playable in-browser via ONNX Runtime Web. Scaling self-play 10×
-bought <strong>14 Elo</strong>. Diagnosed as a self-play <em>signal</em> problem, not a compute ceiling —
-92% of games ended non-decisive, starving the value head of gradient. A classical
-alpha-beta control beat the random baseline 10–0, confirming the harness was sound.</p>
+<p><strong>AlphaZero-style Chess Engine</strong> · <a href="https://rlchess.xyz">rlchess.xyz</a> — Self-play from
+the rules, with no openings or human games. Dual-headed ResNet, PUCT tree search,
+4,672-move policy head, playable in-browser via ONNX Runtime Web. Self-play collapses into
+a <strong>draw cycle</strong> (all threefold repetition from iteration 3), and 10× the self-play leaves
+88% of games undecided. Measured against the network every run started from, only the
+material-assisted run improved: <strong>+31 Elo</strong> (95% CI +3 to +60, one seed). An earlier
+&quot;signal, not compute&quot; headline was withdrawn after a confound in its evaluation was found.</p>
 <p><strong>AlphaGlyph</strong> · <a href="https://alphaglyph.org">alphaglyph.org</a> — Symbolic-regression alpha
 discovery, evaluated against its own overfitting. Combinatorial Purged Cross-Validation
 puts the <strong>probability of backtest overfitting at 72%</strong> across a 42-variant grid, with

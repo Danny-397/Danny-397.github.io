@@ -26,7 +26,7 @@ site reads them from each repository's CI instead.
 |---|---|---|---|
 | Precision on the project's labeled corpus | **100%** precision and recall on 26 labeled findings (18 files, 9 languages); naive line-regex **49.1%** | benchmark/RESULTS.md | `python benchmark/evaluate.py` |
 | Recall under mutation | **50/50** seeded cases found, 0 false positives on 50 negative mutations | benchmark/RESULTS-seeded.md | `python benchmark/seeded.py` |
-| Precision on real code nobody chose | **93%** (95% CI 86–97%) on 100 random findings from 37 PyPI packages, each hand-labeled with a reason; measured before the TLS rule fix it exposed | benchmark/RESULTS-precision.md | `python benchmark/precision_sample.py --score` |
+| Precision on real code nobody chose | **95%** (95% CI 89–98%) on a fresh 100 random findings from 37 PyPI packages, scanner 0.3.2, each hand-labeled with a reason (92% if the classical halves of post-quantum hybrids count as misses). The first sample, on 0.3.1 before the TLS rule fix it exposed, gave 93% (86–97%) | benchmark/RESULTS-precision-current.md | `python benchmark/precision_sample.py --current --score` |
 | Scale | **5,609** findings (4,236 HIGH) across **11,275** files in 37 packages, 2026-10-28, scanner 0.3.1 | benchmark/RESULTS-realworld.md | `python benchmark/realworld.py` |
 | Versus general security tools | quantum-relevant findings caught on the labeled corpus: QuantumSafe 26/26, Semgrep (`p/r2c-security-audit`) 4/26, Bandit 2/26 | benchmark/COMPARISON.md | `python benchmark/comparison.py` |
 

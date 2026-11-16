@@ -1188,7 +1188,7 @@ catch (e) { /* private mode */ }</script>
           scores how exposed the project is from 0&ndash;100, and names the specific NIST-standard
           replacement for every finding.
         </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Usage-aware scanning reaches 100% precision on its own benchmark (naive matching: 49.1%) and 93% on a random, hand-labeled sample of real-world findings.</p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Usage-aware scanning reaches 100% precision on its own benchmark (naive matching: 49.1%) and 95% on a random, hand-labeled sample of real-world findings.</p>
       </div>
 
       <figure class="plate">
@@ -1222,8 +1222,9 @@ catch (e) { /* private mode */ }</script>
         pattern-matching baseline produced, taking precision from 49.1% to 100% on an 18-file,
         9-language benchmark, with 100% recall on 50 seeded cases under mutation testing. Because that
         benchmark is the one it was tuned on, precision was also measured on 100 findings drawn at random
-        from real PyPI packages and labeled by hand: 93% (95% CI 86&ndash;97%). Four of the seven misses
-        were one rule flagging the flags that turn old TLS <em>off</em>; that rule is now fixed.
+        from real PyPI packages and labeled by hand: 93% (95% CI 86&ndash;97%) for version 0.3.1, where four
+        of the seven misses were one rule flagging the flags that turn old TLS <em>off</em>. After that and the
+        recall fixes, a fresh sample of the current scanner gives 95% (89&ndash;98%).
       </p>
 
       <details class="method">

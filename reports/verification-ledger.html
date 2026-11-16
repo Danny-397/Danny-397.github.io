@@ -162,9 +162,9 @@ site reads them from each repository's CI instead.</p>
 </tr>
 <tr>
 <td>Precision on real code nobody chose</td>
-<td><strong>93%</strong> (95% CI 86–97%) on 100 random findings from 37 PyPI packages, each hand-labeled with a reason; measured before the TLS rule fix it exposed</td>
-<td>benchmark/RESULTS-precision.md</td>
-<td><code>python benchmark/precision_sample.py --score</code></td>
+<td><strong>95%</strong> (95% CI 89–98%) on a fresh 100 random findings from 37 PyPI packages, scanner 0.3.2, each hand-labeled with a reason (92% if the classical halves of post-quantum hybrids count as misses). The first sample, on 0.3.1 before the TLS rule fix it exposed, gave 93% (86–97%)</td>
+<td>benchmark/RESULTS-precision-current.md</td>
+<td><code>python benchmark/precision_sample.py --current --score</code></td>
 </tr>
 <tr>
 <td>Scale</td>

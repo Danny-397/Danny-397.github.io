@@ -240,8 +240,8 @@ catch (e) { /* private mode */ }</script>
         <h2><a href="reports/rl-chess-technical-report.html">An AlphaZero-Style Chess Engine, Built From Scratch</a></h2>
         <p class="pull">
           Draw-heavy self-play starves the value head: every game ends in repetition, so it learns
-          that every position is even. Measured against its starting network, only the
-          material-assisted run got stronger &mdash; and the report corrects its own first analysis.
+          that every position is even. Across three seeds, training made the network worse than
+          its random start &mdash; and the report corrects its own first analysis twice.
         </p>
         <p>
           The longest document here. Network, PUCT search and training loop from first

@@ -96,6 +96,12 @@ numbers transcribed in this file.</p>
 <a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/data/gpu_run_2026-07-14.json"><code>data/gpu_run_2026-07-14.json</code></a> (this file's tables, machine-readable)
 and <a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/data/start_network_control.json"><code>data/start_network_control.json</code></a>.</em></p>
 <blockquote>
+<p><strong>Superseded, 2026-11-16.</strong> A three-seed rerun under the corrected draw rule, with
+every network measured against its own starting network, is in
+<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/technical-report.md">technical report §5.8</a> and
+<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/data/seeds_rerun_2026-11.json"><code>data/seeds_rerun_2026-11.json</code></a>. It does not replicate
+the assisted arm's gain below (pooled change +6 Elo, 95% CI −19, +31), and the baseline
+ends up worse than its start (−93, 95% CI −125, −60). This file documents the July run.</p>
 <p><strong>Re-analysis, 2026-11-14 — read this first.</strong> The original conclusions below
 (&quot;the signal lever flips Elo from −21 to +28; the draw cycle is primarily a
 signal problem&quot;) do not survive a closer look:</p>
@@ -1068,13 +1074,13 @@ non-decisive rate stays in the high 80s/90s, and strength against random is
 indistinguishable from the starting network (+10, 95% CI −26, +45).</li>
 <li><strong>The material assist keeps decisive games in self-play</strong> (19% checkmates, final
 iteration 30%) and is the only arm with a measurable gain over its start: +31 Elo
-(95% CI +3, +60), from a single training seed.</li>
+(95% CI +3, +60), from a single training seed. <strong>Not replicated</strong> across three seeds
+(§5.8 of the technical report).</li>
 <li><strong>The original headline is withdrawn.</strong> &quot;Signal, not compute: −21 → +28&quot; compared
 arms evaluated under different searches, without a starting-network reference or
 intervals (see the re-analysis note at the top).</li>
 <li><strong>What would settle it:</strong> three training seeds per arm, every network also evaluated
-with <code>material_weight = 0</code>, and the combined arm. <code>run_experiment.py --seed N</code> now
-writes each seed to its own directory and evaluates every arm both ways.</li>
+with <code>material_weight = 0</code>. Done in November 2026; see technical report §5.8.</li>
 </ol>
 <h2 id="reproducibility">Reproducibility<a class="anchor" href="#reproducibility" aria-label="Link to this section">#</a></h2>
 <pre><code class="language-bash"># All three stages on a GPU (this run):

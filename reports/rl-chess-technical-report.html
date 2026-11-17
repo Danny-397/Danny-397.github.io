@@ -103,8 +103,14 @@ self-play game from iteration 3 onward ends in threefold repetition.</p>
 a 0.30 material term blended into the search's leaf value. Evaluated against a random
 mover and compared with <strong>the network they all started from</strong>, under the same search:
 the baseline changes by −22 Elo (95% CI −56, +12), the 10× arm by +10 (−26, +45), and
-the material-assisted arm by <strong>+31 (+3, +60)</strong>. Only the assisted arm shows a measurable
-gain, and only just. Ten times the compute leaves 88% of self-play games undecided.</p>
+the material-assisted arm by +31 (+3, +60). Ten times the compute leaves 88% of self-play
+games undecided.</p>
+<p>A rerun with <strong>three training seeds per arm</strong> under a corrected draw rule (§5.8) does not
+replicate the assisted arm's gain: pooled, it is unchanged against its own starting network
+(+6 Elo, 95% CI −19, +31). The baseline ends up <strong>worse</strong> than the untrained network it
+started from, by 93 Elo against random (−125, −60) and 155 against a one-ply material-greedy
+opponent (−265, −45). In this regime, self-play training on nearly all-draw games does not
+merely stall; it degrades the network.</p>
 <p>An earlier version of this report claimed the assist &quot;flips Elo from −21 to +28&quot; and that
 the plateau is &quot;primarily a signal problem.&quot; That comparison was confounded (the arms
 were evaluated with different searches), had no starting-network reference and no
@@ -505,7 +511,8 @@ under the search it was evaluated with:</p>
 <p><strong>What the data supports.</strong> The draw cycle in self-play is real, and 10× the self-play
 does not escape it. Neither unassisted arm measurably changed strength. The assisted arm
 gained a little over its own start: +31 Elo, just clear of zero, from one training seed.
-It cannot rank compute against signal; the earlier claim that it could is withdrawn.</p>
+It cannot rank compute against signal; the earlier claim that it could is withdrawn. The
+three-seed rerun in §5.8 does not replicate the assisted arm's gain.</p>
 <h3 id="55-a-rule-artifact-in-draw-detection">5.5 A rule artifact in draw detection<a class="anchor" href="#55-a-rule-artifact-in-draw-detection" aria-label="Link to this section">#</a></h3>
 <p><code>ChessGame.is_terminal()</code> used <code>board.is_game_over(claim_draw=True)</code>. In python-chess a
 threefold-repetition claim is valid not only when a position has occurred three times but
@@ -521,7 +528,9 @@ final position had occurred twice, and in one only once. The rule is now the act
 <code>END_ON_CLAIMABLE_DRAWS</code> / <code>--legacy-draw-claims</code> to reproduce the July run, and tests for
 both. Under the corrected rule the same checkpoint still ends all six games in a real
 threefold repetition, after 25–36 plies, so the behaviour is genuine; how much of the
-<em>rate</em> the rule caused is what the seed-1 legacy-rule run in §5.8 measures. All numbers in
+<em>rate</em> the rule caused is what the seed-1 legacy-rule run in §5.8 measures: 89%
+non-decisive under the old rule against 82% under the corrected one, the same seed, a modest
+difference. The rule inflated the counts; it did not create the cycle. All numbers in
 §5.1–§5.4 used the old rule throughout, so their comparisons are internally consistent.</p>
 <h3 id="56-the-value-head-measured-directly">5.6 The value head, measured directly<a class="anchor" href="#56-the-value-head-measured-directly" aria-label="Link to this section">#</a></h3>
 <p>The draw-cycle explanation is a claim about the value head, so <code>tools/value_probe.py</code>
@@ -547,18 +556,61 @@ the side to move is up or down a queen, and records the value head's output on a
 <td>−0.000 (−0.000, −0.000)</td>
 </tr>
 <tr>
-<td>shipped checkpoint (iteration 2, short CPU run)</td>
+<td>July-era checkpoint (iteration 2, short CPU run)</td>
 <td>−0.057</td>
 <td>−0.058</td>
 <td>−0.060</td>
 <td>+0.003 (+0.003, +0.004)</td>
 </tr>
+<tr>
+<td>rerun seed 1, baseline</td>
+<td>+0.111</td>
+<td>+0.068</td>
+<td>+0.051</td>
+<td>+0.060 (+0.037, +0.083)</td>
+</tr>
+<tr>
+<td>rerun seed 1, assisted (shipped)</td>
+<td>+0.004</td>
+<td>+0.001</td>
+<td>+0.004</td>
+<td>+0.000 (−0.004, +0.004)</td>
+</tr>
+<tr>
+<td>rerun seed 2, baseline</td>
+<td>−0.026</td>
+<td>−0.029</td>
+<td>−0.025</td>
+<td>−0.001 (−0.017, +0.015)</td>
+</tr>
+<tr>
+<td>rerun seed 2, assisted</td>
+<td>+0.021</td>
+<td>+0.023</td>
+<td>+0.022</td>
+<td>−0.001 (−0.021, +0.020)</td>
+</tr>
+<tr>
+<td>rerun seed 3, baseline</td>
+<td>−0.028</td>
+<td>−0.033</td>
+<td>−0.037</td>
+<td>+0.009 (−0.000, +0.019)</td>
+</tr>
+<tr>
+<td>rerun seed 3, assisted</td>
+<td>+0.017</td>
+<td>+0.017</td>
+<td>+0.017</td>
+<td>+0.000 (−0.020, +0.020)</td>
+</tr>
 </tbody>
 </table></div>
 <p>On a −1 to +1 scale, being a queen up should read close to +1. The shipped network's value
 head separates the two by 0.003: it has learned almost nothing about material, exactly
-what a value target of 0 everywhere predicts. This is one early checkpoint; §5.8 runs the
-probe on every trained network.</p>
+what a value target of 0 everywhere predicts. After ten GPU iterations the picture is the
+same: five of the six rerun networks separate the two by less than 0.01, and the best,
+seed-1 baseline, by 0.06.</p>
 <h3 id="57-a-sturdier-yardstick">5.7 A sturdier yardstick<a class="anchor" href="#57-a-sturdier-yardstick" aria-label="Link to this section">#</a></h3>
 <p>Random is a weak yardstick here: most games against it are drawn, so an untrained network
 can land anywhere from about −7 to +120 Elo. <code>evaluation.MaterialGreedyAgent</code> is a sturdier
@@ -605,13 +657,79 @@ corrected draw rule (<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/
 games are mostly decisive. Seed still matters without the blend (per seed, about −460 to −315),
 less with it (−220 to −186); multiple seeds remain necessary. The trained July networks no longer
 exist, so this yardstick applies from the rerun (§5.8) onward.</p>
-<h3 id="58-what-would-settle-it">5.8 What would settle it<a class="anchor" href="#58-what-would-settle-it" aria-label="Link to this section">#</a></h3>
-<p>Three training seeds per arm, under the corrected draw rule; every network evaluated
-against random with and without the material blend and against the greedy opponent; each
-seed's starting network under the same evaluations; the value probe on every trained
-network; and one legacy-rule run for the rule's own effect.
-<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/notebooks/seeds_rerun.ipynb"><code>notebooks/seeds_rerun.ipynb</code></a> does all of this on a
-Kaggle T4 in about nine hours and writes a summary of each arm against its own start.</p>
+<h3 id="58-three-seeds-per-arm">5.8 Three seeds per arm<a class="anchor" href="#58-three-seeds-per-arm" aria-label="Link to this section">#</a></h3>
+<p>The rerun (<a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/notebooks/seeds_rerun.ipynb"><code>notebooks/seeds_rerun.ipynb</code></a>) trained the
+baseline and the material-assisted arm (w = 0.30) from init seeds 1, 2 and 3 under the
+corrected draw rule: 10 iterations × 10 self-play games × 100 simulations each, on a Kaggle
+T4 (the 10× arm is skipped: it is most of the GPU time and showed no change in July). Each
+trained network played 50 games against random under its own search and with w = 0, and 50
+against the material-greedy opponent with w = 0. Each seed's untrained network played 100
+games under each of the same settings. The Kaggle session hit its 12-hour cap after training,
+so the starting-network controls and value probes ran on a CPU from the downloaded
+checkpoints; <a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/tools/summarise_seeds.py"><code>tools/summarise_seeds.py</code></a> pairs them up and
+writes <a href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/data/seeds_rerun_2026-11.json"><code>data/seeds_rerun_2026-11.json</code></a>.</p>
+<p>Pooled over the three seeds (games added before converting to Elo; intervals combine both
+standard errors):</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Arm</th>
+<th>Evaluated against</th>
+<th>Trained</th>
+<th>Starting network</th>
+<th>Change, Elo (95% CI)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td>random</td>
+<td>−19</td>
+<td>+74</td>
+<td><strong>−93 (−125, −60)</strong></td>
+</tr>
+<tr>
+<td>baseline</td>
+<td>material-greedy</td>
+<td>−524</td>
+<td>−369</td>
+<td><strong>−155 (−265, −45)</strong></td>
+</tr>
+<tr>
+<td>assisted</td>
+<td>random, own search (w = 0.30)</td>
+<td>+2</td>
+<td>−3</td>
+<td>+6 (−19, +31)</td>
+</tr>
+<tr>
+<td>assisted</td>
+<td>random, network only (w = 0)</td>
+<td>−30</td>
+<td>+74</td>
+<td>−104 (−136, −72)</td>
+</tr>
+<tr>
+<td>assisted</td>
+<td>material-greedy (w = 0)</td>
+<td>−432</td>
+<td>−369</td>
+<td>−63 (−154, +28)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Per seed against random, the baseline moved −177, −112 and +3; the assisted arm, in its own
+search, −7, +31 and −7. Seeds 1 and 2 started unusually strong against random (+135 and +119)
+and lost all of it; seed 3 started at −24 and stayed there.</p>
+<p>Self-play from iteration 3 onward was 89–100% non-decisive in every run (corrected rule),
+almost entirely genuine threefold repetitions. Over all ten iterations the assisted arm
+produced fewer self-play checkmates than the baseline, 20 against 35 in 300 games each (per
+seed 2, 10 and 8 against 18, 13 and 4), unlike July, where the assist had the most.</p>
+<p><strong>What the data supports.</strong> The draw cycle is real and robust to the draw-rule fix. Training
+inside it made the unassisted networks measurably worse than their random initialisation,
+against both yardsticks. The material assist did not make training work; it kept the
+combined engine level with its start, while its network, judged alone, degraded as much as
+the baseline's. The July single-seed gain of +31 for the assisted arm does not replicate.</p>
 <hr />
 <h2 id="6-the-draw-cycle">6. The Draw Cycle<a class="anchor" href="#6-the-draw-cycle" aria-label="Link to this section">#</a></h2>
 <p>The central empirical finding, and the report's intellectual core.</p>
@@ -682,8 +800,9 @@ a memory ceiling) was not an obstacle to hide but information that produced a be
 design.</p>
 <h2 id="8-limitations-and-future-work">8. Limitations and Future Work<a class="anchor" href="#8-limitations-and-future-work" aria-label="Link to this section">#</a></h2>
 <ul>
-<li><strong>One training seed per arm.</strong> Untrained networks alone span more than 100 Elo against
-random across init seeds (§5.4). Three seeds per arm is the minimum for any ranking.</li>
+<li><strong>Three seeds, short runs.</strong> §5.8 has three seeds per arm and ten iterations each; the
+per-arm intervals are wide (especially against the greedy opponent), and longer runs could
+behave differently. The 10× arm was not rerun.</li>
 <li><strong>Transcribed data.</strong> The GPU run's logs and checkpoints were lost; its numbers are
 transcribed from captured output. Code history begins on 2026-07-18, four days after
 the run, so the seed-42 starting network is reconstructed on the assumption that the
@@ -691,8 +810,8 @@ initialisation code did not change in between.</li>
 <li><strong>A weak yardstick.</strong> Random separates broken from working, not good from better
 (§5.7 adds a greedy opponent).</li>
 <li><strong>The draw rule.</strong> All July numbers ended games on a merely claimable repetition (§5.5).</li>
-<li><strong>The playable network is not a GPU network.</strong> The site serves <code>checkpoints/best.pt</code>,
-iteration 2 of a short CPU run.</li>
+<li><strong>The playable network is weak.</strong> The site serves <code>checkpoints/best.pt</code>, the seed-1
+material-assisted network from the rerun (§5.8), picked before any results were seen.</li>
 <li><strong>Move-history planes (the encoding hypothesis).</strong> Real AlphaZero stacks the last
 <em>T</em> positions in its input, which helps the network reason about repetition, a
 plausible further cause of the draw cycle. Adding them is non-trivial because MCTS
@@ -713,8 +832,11 @@ kind of error the project was supposed to guard against: it compared networks ev
 with different searches, without the network they started from and without intervals,
 and drew a clean conclusion from it. Rebuilding the starting network and measuring
 against it (§5.4) left a smaller and more honest result: the draw cycle is real, extra
-compute does not escape it, and the material assist is the only arm with a measurable,
-marginal gain. The next step is not a bigger run but three seeds per arm.</p>
+compute does not escape it, and the material assist looked like the only arm with a
+marginal gain. Three seeds per arm (§5.8) then removed that gain and showed something
+starker: training inside the draw cycle makes the network worse than where it started. The
+next step is to change the training signal itself (move-history planes, resignation or
+adjudication of won positions, or value targets that are not all zero), not to scale up.</p>
 <h2 id="10-reproducibility">10. Reproducibility<a class="anchor" href="#10-reproducibility" aria-label="Link to this section">#</a></h2>
 <p><strong>Repository.</strong> <a href="https://github.com/Danny-397/RL-Chess-Engine">https://github.com/Danny-397/RL-Chess-Engine</a> (MIT). The code is
 ~4,200 lines (excluding tests); the 50-test suite runs in CI on every push.</p>

@@ -42,9 +42,11 @@ new domain. Adds an original surrogate-data test separating "the agent is weak" 
 the rules, with no openings or human games. Dual-headed ResNet, PUCT tree search,
 4,672-move policy head, playable in-browser via ONNX Runtime Web. Self-play collapses into
 a **draw cycle** (all threefold repetition from iteration 3), and 10× the self-play leaves
-88% of games undecided. Measured against the network every run started from, only the
-material-assisted run improved: **+31 Elo** (95% CI +3 to +60, one seed). An earlier
-"signal, not compute" headline was withdrawn after a confound in its evaluation was found.
+88% of games undecided. Across three training seeds per arm, measured against each run's own
+starting network, training inside the cycle made the network **worse**: −93 Elo against random
+(95% CI −125 to −60) and −155 against a material-greedy opponent. A material-assisted search only held
+level (+6, −19 to +31); a July single-seed gain of +31 did not replicate, and an earlier "signal, not
+compute" headline was withdrawn after a confound in its evaluation was found.
 
 **AlphaGlyph** · [alphaglyph.org](https://alphaglyph.org) — Symbolic-regression alpha
 discovery, evaluated against its own overfitting. Combinatorial Purged Cross-Validation

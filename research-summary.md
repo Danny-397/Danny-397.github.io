@@ -46,7 +46,9 @@ a **draw cycle** (all threefold repetition from iteration 3), and 10× the self-
 starting network, training inside the cycle made the network **worse**: −93 Elo against random
 (95% CI −125 to −60) and −155 against a material-greedy opponent. A material-assisted search only held
 level (+6, −19 to +31); a July single-seed gain of +31 did not replicate, and an earlier "signal, not
-compute" headline was withdrawn after a confound in its evaluation was found.
+compute" headline was withdrawn after a confound in its evaluation was found. Scoring drawn
+games by material did not help either (−93 again), and a search bug that hid repetitions of
+earlier game positions was found by reading the code and fixed.
 
 **AlphaGlyph** · [alphaglyph.org](https://alphaglyph.org) — Symbolic-regression alpha
 discovery, evaluated against its own overfitting. Combinatorial Purged Cross-Validation

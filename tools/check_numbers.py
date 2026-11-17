@@ -144,6 +144,8 @@ def main() -> int:
               r"GitHub Actions running (\d+) pytest cases", str(counts["Alphaglyph"])),
         Claim("home: Tradeski card tests", "index.html",
               r"<dt>Tests in CI</dt><dd>(\d+) <small>across", str(counts["Tradeski"])),
+        Claim("home: chess card tests", "index.html",
+              r"<li>(\d+)-test pytest suite on GitHub Actions", str(counts["RL-Chess-Engine"])),
         Claim("summary: AlphaGlyph tests", "research-summary.md",
               r"(\d+) tests in CI\.", str(counts["Alphaglyph"])),
         Claim("summary: Tradeski tests", "research-summary.md",

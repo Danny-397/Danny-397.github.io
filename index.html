@@ -867,7 +867,7 @@ catch (e) { /* private mode */ }</script>
         <dd>projects deployed to a public URL — not just a repository</dd>
       </div>
       <div>
-        <dt>1,830</dt>
+        <dt>1,836</dt>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
@@ -1403,7 +1403,7 @@ catch (e) { /* private mode */ }</script>
           search and a self-play loop, written from scratch, with no openings or human games. You can
           play it in your browser.
         </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Self-play collapses into a draw cycle that 10&times; compute does not escape. Across three seeds, training inside it left the network worse than its random start.</p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Self-play collapses into a draw cycle. I published a fix, found my own evaluation was confounded, withdrew it, and reran it with three seeds: training inside the cycle leaves the network worse than its random start.</p>
       </div>
 
       <figure class="plate">
@@ -1445,14 +1445,14 @@ catch (e) { /* private mode */ }</script>
         <p class="eyebrow">Reported finding</p>
         <p>
           From iteration 3, every baseline self-play game ends in threefold repetition: with every outcome
-          a draw, the value head learns that every position is even. Ten times the self-play leaves 88%
-          of games undecided. A rerun with three training seeds per arm, each measured against the network
-          it started from, found that training inside the cycle makes the network <em>worse</em>: &minus;93 Elo
-          against random (95% CI &minus;125 to &minus;60) and &minus;155 against a material-greedy opponent. Blending
-          material into the search only held it level (+6, &minus;19 to +31), so a July single-seed gain of +31
-          did not replicate. An earlier headline, &ldquo;a signal problem, not a compute ceiling&rdquo;
-          (&minus;21 &rarr; +28), was withdrawn: it compared runs evaluated with different searches, without a
-          starting-network control or intervals.
+          a draw, the value head learns that every position is even. My first write-up claimed a material
+          blend in the search broke the cycle (&minus;21 &rarr; +28 Elo). It did not hold: the arms had been
+          evaluated with different searches and nothing was compared with the starting network, so I
+          withdrew it. Rerun with three seeds per arm, each measured against its own start, training inside
+          the cycle made the network <em>worse</em>: &minus;93 Elo against random (95% CI &minus;125 to &minus;60).
+          The material blend only held level, and scoring drawn games by material taught the value head
+          a little without changing play (&minus;93 again). Reading the search code then turned up a bug that
+          hid repetitions of earlier positions from the search; it is fixed and tested.
         </p>
       </div>
 
@@ -1463,7 +1463,7 @@ catch (e) { /* private mode */ }</script>
             <li>Modular by component so each piece is testable in isolation: <code>chess_game.py</code> (rules and encoding), <code>model.py</code> (network), <code>mcts.py</code> (search), <code>self_play.py</code> / <code>training.py</code> (the learning loop), <code>evaluation.py</code> (strength measurement).</li>
             <li>Trained with cross-entropy loss against the MCTS visit distribution and mean-squared error against the final game outcome.</li>
             <li>Three ways in: a browser UI, a console client, and a FastAPI HTTP API.</li>
-            <li>53-test pytest suite on GitHub Actions, including an ONNX-vs-PyTorch parity check on the exported network.</li>
+            <li>59-test pytest suite on GitHub Actions, including an ONNX-vs-PyTorch parity check on the exported network.</li>
           </ul>
         </div>
       </details>
@@ -1474,7 +1474,7 @@ catch (e) { /* private mode */ }</script>
       <div class="links">
         <a class="primary" href="https://rlchess.xyz/#play">Play the engine &rarr;</a>
         <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/technical-report.md">Technical report</a>
-        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/experiment-results.md">Experiment results</a>
+        <a class="secondary" href="https://rlchess.xyz/#findings">How the investigation went</a>
         <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine">Source</a>
       </div>
     </article>

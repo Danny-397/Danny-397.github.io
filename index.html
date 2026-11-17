@@ -1403,7 +1403,7 @@ catch (e) { /* private mode */ }</script>
           search and a self-play loop, written from scratch, with no openings or human games. You can
           play it in your browser.
         </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Self-play collapses into a draw cycle that 10&times; compute does not escape. Measured against the network it started from, only the material-assisted run got stronger, and only just.</p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Self-play collapses into a draw cycle that 10&times; compute does not escape. Across three seeds, training inside it left the network worse than its random start.</p>
       </div>
 
       <figure class="plate">
@@ -1429,7 +1429,7 @@ catch (e) { /* private mode */ }</script>
 
       <dl class="figs">
         <div><dt>Self-play games trained</dt><dd>1,000 <small>~9.8h on 2&times;T4</small></dd></div>
-        <div><dt>Gain over starting network</dt><dd>+31 Elo <small>95% CI +3 to +60, one seed</small></dd></div>
+        <div><dt>Change vs starting network (95% CI &minus;125 to &minus;60)</dt><dd>&minus;93 Elo <small>3 seeds</small></dd></div>
         <div><dt>Policy head</dt><dd>4,672 <small>move logits</small></dd></div>
       </dl>
 
@@ -1446,11 +1446,13 @@ catch (e) { /* private mode */ }</script>
         <p>
           From iteration 3, every baseline self-play game ends in threefold repetition: with every outcome
           a draw, the value head learns that every position is even. Ten times the self-play leaves 88%
-          of games undecided. Measured against the seed-42 network all three runs started from, the
-          baseline changed by &minus;22 Elo (95% CI &minus;56 to +12), the 10&times; run by +10 (&minus;26 to +45),
-          and the material-assisted run by +31 (+3 to +60). An earlier headline, &ldquo;a signal problem, not
-          a compute ceiling&rdquo; (&minus;21 &rarr; +28), was withdrawn: it compared runs evaluated with
-          different searches, without that starting-network control or intervals.
+          of games undecided. A rerun with three training seeds per arm, each measured against the network
+          it started from, found that training inside the cycle makes the network <em>worse</em>: &minus;93 Elo
+          against random (95% CI &minus;125 to &minus;60) and &minus;155 against a material-greedy opponent. Blending
+          material into the search only held it level (+6, &minus;19 to +31), so a July single-seed gain of +31
+          did not replicate. An earlier headline, &ldquo;a signal problem, not a compute ceiling&rdquo;
+          (&minus;21 &rarr; +28), was withdrawn: it compared runs evaluated with different searches, without a
+          starting-network control or intervals.
         </p>
       </div>
 

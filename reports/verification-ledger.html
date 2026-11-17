@@ -229,10 +229,16 @@ site reads them from each repository's CI instead.</p>
 <td><code>python run_experiment.py --device cuda</code> (9.8 h on 2× T4)</td>
 </tr>
 <tr>
-<td>Only the material-assisted run measurably improved</td>
-<td>Change vs the seed-42 starting network, Elo vs random (95% CI): baseline <strong>−22</strong> [−56, +12], 10× <strong>+10</strong> [−26, +45], assisted <strong>+31</strong> [+3, +60]</td>
-<td>docs/data/start_network_control.json, docs/technical-report.md §5.4</td>
-<td><code>python tools/no_learning_control.py --seed-values 42 --games 100</code> (~1 h CPU)</td>
+<td>Training inside the draw cycle makes the network worse</td>
+<td>Three seeds per arm, change vs each run's own starting network, pooled (95% CI): baseline vs random <strong>−93</strong> [−125, −60], vs greedy <strong>−155</strong> [−265, −45]; material-assisted in its own search <strong>+6</strong> [−19, +31]</td>
+<td>docs/data/seeds_rerun_2026-11.json, docs/technical-report.md §5.8</td>
+<td><code>notebooks/seeds_rerun.ipynb</code> (≈11.5 h on a T4), then <code>python tools/summarise_seeds.py</code></td>
+</tr>
+<tr>
+<td><em>Not replicated 2026-11-16:</em> the material-assisted run's gain over its start (+31 [+3, +60], July, one seed)</td>
+<td>Pooled over three seeds the assisted arm is unchanged in its own search (+6 [−19, +31])</td>
+<td>docs/technical-report.md §5.4, §5.8</td>
+<td>as above</td>
 </tr>
 <tr>
 <td><em>Withdrawn 2026-11-14:</em> &quot;a signal problem, not compute&quot; (Elo −21 → +28)</td>

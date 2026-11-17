@@ -43,7 +43,8 @@ site reads them from each repository's CI instead.
 | Claim | Figure | Source | Reproduce |
 |---|---|---|---|
 | Self-play collapses into a draw cycle | Baseline self-play: **100%** threefold repetition from iteration 3; 10× self-play still **88%** undecided | docs/data/gpu_run_2026-07-14.json | `python run_experiment.py --device cuda` (9.8 h on 2× T4) |
-| Only the material-assisted run measurably improved | Change vs the seed-42 starting network, Elo vs random (95% CI): baseline **−22** [−56, +12], 10× **+10** [−26, +45], assisted **+31** [+3, +60] | docs/data/start_network_control.json, docs/technical-report.md §5.4 | `python tools/no_learning_control.py --seed-values 42 --games 100` (~1 h CPU) |
+| Training inside the draw cycle makes the network worse | Three seeds per arm, change vs each run's own starting network, pooled (95% CI): baseline vs random **−93** [−125, −60], vs greedy **−155** [−265, −45]; material-assisted in its own search **+6** [−19, +31] | docs/data/seeds_rerun_2026-11.json, docs/technical-report.md §5.8 | `notebooks/seeds_rerun.ipynb` (≈11.5 h on a T4), then `python tools/summarise_seeds.py` |
+| *Not replicated 2026-11-16:* the material-assisted run's gain over its start (+31 [+3, +60], July, one seed) | Pooled over three seeds the assisted arm is unchanged in its own search (+6 [−19, +31]) | docs/technical-report.md §5.4, §5.8 | as above |
 | *Withdrawn 2026-11-14:* "a signal problem, not compute" (Elo −21 → +28) | Compared runs evaluated with different searches, without a starting-network control or intervals | docs/technical-report.md §5.4 | — |
 | Strength of the classical control engine | Easy (depth 2) ≈ **1390** [1284, 1512] on Stockfish's engine scale: +14 =8 −8 vs Stockfish 19 at `UCI_Elo 1320` | docs/data/stockfish_rating_d2_e1320.json | `python tools/stockfish_rating.py --stockfish <path> --depth 2 --games 30` |
 

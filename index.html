@@ -1403,7 +1403,7 @@ catch (e) { /* private mode */ }</script>
           search and a self-play loop, written from scratch, with no openings or human games. You can
           play it in your browser.
         </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Self-play collapses into a draw cycle. I published a fix, found my own evaluation was confounded, withdrew it, and reran it with three seeds: training inside the cycle leaves the network worse than its random start.</p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Self-play collapses into a draw cycle. I published a fix, found my own evaluation was confounded, and withdrew it. Three-seed reruns showed training leaves the network worse than its random start, and that breaking the cycle does not stop that decline.</p>
       </div>
 
       <figure class="plate">
@@ -1452,7 +1452,9 @@ catch (e) { /* private mode */ }</script>
           the cycle made the network <em>worse</em>: &minus;93 Elo against random (95% CI &minus;125 to &minus;60).
           The material blend only held level, and scoring drawn games by material taught the value head
           a little without changing play (&minus;93 again). Reading the search code then turned up a bug that
-          hid repetitions of earlier positions from the search; it is fixed and tested.
+          hid repetitions of earlier positions from the search. With it fixed and self-play contempt added,
+          repetitions fell from 82% of games to 16% and checkmates tripled, yet the network still declined by
+          the same amount (&minus;91, 95% CI &minus;123 to &minus;60). The cycle was real; it was not the cause.
         </p>
       </div>
 

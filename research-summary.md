@@ -47,8 +47,10 @@ starting network, training inside the cycle made the network **worse**: −93 El
 (95% CI −125 to −60) and −155 against a material-greedy opponent. A material-assisted search only held
 level (+6, −19 to +31); a July single-seed gain of +31 did not replicate, and an earlier "signal, not
 compute" headline was withdrawn after a confound in its evaluation was found. Scoring drawn
-games by material did not help either (−93 again), and a search bug that hid repetitions of
-earlier game positions was found by reading the code and fixed.
+games by material did not help either (−93 again). After fixing a search bug that hid repetitions
+of earlier game positions and adding self-play contempt, repetitions fell from 82% of games to 16%
+and checkmates tripled, but the network still declined by the same amount (−91): the cycle is real,
+not the cause.
 
 **AlphaGlyph** · [alphaglyph.org](https://alphaglyph.org) — Symbolic-regression alpha
 discovery, evaluated against its own overfitting. Combinatorial Purged Cross-Validation

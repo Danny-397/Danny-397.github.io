@@ -86,13 +86,52 @@
   .top nav a:hover { color: var(--text); }
 
   /* ---------------------------------------------------------------- hero */
-  .hero { padding-top: clamp(64px, 11vw, 128px); padding-bottom: clamp(56px, 8vw, 88px); }
-  .hero .label { margin: 0 0 28px; }
-  .hero h1 {
-    margin: 0; max-width: 19ch;
-    font: 500 clamp(42px, 6.4vw, 76px)/1.03 var(--serif); letter-spacing: -.022em;
+  .hero { --pc: var(--c); padding-top: clamp(48px, 8vw, 96px); padding-bottom: clamp(56px, 8vw, 88px); }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
+  .hero .label { margin: 0 0 24px; }
+  .hero h1 { margin: 0; font: 500 clamp(38px, 4.3vw, 58px)/1.06 var(--serif); letter-spacing: -.022em; }
+  .rot { display: block; height: 1.12em; overflow: hidden; }
+  .rot-in { display: inline-block; font-style: italic; color: var(--pc); transition: color .5s var(--ease); white-space: nowrap; }
+  .rot-in.swap { animation: rot .7s var(--ease); }
+  @keyframes rot { 0% { transform: translateY(0); opacity: 1; } 45% { transform: translateY(-60%); opacity: 0; }
+                   55% { transform: translateY(60%); opacity: 0; } 100% { transform: none; opacity: 1; } }
+  .hero .sub { margin: 26px 0 0; max-width: 44ch; font-size: clamp(17px, 1.45vw, 19px); color: var(--muted); }
+  .hero-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; margin: 32px 0 0; }
+  .hero-cta a:not(.btn) { font-size: 15px; }
+
+  .show-frame {
+    position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 16px;
+    background: var(--plate); box-shadow: 0 1px 2px rgba(20,24,32,.06), 0 40px 80px -40px rgba(20,24,32,.45);
+    outline: 1px solid var(--frame-edge); outline-offset: -1px;
   }
-  .hero .sub { margin: 28px 0 0; max-width: 58ch; font-size: clamp(18px, 1.6vw, 20px); color: var(--muted); }
+  .show-frame::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: var(--pc); z-index: 2; transition: background-color .5s var(--ease); }
+  .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: left top;
+           opacity: 0; transform: scale(1.03); transition: opacity .8s var(--ease), transform 5.5s linear; }
+  .slide.on { opacity: 1; transform: scale(1); }
+  .show-cap {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px;
+    padding: 64px 22px 18px; color: #F2F4F7;
+    background: linear-gradient(to top, rgba(8,10,14,.94), rgba(8,10,14,.72) 50%, rgba(8,10,14,0));
+  }
+  .cap-name { font: 500 22px/1.2 var(--serif); }
+  .cap-hook { font-size: 14.5px; color: #C9CFD8; }
+  .show-frame:hover .cap-name { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+
+  .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 12px; margin-top: 18px; }
+  .tab {
+    --pc: var(--c); position: relative; display: flex; align-items: baseline; gap: 8px; padding: 14px 2px 6px; border: 0;
+    background: none; color: var(--muted); font: 500 14px/1.3 var(--sans); white-space: nowrap; text-align: left; cursor: pointer;
+  }
+  .tab::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--rule); }
+  .tab .bar { position: absolute; left: 0; top: 0; height: 2px; width: 0; background: var(--pc); z-index: 1; }
+  .tab.on .bar { width: 100%; }
+  .show.run .tab.on .bar { width: 0; animation: fill var(--dwell, 5s) linear forwards; }
+  .show.paused .tab.on .bar { animation-play-state: paused; }
+  @keyframes fill { to { width: 100%; } }
+  .tab .tn { font: 600 12px/1 var(--mono); color: var(--pc); }
+  .tab:hover, .tab.on { color: var(--text); }
+  @media (prefers-color-scheme: dark) { .hero, .tab { --pc: var(--cd); } }
+
   .stats {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 32px;
     margin: clamp(56px, 7vw, 80px) 0 0; padding: 0;
@@ -100,6 +139,20 @@
   .stats div { border-top: 1px solid var(--rule); padding-top: 18px; }
   .stats dt { font: 500 clamp(30px, 3.4vw, 40px)/1 var(--serif); letter-spacing: -.01em; }
   .stats dd { margin: 10px 0 0; font-size: 15px; color: var(--muted); line-height: 1.45; }
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero h1 br { display: none; }
+  }
+  @media (max-width: 640px) {
+    .tabs { grid-template-columns: 1fr 1fr; }
+    .cap-hook { display: none; }
+    .show-cap { padding: 32px 16px 14px; }
+    .cap-name { font-size: 19px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .slide { transition: none; transform: none; }
+    .rot-in.swap { animation: none; }
+  }
 
   /* ---------------------------------------------------------------- index */
   .index { padding-bottom: clamp(72px, 10vw, 120px); }
@@ -220,10 +273,37 @@
 </header>
 
 <main>
-  <section class="hero wrap">
-    <p class="label">Portfolio · New York</p>
-    <h1>Six systems, built from scratch and running live.</h1>
-    <p class="sub">Post-quantum security, reinforcement learning, quantitative finance and interactive art. Each project is deployed to a public URL, tested in continuous integration, and documented in a technical report.</p>
+  <section class="hero wrap" style="--c: #3F55C4; --cd: #93A5F4">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <p class="label">Dan Lichtenberger · New York</p>
+        <h1 aria-label="I build and ship, from scratch, software in security, machine learning, finance and art.">
+          <span aria-hidden="true">I build and ship, <br>from scratch,</span>
+          <span class="rot" aria-hidden="true"><span class="rot-in">cryptography.</span></span>
+        </h1>
+        <p class="sub">Six projects, each live at a public URL, tested in continuous integration, and written up in a technical report.</p>
+        <p class="hero-cta"><a class="btn" href="#work">See the work ↓</a><a href="reports.html">Technical reports</a></p>
+      </div>
+      <div class="show" aria-label="Project showcase">
+        <a class="show-frame" href="#quantumsafe" aria-label="Go to QuantumSafe Scan">
+          <img class="slide on" src="media/quantumsafe-scan.webp" alt="" fetchpriority="high" decoding="async">
+          <img class="slide" src="media/rltrader-lab.webp" alt="" loading="eager" decoding="async">
+          <img class="slide" src="media/tradeski-dashboard.webp" alt="" loading="eager" decoding="async">
+          <img class="slide" src="media/alphaglyph-replay.webp" alt="" loading="eager" decoding="async">
+          <img class="slide" src="media/rlchess-selfplay.webp" alt="" loading="eager" decoding="async">
+          <img class="slide" src="media/neuralcanvas-paint.webp" alt="" loading="eager" decoding="async">
+          <span class="show-cap"><span class="cap-name">QuantumSafe Scan</span><span class="cap-hook">Finds the cryptography quantum computers will break</span></span>
+        </a>
+        <div class="tabs">
+          <button type="button" class="tab on" style="--c: #3F55C4; --cd: #93A5F4" data-id="quantumsafe" data-phrase="cryptography." data-hook="Finds the cryptography quantum computers will break" aria-pressed="true"><span class="bar"></span><span class="tn">01</span><span class="tt">QuantumSafe Scan</span></button>
+          <button type="button" class="tab" style="--c: #5A7400; --cd: #C9F03A" data-id="rl-trader" data-phrase="machine learning." data-hook="A trading agent and a paper on telling skill from luck" aria-pressed="false"><span class="bar"></span><span class="tn">02</span><span class="tt">RL Trader</span></button>
+          <button type="button" class="tab" style="--c: #1F63D6; --cd: #6AA6FF" data-id="tradeski" data-phrase="real-time markets." data-hook="A live market dashboard with an AI analyst" aria-pressed="false"><span class="bar"></span><span class="tn">03</span><span class="tt">Tradeski</span></button>
+          <button type="button" class="tab" style="--c: #17793A; --cd: #4CC765" data-id="alphaglyph" data-phrase="quantitative finance." data-hook="A backtesting lab that tests for skill versus luck" aria-pressed="false"><span class="bar"></span><span class="tn">04</span><span class="tt">AlphaGlyph</span></button>
+          <button type="button" class="tab" style="--c: #8F6424; --cd: #D4AE70" data-id="rl-chess" data-phrase="game-playing AI." data-hook="An AlphaZero-style engine that teaches itself" aria-pressed="false"><span class="bar"></span><span class="tn">05</span><span class="tt">Chess Engine</span></button>
+          <button type="button" class="tab" style="--c: #6A55D8; --cd: #BFB5FA" data-id="neural-canvas" data-phrase="interactive art." data-hook="Paint light in mid-air with your hands" aria-pressed="false"><span class="bar"></span><span class="tn">06</span><span class="tt">Neural Canvas</span></button>
+        </div>
+      </div>
+    </div>
     <dl class="stats">
       <div><dt class="num">6 / 6</dt><dd>projects deployed and live</dd></div>
       <div><dt class="num" data-claim="tests-total">1,865</dt><dd>automated tests running in CI</dd></div>
@@ -501,6 +581,44 @@
   } else {
     items.forEach(function (el) { el.classList.add("in"); });
   }
+
+  /* Hero showcase: cycles through the six projects; the headline's last line
+     names each one's field in its colour. Pauses on hover or focus, and does
+     not advance on its own under reduced motion. */
+  (function () {
+    var show = document.querySelector(".show"); if (!show) return;
+    var hero = document.querySelector(".hero");
+    var tabs = Array.prototype.slice.call(show.querySelectorAll(".tab"));
+    var slides = show.querySelectorAll(".slide");
+    var frame = show.querySelector(".show-frame");
+    var rot = document.querySelector(".rot-in");
+    var name = show.querySelector(".cap-name"), hook = show.querySelector(".cap-hook");
+    var i = 0, timer = null, DWELL = 5000;
+    function select(n) {
+      i = (n + tabs.length) % tabs.length;
+      var t = tabs[i];
+      tabs.forEach(function (x, k) { x.classList.toggle("on", k === i); x.setAttribute("aria-pressed", String(k === i)); });
+      Array.prototype.forEach.call(slides, function (sl, k) { sl.classList.toggle("on", k === i); });
+      hero.style.setProperty("--c", t.style.getPropertyValue("--c"));
+      hero.style.setProperty("--cd", t.style.getPropertyValue("--cd"));
+      frame.setAttribute("href", "#" + t.getAttribute("data-id"));
+      var nm = t.querySelector(".tt").textContent;
+      frame.setAttribute("aria-label", "Go to " + nm);
+      name.textContent = nm; hook.textContent = t.getAttribute("data-hook");
+      rot.classList.remove("swap"); void rot.offsetWidth; rot.classList.add("swap");
+      setTimeout(function () { rot.textContent = t.getAttribute("data-phrase"); }, reduce ? 0 : 300);
+      if (show.classList.contains("run")) { var b = t.querySelector(".bar"); b.style.animation = "none"; void b.offsetWidth; b.style.animation = ""; }
+    }
+    function start() { if (reduce || timer) return; show.classList.add("run"); show.classList.remove("paused");
+                       timer = setInterval(function () { select(i + 1); }, DWELL); }
+    function stop() { clearInterval(timer); timer = null; show.classList.add("paused"); }
+    tabs.forEach(function (t, k) { t.addEventListener("click", function () { stop(); select(k); show.classList.remove("run"); }); });
+    show.addEventListener("pointerenter", stop);
+    show.addEventListener("pointerleave", function () { if (show.classList.contains("run")) { timer = null; start(); } });
+    show.addEventListener("focusin", stop);
+    document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); else if (show.classList.contains("run")) { timer = null; start(); } });
+    start();
+  })();
 
   /* Recordings load only when reached, play while on screen, and can be paused.
      With reduced motion they wait for a click. */

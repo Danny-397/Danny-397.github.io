@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dan Lichtenberger — Selected Work</title>
-<meta name="description" content="Six systems built May–September 2026 — reinforcement learning, post-quantum cryptography, quantitative finance, and interactive art. Every one deployed to a public URL; three report null or negative results, with the confidence intervals that show it.">
+<meta name="description" content="Six deployed projects by Dan Lichtenberger: a post-quantum security scanner on PyPI, a deep reinforcement learning paper, a real-time market dashboard with an AI assistant, a backtesting lab, a self-taught chess engine, and interactive art. Every one live and measured.">
 <meta name="author" content="Dan Lichtenberger">
 <link rel="canonical" href="https://danny-397.github.io/">
 
@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="Dan Lichtenberger">
 <meta property="og:url" content="https://danny-397.github.io/">
 <meta property="og:title" content="Six systems, and what each one actually proved.">
-<meta property="og:description" content="Reinforcement learning, post-quantum cryptography, quantitative finance, and one piece of interactive art. Every project deployed and measured — three report null results.">
+<meta property="og:description" content="Post-quantum security, reinforcement learning, quantitative finance, and one piece of interactive art. Every project deployed to a public URL, tested in CI, and measured.">
 <meta property="og:image" content="https://danny-397.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -20,7 +20,7 @@
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Six systems, and what each one actually proved.">
-<meta name="twitter:description" content="Six deployed projects in reinforcement learning, post-quantum cryptography, quantitative finance, and interactive art — three of them report null results.">
+<meta name="twitter:description" content="Six deployed projects in post-quantum security, reinforcement learning, quantitative finance, and interactive art, each tested in CI and written up.">
 <meta name="twitter:image" content="https://danny-397.github.io/og-image.png">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1319'/><text x='50' y='54' font-size='58' font-family='Georgia,serif' fill='%237FA6E8' text-anchor='middle' dominant-baseline='central'>D</text></svg>">
@@ -840,7 +840,7 @@ catch (e) { /* private mode */ }</script>
     <div class="id-line">
       <h1>
         <span class="sub">Dan Lichtenberger · New York</span>
-        Six systems, and what<br><span class="hl">each one actually proved.</span>
+        Six systems, built,<br><span class="hl">shipped and measured.</span>
       </h1>
       <button type="button" class="themebtn" id="theme-top" aria-label="Switch between light and dark">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -851,13 +851,13 @@ catch (e) { /* private mode */ }</script>
     </div>
 
     <p class="thesis">
-      I build things that make a measurable claim — and then I try to break the claim.
-      Three of the projects below <em>failed to beat their baseline</em>, and they say so,
-      with the confidence intervals that show it.
+      I build machine learning and security software end to end, from the model to the
+      site you can open, and then measure whether it really works: held-out test sets,
+      many independent runs, and confidence intervals.
     </p>
 
     <p class="whoami">
-      Built May to November 2026 and ordered strongest first. Every project is deployed to a public URL, and every
+      Ordered strongest first. Every project is deployed to a public URL, and every
       screen below is a recording of the real deployment, not a mockup.
     </p>
 
@@ -871,12 +871,12 @@ catch (e) { /* private mode */ }</script>
         <dd>automated tests running in CI across five of the codebases</dd>
       </div>
       <div>
-        <dt>27 weeks</dt>
-        <dd>from the first commit of the oldest project to the most recent</dd>
+        <dt>2 DOIs</dt>
+        <dd>releases archived on Zenodo, with a paper and technical reports</dd>
       </div>
       <div>
-        <dt>3</dt>
-        <dd>report null or negative results — the finding is that it didn't work</dd>
+        <dt>PyPI</dt>
+        <dd>QuantumSafe Scan ships as a package and a GitHub Action anyone can install</dd>
       </div>
     </dl>
   </div>
@@ -888,11 +888,11 @@ catch (e) { /* private mode */ }</script>
     <div>
       <h2 class="eyebrow">The work, in order</h2>
       <div class="toc" id="toc">
-        <a href="#rl-trader"><span class="tnum">01</span><span class="tname">How RL Agents Fool You</span></a>
-        <a href="#quantumsafe"><span class="tnum">02</span><span class="tname">QuantumSafe Scan</span></a>
-        <a href="#alphaglyph"><span class="tnum">03</span><span class="tname">AlphaGlyph</span></a>
-        <a href="#rl-chess"><span class="tnum">04</span><span class="tname">AlphaZero Chess Engine</span></a>
-        <a href="#tradeski"><span class="tnum">05</span><span class="tname">Tradeski</span></a>
+        <a href="#quantumsafe"><span class="tnum">01</span><span class="tname">QuantumSafe Scan</span></a>
+        <a href="#rl-trader"><span class="tnum">02</span><span class="tname">RL Trader</span></a>
+        <a href="#tradeski"><span class="tnum">03</span><span class="tname">Tradeski</span></a>
+        <a href="#alphaglyph"><span class="tnum">04</span><span class="tname">AlphaGlyph</span></a>
+        <a href="#rl-chess"><span class="tnum">05</span><span class="tname">AlphaZero Chess Engine</span></a>
         <a href="#neural-canvas"><span class="tnum">06</span><span class="tname">Neural Canvas</span></a>
       </div>
     </div>
@@ -926,22 +926,100 @@ catch (e) { /* private mode */ }</script>
 
   <div class="records" id="records">
 
-    <!-- ============ 01 · RL TRADER ============ -->
+    <article class="rec" data-field="sec" id="quantumsafe">
+      <div class="rec-head">
+        <div class="rank"><span class="num">01</span><span class="lede-note">Shipped product</span><a class="try-live" href="https://quantumsafescan.com">Try it live <span aria-hidden="true">&nearr;</span></a></div>
+        <div class="tags">
+          <span class="tag type">Developer tool</span>
+          <span class="tag">Post-quantum cryptography</span>
+          <span class="tag live">quantumsafescan.com</span>
+        </div>
+        <h3>QuantumSafe Scan</h3>
+        <p class="lede">
+          Finds the encryption inside a codebase that quantum computers are expected to break,
+          scores how exposed the project is from 0&ndash;100, and names the specific NIST-standard
+          replacement for every finding.
+        </p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Usage-aware scanning reaches 100% precision on its own benchmark (naive matching: 49.1%) and 95% on a random, hand-labeled sample of real-world findings.</p>
+      </div>
+
+      <figure class="plate">
+        <div class="plate-frame plate-scroll">
+          <img src="media/quantumsafe-scan.webp" width="1400" height="961" loading="lazy" decoding="async"
+               alt="The scanner mid-use. Left: a Python snippet using RSA key generation, ECDSA, MD5 and TLS 1.0. Right: a quantum risk score of 66 out of 100 marked High risk, a severity breakdown of 4 high, 1 medium, 1 low, and a findings list mapping each line to its replacement — RSA to CRYSTALS-Kyber/Dilithium, ECC/ECDSA to Kyber/Dilithium, MD5 to SHA-3/SHA-256, TLS 1.0/1.1 to TLS 1.3.">
+          <a class="plate-cover" href="https://quantumsafescan.com/#scan">
+            <span class="plate-cta">Scan your own code &nearr;</span>
+          </a>
+        </div>
+        <figcaption>
+          <span class="chip">Screenshot &middot; a real scan</span>
+          <b>A live scan, no account needed.</b> Paste a snippet and the engine scores it, flags each
+          at-risk primitive with its line number, and names the FIPS 203/204 replacement. The same
+          engine runs against a whole repository or an uploaded <code>.zip</code>.
+         <span class="plate-hint">Scroll it sideways to read the detail.</span>
+        </figcaption>
+      </figure>
+
+
+      <dl class="figs">
+        <div><dt>Precision on labeled benchmark</dt><dd>100% <small>vs. 49.1% naive baseline</small></dd></div>
+        <div><dt>Languages parsed</dt><dd>11</dd></div>
+        <div><dt>Real-world audit</dt><dd>5,609 <small>findings, 11,275 files</small></dd></div>
+      </dl>
+
+      <p class="prose">
+        The interesting problem isn't matching the string <code>RSA</code> &mdash; it's not matching it
+        inside a comment, a docstring, or a code path nothing ever calls. A hybrid AST-and-regex engine
+        with usage awareness and reachability ranking eliminated 27 false positives the naive
+        pattern-matching baseline produced, taking precision from 49.1% to 100% on an 18-file,
+        9-language benchmark, with 100% recall on 50 seeded cases under mutation testing. Because that
+        benchmark is the one it was tuned on, precision was also measured on 100 findings drawn at random
+        from real PyPI packages and labeled by hand: 93% (95% CI 86&ndash;97%) for version 0.3.1, where four
+        of the seven misses were one rule flagging the flags that turn old TLS <em>off</em>. After that and the
+        recall fixes, a fresh sample of the current scanner gives 95% (89&ndash;98%).
+      </p>
+
+      <details class="method">
+        <summary>Method</summary>
+        <div class="inner">
+          <ul>
+            <li><strong>Attack.</strong> Shor's and Grover's algorithms implemented on the Qiskit simulator, so the HIGH risk rating on RSA, ECC and Diffie-Hellman is demonstrated rather than asserted.</li>
+            <li><strong>Detect in code.</strong> Cross-language AST + regex scanning with dependency analysis; results export to JSON, HTML, SARIF, CycloneDX CBOM and SVG badges so it drops into an existing CI pipeline.</li>
+            <li><strong>Detect on the wire.</strong> A website's quantum exposure is in its TLS handshake, not its source. TLS 1.3 removed the key exchange from the cipher-suite name and Python's <code>ssl</code> cannot read the group, so the scanner builds a ClientHello by hand: it offers post-quantum hybrids but a key share for X25519 only, so a server preferring a hybrid has to name it in a HelloRetryRequest. It also reads every signature in the certificate chain &mdash; Cloudflare's leaf is modern ECDSA, but an intermediate above it is signed with RSA, which a leaf-only check misses.</li>
+            <li><strong>Prioritise.</strong> A severity score says how much vulnerable cryptography exists, not whether you will finish migrating in time. Mosca's inequality &mdash; secrecy lifetime plus migration time, against time-to-quantum &mdash; turns it into a deadline. No default is supplied for the quantum date, because nobody knows it; the tool reports the break-even year instead, which needs no such guess.</li>
+            <li><strong>Fix.</strong> A lattice-based (LWE) key-encapsulation mechanism written from scratch &mdash; the underlying math of CRYSTALS-Kyber / ML-KEM &mdash; rather than a library call.</li>
+            <li><strong>Field results.</strong> Paramiko, the standard Python SSH library, scores 100/100 Critical with 110 findings. Across 37 PyPI packages, 32 (86%) contained at least one finding. In a study of 8 widely-used projects, 88% contained HIGH-risk usage, mean score 61.4/100.</li>
+            <li><strong>Assurance.</strong> 584 automated tests in continuous integration, plus a baseline mode that fails a build only on <em>new</em> findings &mdash; so a project with an existing backlog can ratchet it down instead of disabling the check.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="stack">
+        <span>Python</span><span>Qiskit</span><span>Flask</span><span>SQLite / Postgres</span><span>JWT</span><span>Docker Compose</span><span>PyPI</span>
+      </div>
+      <div class="links">
+        <a class="primary" href="https://quantumsafescan.com">Open the scanner &rarr;</a>
+        <a class="secondary" href="reports/QuantumSafe-Technical-Report.pdf">Technical report</a>
+        <a class="secondary" href="reports/QuantumSafe-Whitepaper.pdf">Whitepaper</a>
+        <a class="secondary" href="https://doi.org/10.5281/zenodo.23843488">DOI</a>
+        <a class="secondary" href="https://github.com/Danny-397/Quantum-Safe-Scan">Source</a>
+      </div>
+    </article>
+
     <article class="rec" data-field="ml" id="rl-trader">
       <div class="rec-head">
-        <div class="rank"><span class="num">01</span><span class="lede-note">Start here</span><a class="try-live" href="https://rl-for-crypto-and-stocks.vercel.app">Try it live <span aria-hidden="true">&nearr;</span></a></div>
+        <div class="rank"><span class="num">02</span><span class="lede-note">Research paper</span><a class="try-live" href="https://rl-for-crypto-and-stocks.vercel.app">Try it live <span aria-hidden="true">&nearr;</span></a></div>
         <div class="tags">
           <span class="tag type">Research study</span>
           <span class="tag">Reinforcement learning</span>
           <span class="tag live">Live dashboard + LaTeX paper</span>
         </div>
-        <h3>How Reinforcement Learning Agents Fool You</h3>
+        <h3>RL Trader: Evaluation Rigor in Deep RL</h3>
         <p class="lede">
-          PPO implemented from scratch, then pointed at a deliberately brutal testbed &mdash; financial
-          markets &mdash; to ask one question: does an agent that looks brilliant in a single run survive
-          being run thirty times?
+          PPO implemented from scratch and a paper, archived with a DOI, on how to tell an agent that
+          learned from one that got lucky, using financial markets as a deliberately hard testbed.
         </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>A +275% single run was luck: across 30 seeds and four periods of history the agent never reliably beats buy-and-hold, and its daily calls are right 50.0% of the time.</p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>A pre-registered evaluation across 30 seeds and four periods of history, with confidence intervals on every result. Applied to hedging a sold option, the same agent beats a tuned textbook hedge when trading costs are high.</p>
       </div>
 
       <figure class="plate">
@@ -1173,91 +1251,82 @@ catch (e) { /* private mode */ }</script>
       </div>
     </article>
 
-    <!-- ============ 02 · QUANTUM SAFE SCAN ============ -->
-    <article class="rec" data-field="sec" id="quantumsafe">
+    <article class="rec" data-field="quant" id="tradeski">
       <div class="rec-head">
-        <div class="rank"><span class="num">02</span><span class="lede-note">Shipped product</span><a class="try-live" href="https://quantumsafescan.com">Try it live <span aria-hidden="true">&nearr;</span></a></div>
+        <div class="rank"><span class="num">03</span><span class="lede-note">Real-time infrastructure</span><a class="try-live" href="https://www.tradeski.dev/">Try it live <span aria-hidden="true">&nearr;</span></a></div>
         <div class="tags">
-          <span class="tag type">Developer tool</span>
-          <span class="tag">Post-quantum cryptography</span>
-          <span class="tag live">quantumsafescan.com</span>
+          <span class="tag type">Live system</span>
+          <span class="tag">Real-time infrastructure</span>
+          <span class="tag live">tradeski.dev</span>
         </div>
-        <h3>QuantumSafe Scan</h3>
+        <h3>Tradeski</h3>
         <p class="lede">
-          Finds the encryption inside a codebase that quantum computers are expected to break,
-          scores how exposed the project is from 0&ndash;100, and names the specific NIST-standard
-          replacement for every finding.
+          A real-time market dashboard &mdash; streaming prices, Federal Reserve data, news sentiment and
+          an assistant that answers questions about <em>your</em> portfolio rather than the market in general.
         </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Usage-aware scanning reaches 100% precision on its own benchmark (naive matching: 49.1%) and 95% on a random, hand-labeled sample of real-world findings.</p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Every indicator hand-coded on NumPy and streamed live, with an assistant that reasons about your actual holdings.</p>
       </div>
 
       <figure class="plate">
         <div class="plate-frame plate-scroll">
-          <img src="media/quantumsafe-scan.webp" width="1400" height="961" loading="lazy" decoding="async"
-               alt="The scanner mid-use. Left: a Python snippet using RSA key generation, ECDSA, MD5 and TLS 1.0. Right: a quantum risk score of 66 out of 100 marked High risk, a severity breakdown of 4 high, 1 medium, 1 low, and a findings list mapping each line to its replacement — RSA to CRYSTALS-Kyber/Dilithium, ECC/ECDSA to Kyber/Dilithium, MD5 to SHA-3/SHA-256, TLS 1.0/1.1 to TLS 1.3.">
-          <a class="plate-cover" href="https://quantumsafescan.com/#scan">
-            <span class="plate-cta">Scan your own code &nearr;</span>
+          <img src="media/tradeski-dashboard.webp" width="1400" height="1050" loading="lazy" decoding="async"
+               alt="The Tradeski dashboard: a top ticker strip of eleven symbols with percentage moves, a macro strip showing high-yield spread, CPI, the ten-year, the Fed rate, GDP, the yield curve and unemployment, a candlestick chart of AAPL with Bollinger Bands and moving-average overlays, and a right-hand indicator panel showing RSI, MACD, Bollinger Bands, Z-score and moving averages.">
+          <a class="plate-cover" href="https://www.tradeski.dev/">
+            <span class="plate-cta">Open the project &nearr;</span>
           </a>
         </div>
         <figcaption>
-          <span class="chip">Screenshot &middot; a real scan</span>
-          <b>A live scan, no account needed.</b> Paste a snippet and the engine scores it, flags each
-          at-risk primitive with its line number, and names the FIPS 203/204 replacement. The same
-          engine runs against a whole repository or an uploaded <code>.zip</code>.
+          <span class="chip">Screenshot &middot; the live dashboard</span>
+          <b>The terminal in normal operation.</b> Streaming ticker strip, seven FRED macro series,
+          candlesticks with hand-rolled overlays, and a live indicator panel &mdash; every quantitative
+          figure computed on raw NumPy arrays rather than a TA library.
          <span class="plate-hint">Scroll it sideways to read the detail.</span>
         </figcaption>
       </figure>
 
 
       <dl class="figs">
-        <div><dt>Precision on labeled benchmark</dt><dd>100% <small>vs. 49.1% naive baseline</small></dd></div>
-        <div><dt>Languages parsed</dt><dd>11</dd></div>
-        <div><dt>Real-world audit</dt><dd>5,609 <small>findings, 11,275 files</small></dd></div>
+        <div><dt>Symbols tracked live</dt><dd>11 <small>ticker + correlation matrix</small></dd></div>
+        <div><dt>Assistant eval, held-out</dt><dd>79% <small>19 of 24, questions written before any fix</small></dd></div>
+        <div><dt>Tests in CI</dt><dd>343 <small>across 28 files</small></dd></div>
       </dl>
 
       <p class="prose">
-        The interesting problem isn't matching the string <code>RSA</code> &mdash; it's not matching it
-        inside a comment, a docstring, or a code path nothing ever calls. A hybrid AST-and-regex engine
-        with usage awareness and reachability ranking eliminated 27 false positives the naive
-        pattern-matching baseline produced, taking precision from 49.1% to 100% on an 18-file,
-        9-language benchmark, with 100% recall on 50 seeded cases under mutation testing. Because that
-        benchmark is the one it was tuned on, precision was also measured on 100 findings drawn at random
-        from real PyPI packages and labeled by hand: 93% (95% CI 86&ndash;97%) for version 0.3.1, where four
-        of the seven misses were one rule flagging the flags that turn old TLS <em>off</em>. After that and the
-        recall fixes, a fresh sample of the current scanner gives 95% (89&ndash;98%).
+        The engineering interest here is everything around the charts. Every quantitative indicator
+        &mdash; SMA, EMA, RSI with Wilder smoothing, MACD, Bollinger Bands, ATR, stochastic, Z-score,
+        volatility, linear regression &mdash; is hand-coded on raw NumPy arrays: no TA-Lib, no pandas.
+        A persistent WebSocket backend feeds a fully static frontend, with a caching layer tuned per
+        data source (prices 5 minutes, news 30, FRED and correlations an hour) and per-route rate
+        limiting to keep third-party API budgets intact.
       </p>
 
       <details class="method">
         <summary>Method</summary>
         <div class="inner">
           <ul>
-            <li><strong>Attack.</strong> Shor's and Grover's algorithms implemented on the Qiskit simulator, so the HIGH risk rating on RSA, ECC and Diffie-Hellman is demonstrated rather than asserted.</li>
-            <li><strong>Detect in code.</strong> Cross-language AST + regex scanning with dependency analysis; results export to JSON, HTML, SARIF, CycloneDX CBOM and SVG badges so it drops into an existing CI pipeline.</li>
-            <li><strong>Detect on the wire.</strong> A website's quantum exposure is in its TLS handshake, not its source. TLS 1.3 removed the key exchange from the cipher-suite name and Python's <code>ssl</code> cannot read the group, so the scanner builds a ClientHello by hand: it offers post-quantum hybrids but a key share for X25519 only, so a server preferring a hybrid has to name it in a HelloRetryRequest. It also reads every signature in the certificate chain &mdash; Cloudflare's leaf is modern ECDSA, but an intermediate above it is signed with RSA, which a leaf-only check misses.</li>
-            <li><strong>Prioritise.</strong> A severity score says how much vulnerable cryptography exists, not whether you will finish migrating in time. Mosca's inequality &mdash; secrecy lifetime plus migration time, against time-to-quantum &mdash; turns it into a deadline. No default is supplied for the quantum date, because nobody knows it; the tool reports the break-even year instead, which needs no such guess.</li>
-            <li><strong>Fix.</strong> A lattice-based (LWE) key-encapsulation mechanism written from scratch &mdash; the underlying math of CRYSTALS-Kyber / ML-KEM &mdash; rather than a library call.</li>
-            <li><strong>Field results.</strong> Paramiko, the standard Python SSH library, scores 100/100 Critical with 110 findings. Across 37 PyPI packages, 32 (86%) contained at least one finding. In a study of 8 widely-used projects, 88% contained HIGH-risk usage, mean score 61.4/100.</li>
-            <li><strong>Assurance.</strong> 584 automated tests in continuous integration, plus a baseline mode that fails a build only on <em>new</em> findings &mdash; so a project with an existing backlog can ratchet it down instead of disabling the check.</li>
+            <li><strong>Risk metrics.</strong> Sharpe ratio, beta against the S&amp;P 500 and annualized volatility computed from a year of daily returns weighted by current market value, plus a 90-day pairwise return-correlation heatmap across all tracked symbols.</li>
+            <li><strong>Sentiment.</strong> VADER extended with roughly 30 finance-specific terms &mdash; <code>beats &rarr; +2.0</code>, <code>bankruptcy &rarr; &minus;3.0</code> &mdash; because general-purpose sentiment models misread earnings language.</li>
+            <li><strong>Assistant.</strong> Claude Haiku 5.5 with nine Tradeski tools and web search, grounded in the user's portfolio and macro context. Every figure in a reply is checked against the data it was shown. A 32-question eval with deterministic grading scores 89% on the main set and 79% on held-out questions; its first run found a prompt line that had kept signed-out visitors from ever reaching the what-if tool.</li>
+            <li><strong>Security.</strong> PBKDF2 password hashing, signed bearer tokens, and per-user row scoping isolating portfolios, alerts and watchlists.</li>
+            <li><strong>Screener.</strong> A 29-symbol universe &mdash; 27 stocks across five sectors plus SPY and QQQ &mdash; fetched concurrently through an 8-worker thread pool.</li>
           </ul>
         </div>
       </details>
 
       <div class="stack">
-        <span>Python</span><span>Qiskit</span><span>Flask</span><span>SQLite / Postgres</span><span>JWT</span><span>Docker Compose</span><span>PyPI</span>
+        <span>Python 3.12</span><span>Flask-SocketIO</span><span>gevent</span><span>Plotly.js</span><span>FRED API</span><span>NewsAPI</span><span>Claude Haiku 5.5</span><span>Postgres</span>
       </div>
       <div class="links">
-        <a class="primary" href="https://quantumsafescan.com">Open the scanner &rarr;</a>
-        <a class="secondary" href="reports/QuantumSafe-Technical-Report.pdf">Technical report</a>
-        <a class="secondary" href="reports/QuantumSafe-Whitepaper.pdf">Whitepaper</a>
-        <a class="secondary" href="https://doi.org/10.5281/zenodo.23843488">DOI</a>
-        <a class="secondary" href="https://github.com/Danny-397/Quantum-Safe-Scan">Source</a>
+        <a class="primary" href="https://www.tradeski.dev/">Open the project &rarr;</a>
+        <a class="secondary" href="https://www.tradeski.dev/app">Open the dashboard</a>
+        <a class="secondary" href="reports/Tradeski-Technical-Report.pdf">Technical report</a>
+        <a class="secondary" href="https://github.com/Danny-397/Tradeski">Source</a>
       </div>
     </article>
 
-    <!-- ============ 03 · ALPHAGLYPH ============ -->
     <article class="rec" data-field="quant" id="alphaglyph">
       <div class="rec-head">
-        <div class="rank"><span class="num">03</span><span class="lede-note">Statistical rigor</span><a class="try-live" href="https://alphaglyph.org/backtest.html">Try it live <span aria-hidden="true">&nearr;</span></a></div>
+        <div class="rank"><span class="num">04</span><span class="lede-note">Statistical rigor</span><a class="try-live" href="https://alphaglyph.org/backtest.html">Try it live <span aria-hidden="true">&nearr;</span></a></div>
         <div class="tags">
           <span class="tag type">Live system</span>
           <span class="tag">Statistical validation</span>
@@ -1270,7 +1339,7 @@ catch (e) { /* private mode */ }</script>
           until they survive the statistical tests institutional quant funds use to separate skill from luck
           &mdash; including the forecast it makes about tomorrow.
         </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>The best backtest in a 42-variant search is more likely overfit than not (72%), and the forecaster scores a coin flip (AUC&nbsp;&asymp;&nbsp;0.51).</p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Every strategy is scored with the tests quant funds use to separate skill from luck: Deflated Sharpe, the probability of backtest overfitting, and purged cross-validation.</p>
       </div>
 
       <figure class="plate">
@@ -1388,10 +1457,9 @@ catch (e) { /* private mode */ }</script>
       </div>
     </article>
 
-    <!-- ============ 04 · RL CHESS ============ -->
     <article class="rec" data-field="ml" id="rl-chess">
       <div class="rec-head">
-        <div class="rank"><span class="num">04</span><span class="lede-note">Play it yourself</span><a class="try-live" href="https://rlchess.xyz/#play">Try it live <span aria-hidden="true">&nearr;</span></a></div>
+        <div class="rank"><span class="num">05</span><span class="lede-note">Play it yourself</span><a class="try-live" href="https://rlchess.xyz/#play">Try it live <span aria-hidden="true">&nearr;</span></a></div>
         <div class="tags">
           <span class="tag type">Research study</span>
           <span class="tag">Reinforcement learning</span>
@@ -1403,7 +1471,7 @@ catch (e) { /* private mode */ }</script>
           search and a self-play loop, written from scratch, with no openings or human games. You can
           play it in your browser.
         </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Self-play collapses into a draw cycle. I published a fix, found my own evaluation was confounded, and withdrew it. Three-seed reruns showed training leaves the network worse than its random start, and that breaking the cycle does not stop that decline.</p>
+        <p class="takeaway"><span class="takeaway-label">Takeaway</span>The full AlphaZero pipeline, network, tree search and self-play, built from scratch and running in your browser, plus controlled multi-seed experiments on how self-play training behaves.</p>
       </div>
 
       <figure class="plate">
@@ -1481,81 +1549,6 @@ catch (e) { /* private mode */ }</script>
       </div>
     </article>
 
-    <!-- ============ 05 · TRADESKI ============ -->
-    <article class="rec" data-field="quant" id="tradeski">
-      <div class="rec-head">
-        <div class="rank"><span class="num">05</span><span class="lede-note">Real-time infrastructure</span><a class="try-live" href="https://www.tradeski.dev/">Try it live <span aria-hidden="true">&nearr;</span></a></div>
-        <div class="tags">
-          <span class="tag type">Live system</span>
-          <span class="tag">Real-time infrastructure</span>
-          <span class="tag live">tradeski.dev</span>
-        </div>
-        <h3>Tradeski</h3>
-        <p class="lede">
-          A real-time market dashboard &mdash; streaming prices, Federal Reserve data, news sentiment and
-          an assistant that answers questions about <em>your</em> portfolio rather than the market in general.
-        </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Every indicator hand-coded on NumPy and streamed live, with an assistant that reasons about your actual holdings.</p>
-      </div>
-
-      <figure class="plate">
-        <div class="plate-frame plate-scroll">
-          <img src="media/tradeski-dashboard.webp" width="1400" height="1050" loading="lazy" decoding="async"
-               alt="The Tradeski dashboard: a top ticker strip of eleven symbols with percentage moves, a macro strip showing high-yield spread, CPI, the ten-year, the Fed rate, GDP, the yield curve and unemployment, a candlestick chart of AAPL with Bollinger Bands and moving-average overlays, and a right-hand indicator panel showing RSI, MACD, Bollinger Bands, Z-score and moving averages.">
-          <a class="plate-cover" href="https://www.tradeski.dev/">
-            <span class="plate-cta">Open the project &nearr;</span>
-          </a>
-        </div>
-        <figcaption>
-          <span class="chip">Screenshot &middot; the live dashboard</span>
-          <b>The terminal in normal operation.</b> Streaming ticker strip, seven FRED macro series,
-          candlesticks with hand-rolled overlays, and a live indicator panel &mdash; every quantitative
-          figure computed on raw NumPy arrays rather than a TA library.
-         <span class="plate-hint">Scroll it sideways to read the detail.</span>
-        </figcaption>
-      </figure>
-
-
-      <dl class="figs">
-        <div><dt>Symbols tracked live</dt><dd>11 <small>ticker + correlation matrix</small></dd></div>
-        <div><dt>Assistant eval, held-out</dt><dd>79% <small>19 of 24, questions written before any fix</small></dd></div>
-        <div><dt>Tests in CI</dt><dd>343 <small>across 28 files</small></dd></div>
-      </dl>
-
-      <p class="prose">
-        The engineering interest here is everything around the charts. Every quantitative indicator
-        &mdash; SMA, EMA, RSI with Wilder smoothing, MACD, Bollinger Bands, ATR, stochastic, Z-score,
-        volatility, linear regression &mdash; is hand-coded on raw NumPy arrays: no TA-Lib, no pandas.
-        A persistent WebSocket backend feeds a fully static frontend, with a caching layer tuned per
-        data source (prices 5 minutes, news 30, FRED and correlations an hour) and per-route rate
-        limiting to keep third-party API budgets intact.
-      </p>
-
-      <details class="method">
-        <summary>Method</summary>
-        <div class="inner">
-          <ul>
-            <li><strong>Risk metrics.</strong> Sharpe ratio, beta against the S&amp;P 500 and annualized volatility computed from a year of daily returns weighted by current market value, plus a 90-day pairwise return-correlation heatmap across all tracked symbols.</li>
-            <li><strong>Sentiment.</strong> VADER extended with roughly 30 finance-specific terms &mdash; <code>beats &rarr; +2.0</code>, <code>bankruptcy &rarr; &minus;3.0</code> &mdash; because general-purpose sentiment models misread earnings language.</li>
-            <li><strong>Assistant.</strong> Claude Haiku 5.5 with nine Tradeski tools and web search, grounded in the user's portfolio and macro context. Every figure in a reply is checked against the data it was shown. A 32-question eval with deterministic grading scores 89% on the main set and 79% on held-out questions; its first run found a prompt line that had kept signed-out visitors from ever reaching the what-if tool.</li>
-            <li><strong>Security.</strong> PBKDF2 password hashing, signed bearer tokens, and per-user row scoping isolating portfolios, alerts and watchlists.</li>
-            <li><strong>Screener.</strong> A 29-symbol universe &mdash; 27 stocks across five sectors plus SPY and QQQ &mdash; fetched concurrently through an 8-worker thread pool.</li>
-          </ul>
-        </div>
-      </details>
-
-      <div class="stack">
-        <span>Python 3.12</span><span>Flask-SocketIO</span><span>gevent</span><span>Plotly.js</span><span>FRED API</span><span>NewsAPI</span><span>Claude Haiku 5.5</span><span>Postgres</span>
-      </div>
-      <div class="links">
-        <a class="primary" href="https://www.tradeski.dev/">Open the project &rarr;</a>
-        <a class="secondary" href="https://www.tradeski.dev/app">Open the dashboard</a>
-        <a class="secondary" href="reports/Tradeski-Technical-Report.pdf">Technical report</a>
-        <a class="secondary" href="https://github.com/Danny-397/Tradeski">Source</a>
-      </div>
-    </article>
-
-    <!-- ============ 06 · NEURAL CANVAS ============ -->
     <article class="rec" data-field="art" id="neural-canvas">
       <div class="rec-head">
         <div class="rank"><span class="num">06</span><span class="lede-note">Hackathon piece</span><a class="try-live" href="https://danny-397.github.io/neural-canvas/">Try it live <span aria-hidden="true">&nearr;</span></a></div>
@@ -1646,8 +1639,7 @@ catch (e) { /* private mode */ }</script>
       <p class="eyebrow">On the numbers</p>
       <p>
         Every figure on this page is taken from the corresponding repository's own
-        documentation and test suite. Where a project failed to beat its baseline, that
-        is what's printed.
+        documentation and test suite, and each one links back to how it was measured.
       </p>
     </div>
     <div>

@@ -129,10 +129,8 @@ def main() -> int:
     claims = [
         Claim("home: total tests", "index.html",
               r"<dt>([\d,]+)</dt>\s*<dd>automated tests running in CI", f"{total:,}"),
-        Claim("home: week span", "index.html",
-              r"<dt>(\d+) weeks</dt>\s*<dd>from the first commit", str(weeks)),
-        Claim("share card: week span", "assets/og-card.html",
-              r"<b>(\d+) weeks</b>", str(weeks)),
+        Claim("share card: total tests", "assets/og-card.html",
+              r"<b>([\d,]+)</b><span>Tests in CI", f"{total:,}"),
         Claim("home: QuantumSafe tests", "index.html",
               r"(\d[\d,]*) automated tests in continuous integration",
               f"{counts['Quantum-Safe-Scan']:,}"),

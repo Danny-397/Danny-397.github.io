@@ -78,8 +78,8 @@ catch (e) { /* private mode */ }</script>
   All figures verified against source on 2026-08-01; RL-Trader and Tradeski
   figures re-verified 2026-09-30.
 -->
-<p>Six projects, built May–August 2026. Each entry states what the project does and what
-it actually measured — including the three where the central idea did not hold up.</p>
+<p>Six projects, each deployed to a public URL. Each entry states what the project does
+and what it measured.</p>
 <p><strong>QuantumSafe Scan</strong> · <a href="https://quantumsafescan.com">quantumsafescan.com</a> · <a href="https://doi.org/10.5281/zenodo.23843488">DOI</a> — Finds
 cryptography a quantum computer would break, scores exposure 0–100, names the
 NIST-standard replacement. The hard part isn't matching <code>RSA</code>; it's <em>not</em> matching it
@@ -120,7 +120,7 @@ window-dependent, and the report documents that instability rather than quoting 
 friendlier run. 374 tests in CI.</p>
 <p><strong>Tradeski</strong> · <a href="https://www.tradeski.dev/">tradeski.dev</a> — Live market, macro, and
 sentiment data in one dashboard: 11 ticker symbols, 7 FRED series hourly, a 29-symbol
-screener, a retrieval-grounded assistant, 337 tests. Its most useful lesson was a bug:
+screener, a retrieval-grounded assistant, 343 tests. Its most useful lesson was a bug:
 live prices never reached the browser because the server emitted on one Socket.IO
 namespace while the client listened on another. Both halves were correct alone, and all
 71 tests passed throughout — every one of them tested a pure function, so no test

@@ -14,8 +14,8 @@
   figures re-verified 2026-09-30.
 -->
 
-Six projects, built May–August 2026. Each entry states what the project does and what
-it actually measured — including the three where the central idea did not hold up.
+Six projects, each deployed to a public URL. Each entry states what the project does
+and what it measured.
 
 **QuantumSafe Scan** · [quantumsafescan.com](https://quantumsafescan.com) · [DOI](https://doi.org/10.5281/zenodo.23843488) — Finds
 cryptography a quantum computer would break, scores exposure 0–100, names the

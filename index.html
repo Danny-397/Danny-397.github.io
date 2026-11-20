@@ -4,1983 +4,526 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dan Lichtenberger — Selected Work</title>
-<meta name="description" content="Six deployed projects by Dan Lichtenberger: a post-quantum security scanner on PyPI, a deep reinforcement learning paper, a real-time market dashboard with an AI assistant, a backtesting lab, a self-taught chess engine, and interactive art. Every one live and measured.">
+<meta name="description" content="Six projects by Dan Lichtenberger, built from scratch and running live: a post-quantum security scanner on PyPI, a deep reinforcement learning paper, a real-time market dashboard with an AI analyst, a backtesting lab, a self-taught chess engine, and hand-tracked interactive art.">
 <meta name="author" content="Dan Lichtenberger">
 <link rel="canonical" href="https://danny-397.github.io/">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Dan Lichtenberger">
 <meta property="og:url" content="https://danny-397.github.io/">
-<meta property="og:title" content="Six systems, and what each one actually proved.">
+<meta property="og:title" content="Dan Lichtenberger — six systems, built, shipped and measured">
 <meta property="og:description" content="Post-quantum security, reinforcement learning, quantitative finance, and one piece of interactive art. Every project deployed to a public URL, tested in CI, and measured.">
 <meta property="og:image" content="https://danny-397.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Dan Lichtenberger — six systems, and what each one actually proved.">
-
+<meta property="og:image:alt" content="Dan Lichtenberger — six systems, built, shipped and measured.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Six systems, and what each one actually proved.">
+<meta name="twitter:title" content="Dan Lichtenberger — six systems, built, shipped and measured">
 <meta name="twitter:description" content="Six deployed projects in post-quantum security, reinforcement learning, quantitative finance, and interactive art, each tested in CI and written up.">
 <meta name="twitter:image" content="https://danny-397.github.io/og-image.png">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1319'/><text x='50' y='54' font-size='58' font-family='Georgia,serif' fill='%237FA6E8' text-anchor='middle' dominant-baseline='central'>D</text></svg>">
-<script>document.documentElement.className += " js";
-/* Apply the saved theme here, before first paint. Setting it further down the
-   page meant a stored choice that disagreed with the OS flashed the wrong
-   colors on every load. */
-try { var savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark' || savedTheme === 'light')
-        document.documentElement.setAttribute('data-theme', savedTheme); }
-catch (e) { /* private mode */ }</script>
 <style>
   :root {
-    --bg:        #EAE7DF;
-    --bg-deep:   #DFDBD1;
-    --surface:   #F5F3ED;
-    --surface-2: #FBFAF6;
-    --text:      #15181E;
-    --muted:     #565B64;
-    --faint:     #5D6168;   /* 5.0:1 on the paper background (was 4.1:1) */
-    --rule:      #C7C3B8;
-    --rule-soft: #D9D6CC;
-    --accent:    #1F4B99;
-    --accent-ink:#173A78;
-    --accent-lift: #2E63BC;
-    --accent-wash: rgba(31,75,153,.085);
-    --accent-glow: rgba(31,75,153,.16);
-    --flag:      #A8402F;
-    --flag-wash: rgba(168,64,47,.09);
-    --ok:        #3F6B4F;
-    --plate:     #0E1218;
-    --shadow:    0 1px 2px rgba(20,24,32,.05), 0 8px 24px -12px rgba(20,24,32,.14);
-    --shadow-lift: 0 2px 4px rgba(20,24,32,.06), 0 18px 44px -18px rgba(20,24,32,.22);
+    --bg:      #EAE7DF;
+    --surface: #F3F1EB;
+    --text:    #15181E;
+    --muted:   #565B64;
+    --rule:    #CFCBC1;
+    --accent:  #1F4B99;
+    --accent-hover: #173A78;
+    --plate:   #0E1218;
+    --frame-edge: rgba(20,24,32,.10);
+    --shadow:  0 1px 2px rgba(20,24,32,.05), 0 24px 48px -28px rgba(20,24,32,.35);
 
-    --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","Hoefler Text",Georgia,serif;
-    --sans: "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
-    --mono: ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SF Mono",Menlo,"DejaVu Sans Mono",monospace;
+    --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --sans:  "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    --mono:  ui-monospace,"Cascadia Mono","SF Mono",Consolas,Menlo,monospace;
 
-    --s1: .375rem; --s2: .75rem; --s3: 1.25rem; --s4: 2rem; --s5: 3.25rem; --s6: 5rem;
-    /* type scale: every non-display size on the page is one of these seven */
-    --fs-micro: .72rem; --fs-xs: .8rem; --fs-sm: .92rem; --fs-base: 1rem;
-    --fs-md: 1.12rem; --fs-lg: 1.25rem; --fs-xl: 1.65rem;
-    --r-sm: 4px; --r-md: 8px;
-    --fast: .16s; --med: .24s;
-    --maxw: 1200px;
-    --ease: cubic-bezier(.22,.61,.36,1);
+    --wrap: 1120px;
+    --gutter: clamp(20px, 5vw, 48px);
+    --ease: cubic-bezier(.2,.7,.2,1);
   }
-
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg:        #0D1117;
-      --bg-deep:   #080B10;
-      --surface:   #141920;
-      --surface-2: #1A2029;
-      --text:      #E2E6EB;
-      --muted:     #939BA6;
-      --faint:     #7C858F;
-      --rule:      #272E38;
-      --rule-soft: #1D232B;
-      --accent:    #7FA6E8;
-      --accent-ink:#A9C4F1;
-      --accent-lift: #9DBCF0;
-      --accent-wash: rgba(127,166,232,.10);
-      --accent-glow: rgba(127,166,232,.20);
-      --flag:      #E08472;
-      --flag-wash: rgba(224,132,114,.11);
-      --ok:        #7CB68F;
-      --plate:     #06090D;
-      --shadow:    0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
-      --shadow-lift: 0 2px 4px rgba(0,0,0,.45), 0 18px 44px -18px rgba(0,0,0,.75);
+    :root {
+      --bg:      #0D1117;
+      --surface: #141920;
+      --text:    #E2E6EB;
+      --muted:   #9AA2AD;
+      --rule:    #262D37;
+      --accent:  #8FB2EC;
+      --accent-hover: #B4CCF3;
+      --plate:   #06090D;
+      --frame-edge: rgba(255,255,255,.08);
+      --shadow:  0 1px 2px rgba(0,0,0,.4), 0 24px 48px -28px rgba(0,0,0,.8);
     }
-  }
-  :root[data-theme="dark"] {
-    --bg:#0D1117; --bg-deep:#080B10; --surface:#141920; --surface-2:#1A2029;
-    --text:#E2E6EB; --muted:#939BA6; --faint:#7C858F;
-    --rule:#272E38; --rule-soft:#1D232B;
-    --accent:#7FA6E8; --accent-ink:#A9C4F1; --accent-lift:#9DBCF0;
-    --accent-wash: rgba(127,166,232,.10); --accent-glow: rgba(127,166,232,.20);
-    --flag:#E08472; --flag-wash: rgba(224,132,114,.11); --ok:#7CB68F; --plate:#06090D;
-    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
-    --shadow-lift: 0 2px 4px rgba(0,0,0,.45), 0 18px 44px -18px rgba(0,0,0,.75);
   }
 
   *, *::before, *::after { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 16px;
-    line-height: 1.62;
-    margin: 0;
-    overflow-x: hidden;
-    font-feature-settings: "kern" 1;
-    text-rendering: optimizeLegibility;
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 400 17px/1.6 var(--sans);
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
   }
-  ::selection { background: var(--accent-glow); }
+  img, video { display: block; max-width: 100%; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gutter); }
+  .num { font-variant-numeric: tabular-nums lining-nums; }
+  .label { font: 500 12.5px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .skip { position: absolute; left: -9999px; }
+  .skip:focus { left: 16px; top: 12px; background: var(--surface); padding: 8px 12px; z-index: 10; }
 
-  a { color: inherit; }
-  :focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-    border-radius: 2px;
-  }
+  /* ---------------------------------------------------------------- top bar */
+  .top { border-bottom: 1px solid var(--rule); }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 24px; }
+  .top .name { font: 600 16px/1 var(--sans); color: var(--text); letter-spacing: -.01em; }
+  .top nav { display: flex; gap: clamp(16px, 3vw, 32px); }
+  .top nav a { font-size: 15px; color: var(--muted); }
+  .top nav a:hover { color: var(--text); }
 
-  .wrap {
-    max-width: var(--maxw);
-    margin: 0 auto;
-    padding: 0 var(--s3);
+  /* ---------------------------------------------------------------- hero */
+  .hero { padding-top: clamp(64px, 11vw, 128px); padding-bottom: clamp(56px, 8vw, 88px); }
+  .hero .label { margin: 0 0 28px; }
+  .hero h1 {
+    margin: 0; max-width: 19ch;
+    font: 500 clamp(42px, 6.4vw, 76px)/1.03 var(--serif); letter-spacing: -.022em;
   }
+  .hero .sub { margin: 28px 0 0; max-width: 58ch; font-size: clamp(18px, 1.6vw, 20px); color: var(--muted); }
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 32px;
+    margin: clamp(56px, 7vw, 80px) 0 0; padding: 0;
+  }
+  .stats div { border-top: 1px solid var(--rule); padding-top: 18px; }
+  .stats dt { font: 500 clamp(30px, 3.4vw, 40px)/1 var(--serif); letter-spacing: -.01em; }
+  .stats dd { margin: 10px 0 0; font-size: 15px; color: var(--muted); line-height: 1.45; }
 
-  .skip {
-    position: absolute; left: -9999px; top: 0; z-index: 100;
-    background: var(--surface); color: var(--text);
-    padding: .6rem 1rem; border: 1px solid var(--rule); border-radius: 4px;
+  /* ---------------------------------------------------------------- index */
+  .index { padding-bottom: clamp(72px, 10vw, 120px); }
+  .index h2 { margin: 0 0 18px; }
+  .index ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--text); }
+  .index li { border-bottom: 1px solid var(--rule); }
+  .index a {
+    display: grid; grid-template-columns: 56px minmax(180px, 1.1fr) 2fr 150px; gap: 24px;
+    align-items: baseline; padding: 20px 4px; color: var(--text);
+    transition: background-color .25s var(--ease), padding .25s var(--ease);
   }
-  .skip:focus { left: var(--s3); top: var(--s2); }
+  .index a:hover { background: var(--surface); padding-left: 14px; }
+  .index .n { font: 500 13px/1 var(--mono); color: var(--muted); }
+  .index .t { font: 500 22px/1.2 var(--serif); }
+  .index .d { color: var(--muted); font-size: 15.5px; }
+  .index .f { font: 500 12px/1.4 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); text-align: right; }
 
-  /* ---------- scroll progress ---------- */
-  .progress {
-    position: fixed; top: 0; left: 0; z-index: 60;
-    height: 2px; width: 100%;
-    transform: scaleX(0); transform-origin: 0 50%;
-    background: var(--accent);
-    pointer-events: none;
-  }
+  /* ---------------------------------------------------------------- projects */
+  .project { padding-top: clamp(72px, 10vw, 120px); scroll-margin-top: 8px; }
+  .project + .project { margin-top: clamp(24px, 4vw, 40px); }
+  .p-head { display: grid; grid-template-columns: 1fr auto; gap: 24px 48px; align-items: end; }
+  .p-head .label { margin: 0 0 18px; }
+  .p-head .label b { color: var(--text); font-weight: 600; margin-right: 10px; }
+  .p-head h2 { margin: 0; font: 500 clamp(34px, 4.4vw, 52px)/1.05 var(--serif); letter-spacing: -.02em; }
+  .p-head .lede { margin: 18px 0 0; max-width: 60ch; font-size: clamp(17.5px, 1.5vw, 19.5px); color: var(--muted); }
 
-  /* ---------- eyebrow / labels ---------- */
-  .eyebrow {
-    font-family: var(--mono);
-    font-size: var(--fs-micro);
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--faint);
-    margin: 0;
+  .actions { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; margin: 0; padding: 0; list-style: none; }
+  .actions a { font-size: 15px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px;
+    background: var(--text); color: var(--bg) !important; font-weight: 600; font-size: 15px;
+    transition: transform .2s var(--ease), opacity .2s var(--ease);
   }
+  .btn:hover { opacity: .88; transform: translateY(-1px); }
+  .p-head .actions { justify-content: flex-end; }
 
-  /* ---------- sticky utility bar ---------- */
-  .util {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 40;
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
-    backdrop-filter: saturate(150%) blur(12px);
-    -webkit-backdrop-filter: saturate(150%) blur(12px);
-    border-bottom: 1px solid var(--rule);
-    transform: translateY(-101%);
-    transition: transform var(--med) var(--ease);
+  .frame {
+    position: relative; margin: clamp(32px, 4vw, 44px) 0 0; aspect-ratio: var(--ar, 16 / 10); overflow: hidden;
+    border-radius: 14px; background: var(--plate); box-shadow: var(--shadow);
+    outline: 1px solid var(--frame-edge); outline-offset: -1px;
   }
-  @supports not (backdrop-filter: blur(1px)) { .util { background: var(--bg); } }
-  .util.on { transform: none; }
-  .util-in {
-    max-width: var(--maxw); margin: 0 auto; padding: .55rem var(--s3);
-    display: flex; align-items: center; justify-content: space-between; gap: var(--s3);
+  .frame img, .frame video { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+  .frame .toggle {
+    position: absolute; right: 14px; bottom: 14px; padding: 7px 12px; border: 0; border-radius: 999px;
+    background: rgba(14,18,24,.72); color: #E6EAF0; font: 500 12.5px/1 var(--sans); cursor: pointer;
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
   }
-  .util-name { font-family: var(--serif); font-size: var(--fs-base); letter-spacing: -.01em; white-space: nowrap; }
-  .util-links { display: flex; gap: var(--s3); flex-wrap: wrap; align-items: center; }
-  .util-links a {
-    font-size: var(--fs-xs); text-decoration: none; color: var(--muted);
-    transition: color var(--fast);
-  }
-  .util-links a:hover { color: var(--accent-ink); }
-  @media (max-width: 700px) { .util-links a.opt { display: none; } }
+  .frame .toggle:hover { background: rgba(14,18,24,.9); }
 
-  /* ---------- theme toggle ---------- */
-  .themebtn {
-    appearance: none; cursor: pointer;
-    display: inline-grid; place-items: center;
-    width: 34px; height: 34px; padding: 0;
-    background: transparent;
-    border: 1px solid var(--rule);
-    border-radius: 50%;
-    color: var(--muted);
-    transition: color var(--fast), border-color var(--fast), background var(--fast), transform var(--fast) var(--ease);
-    flex: none;
-  }
-  .themebtn:hover {
-    color: var(--accent-ink); border-color: var(--accent);
-    background: var(--accent-wash); transform: rotate(-18deg);
-  }
-  .themebtn svg { width: 15px; height: 15px; display: block; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
-  .themebtn .i-sun { display: none; }
-  .themebtn .i-moon { display: block; }
-  :root[data-theme="dark"] .themebtn .i-sun { display: block; }
-  :root[data-theme="dark"] .themebtn .i-moon { display: none; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .themebtn .i-sun { display: block; }
-    :root:not([data-theme="light"]) .themebtn .i-moon { display: none; }
-  }
+  .p-body { display: grid; grid-template-columns: 4fr 8fr; gap: 48px; margin-top: clamp(32px, 4vw, 48px); }
+  .metrics { margin: 0; padding: 0; display: grid; gap: 22px; align-content: start; }
+  .metrics div { border-top: 1px solid var(--rule); padding-top: 14px; }
+  .metrics dt { font: 500 34px/1 var(--serif); letter-spacing: -.01em; }
+  .metrics dd { margin: 8px 0 0; font-size: 14.5px; color: var(--muted); line-height: 1.45; }
+  .depth { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 28px 40px; align-content: start; }
+  .depth li { border-top: 1px solid var(--rule); padding-top: 14px; font-size: 15.5px; line-height: 1.6; color: var(--muted); }
+  .depth strong { display: block; margin-bottom: 6px; color: var(--text); font-weight: 600; font-size: 16px; }
+  .stack { grid-column: 2; margin: 4px 0 0; font: 13px/1.6 var(--mono); color: var(--muted); }
 
-  /* ---------- masthead ---------- */
-  .masthead {
-    border-bottom: 1px solid var(--rule);
-    position: relative;
-    overflow: hidden;
-    background:
-      radial-gradient(1100px 520px at 78% 8%, var(--accent-wash), transparent 68%),
-      linear-gradient(180deg, var(--surface) 0%, var(--bg) 62%);
-  }
-  /* fine grain, so the paper ground is not a flat fill */
-  .masthead::before {
-    content: "";
-    position: absolute; inset: 0; z-index: 1;
-    pointer-events: none; opacity: .5; mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E");
-  }
-  :root[data-theme="dark"] .masthead::before { mix-blend-mode: screen; opacity: .26; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .masthead::before { mix-blend-mode: screen; opacity: .26; }
-  }
-  #plot {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    opacity: .42;
-    pointer-events: none;
-  }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #plot { opacity: .54; } }
-  :root[data-theme="dark"] #plot { opacity: .54; }
-  :root[data-theme="light"] #plot { opacity: .42; }
+  /* ---------------------------------------------------------------- more */
+  .more { padding-top: clamp(96px, 12vw, 144px); padding-bottom: clamp(72px, 9vw, 104px); }
+  .more h2 { margin: 0 0 28px; font: 500 clamp(28px, 3vw, 36px)/1.1 var(--serif); letter-spacing: -.015em; }
+  .more-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .more-grid > div { border-top: 1px solid var(--rule); padding-top: 16px; }
+  .more-grid h3 { margin: 0 0 8px; font: 600 16px/1.35 var(--sans); }
+  .more-grid p { margin: 0 0 12px; font-size: 15.5px; color: var(--muted); }
 
-  /* keep the plot behind the words: a scrim that clears the reading column */
-  .masthead::after {
-    content: "";
-    position: absolute; inset: 0; z-index: 2;
-    pointer-events: none;
-    background:
-      linear-gradient(to right, var(--bg) 0%, var(--bg) 28%, rgba(0,0,0,0) 82%),
-      linear-gradient(to bottom, rgba(0,0,0,0) 56%, var(--bg) 100%);
-  }
+  /* ---------------------------------------------------------------- footer */
+  footer { border-top: 1px solid var(--rule); padding: 40px 0 56px; font-size: 15px; color: var(--muted); }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 40px; }
+  footer p { margin: 0; }
+  footer .links { display: flex; gap: 24px; }
 
-  .masthead-inner {
-    position: relative;
-    z-index: 3;
-    /* padding-block only: a shorthand here would zero the side gutter .wrap sets */
-    padding-block: var(--s6) var(--s4);
-    display: grid;
-    gap: var(--s3);
-  }
-  @media (max-width: 700px) { .masthead-inner { padding-block-start: var(--s5); } }
-  .id-line {
-    display: flex;
-    gap: var(--s3);
-    align-items: flex-start; justify-content: space-between;
-  }
-  .id-line h1 { flex: 1; min-width: 0; }
-  h1 {
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: clamp(2.3rem, 6vw, 4rem);
-    line-height: 1.04;
-    letter-spacing: -.02em;
-    margin: 0;
-    text-wrap: balance;
-  }
-  h1 .sub {
-    display: flex; align-items: center; gap: .6rem;
-    font-family: var(--mono);
-    font-size: var(--fs-xs);
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 1.1rem;
-    line-height: 1.4;
-  }
-  h1 .sub::after {
-    content: ""; flex: 1; height: 1px; max-width: 120px;
-    background: linear-gradient(90deg, var(--accent), transparent);
-  }
-  h1 .hl {
-    font-style: italic;
-    background: linear-gradient(transparent 62%, var(--accent-glow) 62%);
-  }
-  .thesis {
-    font-family: var(--serif);
-    font-size: clamp(1.16rem, 2.1vw, 1.38rem);
-    line-height: 1.55;
-    max-width: 34em;
-    margin: 0;
-    color: var(--text);
-  }
-  .thesis em { font-style: italic; color: var(--accent-ink); }
-  .whoami { max-width: 44em; margin: 0; color: var(--muted); font-size: var(--fs-sm); }
-  .kbd {
-    font-family: var(--mono); font-size: .87em;
-    background: var(--accent-wash); color: var(--accent-ink);
-    padding: .1em .38em; border-radius: 3px;
-    border: 1px solid var(--rule-soft);
-  }
+  /* ---------------------------------------------------------------- reveal */
+  .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+  .js .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .js .reveal { opacity: 1; transform: none; transition: none; } }
 
-  /* ---------- ledger strip ---------- */
-  .ledger {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    border-top: 1px solid var(--rule);
-    margin-top: var(--s4);
+  /* ---------------------------------------------------------------- narrow */
+  @media (max-width: 900px) {
+    .index a { grid-template-columns: 40px 1fr; gap: 4px 16px; }
+    .index .d { grid-column: 2; }
+    .index .f { display: none; }
+    .p-head { grid-template-columns: 1fr; }
+    .p-head .actions { justify-content: flex-start; }
+    .p-body { grid-template-columns: 1fr; gap: 36px; }
+    .metrics { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .stack { grid-column: 1; }
   }
-  .ledger div {
-    padding: var(--s3) var(--s3) var(--s3) 0;
-    border-right: 1px solid var(--rule-soft);
-    position: relative;
-  }
-  .ledger div::before {
-    content: ""; position: absolute; top: -1px; left: 0; width: 28px; height: 2px;
-    background: var(--accent);
-  }
-  .ledger div:last-child { border-right: 0; }
-  .ledger dt {
-    display: block;
-    font-family: var(--mono);
-    font-variant-numeric: tabular-nums;
-    font-size: var(--fs-xl);
-    font-weight: 600;
-    letter-spacing: -.02em;
-    color: var(--accent-ink);
-    line-height: 1.1;
-  }
-  .ledger dd {
-    display: block;
-    font-size: var(--fs-xs);
-    color: var(--muted);
-    line-height: 1.45;
-    margin: .3rem 0 0;
-    max-width: 20em;
-  }
-
-  /* ---------- body grid ---------- */
-  .layout {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: var(--s6);
-    padding-block: var(--s5) var(--s6);
-    align-items: start;
-  }
-  @media (max-width: 980px) {
-    .layout { grid-template-columns: 1fr; gap: var(--s4); padding-block-start: var(--s4); }
-  }
-  /* A grid item defaults to min-width:auto, so it refuses to shrink below the
-     intrinsic width of its contents. The index rail's longest entry was wider
-     than a phone, which pushed the whole page 14px sideways. */
-  .layout > * { min-width: 0; }
-
-  /* ---------- index rail ---------- */
-  .rail { position: sticky; top: var(--s4); display: grid; gap: var(--s4); }
-  @media (max-width: 980px) { .rail { position: static; } }
-  .rail h2 { margin: 0 0 var(--s2); }
-
-  .toc { display: grid; border-top: 1px solid var(--rule-soft); }
-  .toc a {
-    display: grid;
-    grid-template-columns: 2rem 1fr;
-    align-items: baseline;
-    padding: .5rem 0 .5rem .5rem;
-    text-decoration: none;
-    border-bottom: 1px solid var(--rule-soft);
-    border-left: 2px solid transparent;
-    color: var(--muted);
-    transition: color var(--fast), border-color var(--fast), background var(--fast), padding-left var(--fast) var(--ease);
-  }
-  .toc a:hover, .toc a.here { color: var(--accent-ink); background: var(--accent-wash); }
-  .toc a.here { border-left-color: var(--accent); }
-  .toc a:hover { padding-left: .7rem; }
-  .toc a.here .tnum { color: var(--accent); }
-  .tnum {
-    font-family: var(--mono); font-size: var(--fs-micro); color: var(--faint);
-    font-variant-numeric: tabular-nums; letter-spacing: .04em;
-  }
-  .tname { font-size: var(--fs-sm); line-height: 1.35; }
-  .toc a.here .tname { font-weight: 600; }
-
-  .filters {
-    display: flex; flex-wrap: wrap; gap: var(--s1);
-    border-top: 1px solid var(--rule-soft);
-    padding-top: var(--s3);
-  }
-  .filters button {
-    appearance: none; cursor: pointer;
-    background: transparent;
-    border: 1px solid var(--rule);
-    border-radius: var(--r-sm);
-    padding: .3rem .7rem;
-    margin: 0; font: inherit; font-size: var(--fs-xs);
-    color: var(--muted); text-align: left;
-    transition: color var(--fast), border-color var(--fast), background var(--fast);
-  }
-  .filters button:hover { color: var(--text); border-color: var(--muted); }
-  .filters button[aria-pressed="true"] {
-    color: var(--surface-2);
-    background: var(--accent);
-    border-color: var(--accent);
-    font-weight: 500;
-  }
-  .filters .n {
-    font-family: var(--mono); font-size: var(--fs-micro); color: var(--faint);
-    font-weight: 400; margin-left: .3rem; font-variant-numeric: tabular-nums;
-  }
-  .filters button[aria-pressed="true"] .n { color: var(--surface-2); opacity: .72; }
-  .rail-note {
-    font-size: var(--fs-xs); color: var(--muted); line-height: 1.5;
-    border-top: 1px solid var(--rule-soft);
-    padding-top: var(--s2); margin: 0;
-  }
-  .rail-note a { color: var(--accent-ink); }
-
-  /* ---------- records ---------- */
-  .records { display: grid; gap: var(--s4); }
-  .rec {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--rule-soft);
-    border-radius: 8px;
-    padding: var(--s4) var(--s4) var(--s4);
-    display: grid;
-    gap: var(--s3);
-    scroll-margin-top: 4.5rem;
-    box-shadow: var(--shadow);
-    transition: box-shadow var(--med) var(--ease), border-color var(--med) var(--ease);
-  }
-  .rec::before {
-    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-    border-radius: 8px 0 0 8px;
-    background: linear-gradient(180deg, var(--accent), transparent 72%);
-    opacity: .85;
-  }
-  .rec:hover { box-shadow: var(--shadow-lift); border-color: var(--rule); }
-  @media (max-width: 700px) { .rec { padding: var(--s3); border-radius: 6px; } }
-  .rec[hidden] { display: none; }
-
-  /* Reveal on scroll, but only once JS has confirmed it is running: the .js class
-     is set by an inline script in <head>. Without it every .reveal stays visible,
-     so a blocked script can never leave a chart invisible. */
-  .js .reveal { opacity: 0; transform: translateY(14px); }
-  .js .reveal.in { opacity: 1; transform: none; transition: opacity .4s var(--ease), transform .4s var(--ease); }
-
-  .rec-head { display: grid; gap: var(--s2); }
-
-  .rank {
-    display: flex; align-items: baseline; gap: var(--s2);
-    font-family: var(--mono);
-  }
-  .rank .num {
-    font-size: var(--fs-xl); font-weight: 600; letter-spacing: -.03em;
-    color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1;
-  }
-  .rank .lede-note {
-    font-size: var(--fs-xs); color: var(--faint);
-  }
-  /* The live link, at the top of the card where a skimmer looks first; the
-     full link row stays at the bottom for readers who finish the write-up. */
-  .rank .try-live {
-    margin-left: auto;
-    font-family: var(--sans); font-size: var(--fs-sm); font-weight: 600;
-    color: var(--accent); text-decoration: none; white-space: nowrap;
-  }
-  .takeaway {
-    margin: var(--s1) 0 0; padding-left: var(--s3);
-    border-left: 2px solid var(--accent);
-    font-size: var(--fs-base); line-height: 1.5; color: var(--text);
-  }
-  .takeaway-label {
-    display: block; margin-bottom: 2px;
-    font-family: var(--mono); font-size: var(--fs-micro); color: var(--faint);
-    text-transform: uppercase; letter-spacing: .08em;
-  }
-  .rank .try-live:hover { color: var(--accent-lift); text-decoration: underline; text-underline-offset: 3px; }
-
-  .tags { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s2); align-items: center; }
-  .tag {
-    font-size: var(--fs-xs); color: var(--muted);
-    border: 1px solid var(--rule); border-radius: var(--r-sm);
-    padding: .12rem .5rem; line-height: 1.5;
-  }
-  .tag.type { color: var(--accent-ink); border-color: var(--accent); background: var(--accent-wash); }
-  .tag.live::before,
-  .tag.warn::before {
-    content: ""; display: inline-block;
-    width: 6px; height: 6px; border-radius: 50%;
-    margin-right: .45rem; vertical-align: .08em;
-  }
-  .tag.live::before { background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 22%, transparent); }
-  .tag.live { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, var(--rule)); }
-  .tag.warn::before { background: none; border: 1px solid var(--flag); }
-  .tag.warn { color: var(--flag); border-color: color-mix(in srgb, var(--flag) 45%, var(--rule)); background: var(--flag-wash); }
-
-  .rec h3 {
-    font-family: var(--serif); font-weight: 400;
-    font-size: clamp(1.6rem, 3.2vw, 2.2rem);
-    line-height: 1.12; letter-spacing: -.015em;
-    margin: 0; text-wrap: balance;
-  }
-  .lede {
-    font-family: var(--serif); font-size: var(--fs-md); line-height: 1.55;
-    color: var(--text); max-width: 40em; margin: 0;
-  }
-  .rec p { margin: 0; max-width: 42em; }
-  .prose { color: var(--muted); font-size: var(--fs-sm); }
-
-  /* ---------- media plates ---------- */
-  .plate {
-    margin: var(--s1) 0 0;
-    display: grid;
-    gap: var(--s2);
-  }
-  .plate-frame {
-    position: relative;
-    background: var(--plate);
-    border: 1px solid var(--rule);
-    border-radius: 6px;
-    overflow: hidden;
-    line-height: 0;
-    box-shadow: var(--shadow);
-  }
-  .plate-frame img,
-  .plate-frame video {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  .plate-cover {
-    position: absolute; inset: 0;
-    display: flex; align-items: flex-end; justify-content: flex-start;
-    padding: var(--s3);
-    text-decoration: none;
-    background: linear-gradient(to top, rgba(6,9,13,.82) 0%, rgba(6,9,13,0) 46%);
-    opacity: 0;
-    transition: opacity var(--med) var(--ease);
-  }
-  .plate-frame:hover .plate-cover,
-  .plate-cover:focus-visible { opacity: 1; }
-  .plate-cta {
-    font-family: var(--mono); font-size: var(--fs-xs); letter-spacing: .02em;
-    color: #F2F5F9;
-    border-bottom: 1px solid rgba(242,245,249,.65);
-    padding-bottom: .1rem;
-    line-height: 1.4;
-  }
-  .chip {
-    display: inline-block;
-    font-size: var(--fs-micro);
-    color: var(--faint);
-    border: 1px solid var(--rule);
-    border-radius: var(--r-sm);
-    padding: .05rem .45rem;
-    margin-right: .5rem;
-    line-height: 1.6;
-    vertical-align: .08em;
-    white-space: nowrap;
-  }
-  /* A caption chip is white-space:nowrap, and the longest one once measured
-     334px on a single line. Held unbreakable it set the floor for the whole
-     records column and pushed the page sideways on any phone narrower than
-     about 430px. Below that, let a chip wrap instead. */
-  @media (max-width: 430px) {
-    .chip { white-space: normal; }
-  }
-  .plate-toggle {
-    position: absolute; top: var(--s2); right: var(--s2);
-    appearance: none; cursor: pointer;
-    font-size: var(--fs-micro);
-    color: #CBD4E0;
-    background: rgba(8,11,16,.82);
-    border: 1px solid rgba(203,212,224,.22);
-    border-radius: var(--r-sm);
-    padding: .22rem .6rem;
-    line-height: 1.5;
-    transition: color var(--fast), border-color var(--fast);
-  }
-  .plate-toggle:hover { color: #fff; border-color: rgba(203,212,224,.5); }
-
-  /* dense screenshots stay legible on a phone: let them pan instead of shrinking */
-  @media (max-width: 760px) {
-    /* The image is deliberately wider than the phone so the detail can be read
-       by scrolling the plate sideways. min-width:0 keeps that 660px from
-       propagating up through the record and shoving the whole page over. */
-    .plate-scroll { overflow-x: auto; overscroll-behavior-x: contain; min-width: 0; }
-    .plate-scroll img { min-width: 660px; }
-    .plate-scroll::-webkit-scrollbar { height: 6px; }
-    .plate-scroll::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
-    .plate-hint { display: inline; }
-  }
-  .plate-hint { display: none; color: var(--faint); font-style: italic; }
-
-  .plate figcaption {
-    font-size: var(--fs-xs);
-    color: var(--muted);
-    line-height: 1.5;
-    max-width: 46em;
-    margin: 0;
-  }
-  .plate figcaption b { color: var(--text); font-weight: 600; }
-
-  /* figures */
-  .figs {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-    gap: var(--s3);
-    margin: 0;
-    padding: var(--s3);
-    background: var(--surface-2);
-    border: 1px solid var(--rule-soft);
-    border-radius: 6px;
-  }
-  .figs > div { display: grid; gap: .15rem; }
-  .figs dt {
-    font-size: var(--fs-xs); color: var(--faint); order: 2;
-  }
-  .figs dd {
-    margin: 0; order: 1;
-    font-family: var(--mono); font-variant-numeric: tabular-nums;
-    font-size: var(--fs-lg); font-weight: 600; letter-spacing: -.02em;
-    color: var(--text); line-height: 1.25;
-  }
-  .figs dd small { font-size: var(--fs-xs); font-weight: 400; color: var(--muted); letter-spacing: 0; }
-
-  /* ---------- inline charts ---------- */
-  .viz {
-    margin: 0;
-    display: grid; gap: var(--s2);
-    padding: var(--s3);
-    background: var(--surface-2);
-    border: 1px solid var(--rule-soft);
-    border-radius: 6px;
-  }
-  .viz-head { display: grid; gap: .2rem; }
-  .viz-title { font-size: var(--fs-sm); font-weight: 600; color: var(--text); margin: 0; }
-  .viz-sub { font-size: var(--fs-xs); color: var(--muted); margin: 0; line-height: 1.45; }
-  .viz svg { display: block; width: 100%; height: auto; overflow: visible; }
-  .viz .ax { font-family: var(--mono); font-size: 10px; fill: var(--faint); letter-spacing: .03em; }
-  .viz .lbl { font-family: var(--mono); font-size: 10px; fill: var(--muted); }
-  .viz .lbl-em { font-family: var(--mono); font-size: 10px; fill: var(--text); font-weight: 600; }
-  .viz .grid { stroke: var(--rule-soft); stroke-width: 1; }
-  .viz .zero { stroke: var(--muted); stroke-width: 1; }
-  .viz .bh { stroke: var(--text); stroke-width: 1.5; }
-  .viz .ci { stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
-  .viz .dot { fill: var(--accent); stroke: var(--surface-2); stroke-width: 2; }
-  .viz .dot-hit { fill: transparent; cursor: pointer; }
-  .viz .mean { fill: var(--accent-ink); stroke: var(--surface-2); stroke-width: 2; }
-  .viz-row { display: grid; gap: .3rem; }
-  .viz-tt {
-    position: absolute; z-index: 5; pointer-events: none;
-    background: var(--plate); color: #EDF1F6;
-    font-family: var(--mono); font-size: var(--fs-micro);
-    padding: .3rem .5rem; border-radius: var(--r-sm);
-    white-space: nowrap; opacity: 0; transition: opacity .12s;
-    box-shadow: var(--shadow-lift);
-  }
-  .viz-wrap { position: relative; }
-  .viz table { border-collapse: collapse; font-size: var(--fs-xs); width: 100%; }
-  .viz table th, .viz table td {
-    text-align: right; padding: .22rem .5rem .22rem 0;
-    border-bottom: 1px solid var(--rule-soft);
-    font-variant-numeric: tabular-nums; font-family: var(--mono);
-  }
-  .viz table th { color: var(--faint); font-weight: 500; font-size: var(--fs-micro); }
-  .viz table th:first-child, .viz table td:first-child { text-align: left; }
-  .viz details summary {
-    cursor: pointer; font-size: var(--fs-xs); font-weight: 500; color: var(--accent-ink);
-    padding: .2rem 0;
-  }
-
-  /* meter */
-  .meter-track {
-    position: relative; height: 10px; border-radius: 100px;
-    background: var(--accent-wash);
-    border: 1px solid var(--rule-soft);
-    overflow: hidden;
-  }
-  .meter-fill {
-    position: absolute; inset: 0 auto 0 0; border-radius: 100px;
-    background: linear-gradient(90deg, var(--accent), var(--flag));
-  }
-  .meter-mid {
-    position: absolute; top: -3px; bottom: -3px; width: 2px;
-    background: var(--surface-2);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 45%, transparent);
-  }
-  .meter-scale {
-    display: flex; justify-content: space-between;
-    font-family: var(--mono); font-size: var(--fs-micro); color: var(--faint);
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* reported finding */
-  .finding {
-    border-left: 3px solid var(--flag);
-    border-radius: 0 6px 6px 0;
-    background: var(--flag-wash);
-    padding: var(--s3);
-    display: grid; gap: .35rem; max-width: 46em;
-  }
-  .finding .eyebrow { color: var(--flag); }
-  .finding p { font-size: var(--fs-sm); color: var(--text); }
-
-  /* method disclosure */
-  details.method {
-    border-top: 1px solid var(--rule-soft);
-    padding-top: var(--s2);
-  }
-  details.method > summary {
-    list-style: none; cursor: pointer;
-    font-size: var(--fs-sm); font-weight: 500; color: var(--accent-ink);
-    display: flex; align-items: center; gap: .55rem; padding: .15rem 0;
-    transition: color var(--fast);
-  }
-  details.method > summary:hover { color: var(--accent); }
-  details.method > summary::-webkit-details-marker { display: none; }
-  details.method > summary::before {
-    content: "+"; font-size: var(--fs-base); line-height: 1; width: .8em; color: var(--accent);
-  }
-  details.method[open] > summary::before { content: "\2212"; }
-  details.method .inner { padding-top: var(--s2); display: grid; gap: var(--s2); }
-  details.method ul {
-    margin: 0; padding-left: 1.1rem;
-    color: var(--muted); font-size: var(--fs-sm);
-    display: grid; gap: .4rem; max-width: 44em;
-  }
-  details.method li::marker { color: var(--accent); }
-  code {
-    font-family: var(--mono); font-size: .87em;
-    background: var(--accent-wash);
-    padding: .08em .35em; border-radius: 3px;
-  }
-
-  /* stack + links */
-  .stack { display: flex; flex-wrap: wrap; gap: var(--s1); }
-  .stack span {
-    font-family: var(--mono); font-size: var(--fs-micro); color: var(--muted);
-    border: 1px solid var(--rule); border-radius: var(--r-sm);
-    padding: .12rem .5rem; white-space: nowrap;
-    transition: color var(--fast), border-color var(--fast);
-  }
-  .stack span:hover { color: var(--text); border-color: var(--muted); }
-  .links { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); align-items: center; }
-  .links a {
-    font-size: var(--fs-sm); font-weight: 500;
-    text-decoration: none; color: var(--accent-ink);
-    border-bottom: 1px solid var(--accent);
-    padding-bottom: .12rem;
-    transition: background var(--fast), color var(--fast);
-  }
-  .links a:hover { background: var(--accent-wash); }
-  .links a.primary {
-    border: 1px solid var(--accent);
-    border-radius: var(--r-sm);
-    padding: .5rem .95rem;
-    background: var(--accent-wash);
-    color: var(--accent-ink);
-    transition: background var(--fast) var(--ease), color var(--fast), box-shadow var(--fast);
-  }
-  .links a.primary:hover {
-    background: var(--accent); color: var(--surface-2);
-    box-shadow: 0 6px 18px -8px var(--accent-glow);
-  }
-  .links a.secondary { color: var(--muted); border-bottom-color: var(--rule); }
-  .links a.secondary:hover { color: var(--text); }
-
-  .caveat {
-    font-size: var(--fs-sm);
-    color: var(--muted);
-    border-left: 3px solid var(--rule);
-    background: var(--surface-2);
-    border-radius: 0 6px 6px 0;
-    padding: var(--s3);
-    max-width: 46em;
-  }
-  .caveat b { color: var(--text); font-weight: 600; }
-
-  /* ---------- colophon ---------- */
-  .colophon {
-    border-top: 1px solid var(--rule);
-    padding: var(--s5) 0 var(--s5);
-    background: linear-gradient(180deg, var(--bg), var(--bg-deep));
-  }
-  .colophon-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: var(--s4);
-    align-items: start;
-  }
-  .colophon p { margin: .5rem 0 0; color: var(--muted); font-size: var(--fs-sm); max-width: 30em; }
-  .colophon a { color: var(--accent-ink); }
-
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    * { transition: none !important; animation: none !important; }
-    .reveal { opacity: 1; transform: none; }
-    .themebtn:hover { transform: none; }
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .top nav a.opt { display: none; }
+    .stats { grid-template-columns: 1fr 1fr; gap: 28px 20px; }
+    .metrics { grid-template-columns: 1fr; }
+    .metrics dt { font-size: 30px; }
+    .depth { grid-template-columns: 1fr; gap: 22px; }
+    .more-grid { grid-template-columns: 1fr; gap: 24px; }
+    .frame { border-radius: 10px; }
   }
 </style>
+<script>document.documentElement.className += " js";</script>
 <script src="analytics.js" defer></script>
 <script src="warm.js" defer></script>
 </head>
 <body>
+<a class="skip" href="#work">Skip to the projects</a>
 
-<a class="skip" href="#records">Skip to the projects</a>
-
-<div class="progress" id="progress" aria-hidden="true"></div>
-
-<div class="util" id="util" aria-hidden="true" inert>
-  <div class="util-in">
-    <span class="util-name">Dan Lichtenberger</span>
-    <nav class="util-links">
-      <a href="#rl-trader">Projects</a>
-      <a class="opt" href="reports.html">Reports</a>
+<header class="top">
+  <div class="wrap">
+    <a class="name" href="./">Dan Lichtenberger</a>
+    <nav aria-label="Site">
+      <a href="#work">Work</a>
+      <a href="reports.html">Reports</a>
       <a class="opt" href="https://github.com/Danny-397">GitHub</a>
-      <a href="mailto:dlichtenberger91@gmail.com">Email</a>
-      <button type="button" class="themebtn" id="theme-util" aria-label="Switch between light and dark">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <g class="i-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></g>
-          <g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></g>
-        </svg>
-      </button>
+      <a href="mailto:dlichtenberger91@gmail.com">Contact</a>
     </nav>
-  </div>
-</div>
-
-<header class="masthead">
-  <canvas id="plot" aria-hidden="true"></canvas>
-  <div class="wrap masthead-inner">
-    <div class="id-line">
-      <h1>
-        <span class="sub">Dan Lichtenberger · New York</span>
-        Six systems, built,<br><span class="hl">shipped and measured.</span>
-      </h1>
-      <button type="button" class="themebtn" id="theme-top" aria-label="Switch between light and dark">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <g class="i-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></g>
-          <g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></g>
-        </svg>
-      </button>
-    </div>
-
-    <p class="thesis">
-      I build machine learning and security software end to end, from the model to the
-      site you can open, and then measure whether it really works: held-out test sets,
-      many independent runs, and confidence intervals.
-    </p>
-
-    <p class="whoami">
-      Ordered strongest first. Every project is deployed to a public URL, and every
-      screen below is a recording of the real deployment, not a mockup.
-    </p>
-
-    <dl class="ledger">
-      <div>
-        <dt>6 / 6</dt>
-        <dd>projects deployed to a public URL — not just a repository</dd>
-      </div>
-      <div>
-        <dt>1,865</dt>
-        <dd>automated tests running in CI across five of the codebases</dd>
-      </div>
-      <div>
-        <dt>2 DOIs</dt>
-        <dd>releases archived on Zenodo, with a paper and technical reports</dd>
-      </div>
-      <div>
-        <dt>PyPI</dt>
-        <dd>QuantumSafe Scan ships as a package and a GitHub Action anyone can install</dd>
-      </div>
-    </dl>
   </div>
 </header>
 
-<main class="wrap layout">
+<main>
+  <section class="hero wrap">
+    <p class="label">Portfolio · New York</p>
+    <h1>Six systems, built from scratch and running live.</h1>
+    <p class="sub">Post-quantum security, reinforcement learning, quantitative finance and interactive art. Each project is deployed to a public URL, tested in continuous integration, and documented in a technical report.</p>
+    <dl class="stats">
+      <div><dt class="num">6 / 6</dt><dd>projects deployed and live</dd></div>
+      <div><dt class="num" data-claim="tests-total">1,865</dt><dd>automated tests running in CI</dd></div>
+      <div><dt class="num">2</dt><dd>releases archived with DOIs on Zenodo</dd></div>
+      <div><dt>PyPI</dt><dd>a security scanner anyone can install</dd></div>
+    </dl>
+  </section>
 
-  <nav class="rail" aria-label="Project index">
-    <div>
-      <h2 class="eyebrow">The work, in order</h2>
-      <div class="toc" id="toc">
-        <a href="#quantumsafe"><span class="tnum">01</span><span class="tname">QuantumSafe Scan</span></a>
-        <a href="#rl-trader"><span class="tnum">02</span><span class="tname">RL Trader</span></a>
-        <a href="#tradeski"><span class="tnum">03</span><span class="tname">Tradeski</span></a>
-        <a href="#alphaglyph"><span class="tnum">04</span><span class="tname">AlphaGlyph</span></a>
-        <a href="#rl-chess"><span class="tnum">05</span><span class="tname">AlphaZero Chess Engine</span></a>
-        <a href="#neural-canvas"><span class="tnum">06</span><span class="tname">Neural Canvas</span></a>
+  <section class="index wrap" id="work" aria-labelledby="work-h">
+    <h2 class="label" id="work-h">Selected work</h2>
+    <ol>
+      <li><a href="#quantumsafe"><span class="n">01</span><span class="t">QuantumSafe Scan</span><span class="d">Finds the cryptography quantum computers will break, and names its replacement</span><span class="f">Security</span></a></li>
+      <li><a href="#rl-trader"><span class="n">02</span><span class="t">RL Trader</span><span class="d">Deep reinforcement learning from scratch, with a paper on rigorous evaluation</span><span class="f">Machine learning</span></a></li>
+      <li><a href="#tradeski"><span class="n">03</span><span class="t">Tradeski</span><span class="d">A real-time market dashboard with an AI analyst grounded in your holdings</span><span class="f">Real-time systems</span></a></li>
+      <li><a href="#alphaglyph"><span class="n">04</span><span class="t">AlphaGlyph</span><span class="d">A backtesting lab that tests every strategy for skill versus luck</span><span class="f">Quant finance</span></a></li>
+      <li><a href="#rl-chess"><span class="n">05</span><span class="t">Chess Engine</span><span class="d">An AlphaZero-style engine that learns by playing itself, in your browser</span><span class="f">Machine learning</span></a></li>
+      <li><a href="#neural-canvas"><span class="n">06</span><span class="t">Neural Canvas</span><span class="d">Paint light in mid-air with your hands, tracked live on-device</span><span class="f">Interactive art</span></a></li>
+    </ol>
+  </section>
+
+  <!-- 01 -->
+  <article class="project wrap" id="quantumsafe" aria-labelledby="qss-h">
+    <div class="p-head reveal">
+      <div>
+        <p class="label"><b>01</b>Post-quantum security · Developer tool</p>
+        <h2 id="qss-h">QuantumSafe Scan</h2>
+        <p class="lede">Scans code in 11 languages for the encryption quantum computers will break, scores the exposure from 0 to 100, and names the NIST-standard replacement for every finding.</p>
+      </div>
+      <ul class="actions">
+        <li><a class="btn" href="https://quantumsafescan.com">Scan your code ↗</a></li>
+        <li><a href="https://pypi.org/project/quantumsafe-scan/">PyPI</a></li>
+        <li><a href="reports/quantumsafe-technical-report.html">Report</a></li>
+        <li><a href="https://github.com/Danny-397/Quantum-Safe-Scan">Source</a></li>
+      </ul>
+    </div>
+    <div class="frame reveal">
+      <img src="media/quantumsafe-scan.webp" width="1400" height="961" loading="lazy" decoding="async"
+           alt="A live scan: a Python snippet using RSA, ECDSA, MD5 and TLS 1.0 on the left; on the right a quantum risk score of 66 out of 100 and a findings list mapping each line to its NIST replacement.">
+    </div>
+    <div class="p-body reveal">
+      <dl class="metrics">
+        <div><dt class="num">95%</dt><dd>precision on a random, hand-labeled sample of real-world findings</dd></div>
+        <div><dt class="num">88%</dt><dd>recall on held-out real code</dd></div>
+        <div><dt class="num" data-claim="tests-quantumsafe">584</dt><dd>tests in CI</dd></div>
+      </dl>
+      <ul class="depth">
+        <li><strong>Usage-aware detection</strong>A hybrid AST-and-regex engine that ignores comments and code nothing calls, raising precision from 49.1% for naive matching to 100% on its benchmark.</li>
+        <li><strong>Reads the TLS handshake</strong>Builds a TLS 1.3 ClientHello by hand to detect post-quantum hybrid key exchange, and checks every signature in the certificate chain, not just the leaf.</li>
+        <li><strong>Demonstrates the threat</strong>Shor's and Grover's algorithms run on the Qiskit simulator, and a lattice (LWE) key-encapsulation mechanism, the math behind ML-KEM, is written from scratch.</li>
+        <li><strong>Built for real pipelines</strong>Published on PyPI and as a GitHub Action, with SARIF and CycloneDX CBOM export and a baseline mode that fails a build only on new findings.</li>
+      </ul>
+      <p class="stack">Python · Qiskit · Flask · Postgres · Docker · <a href="https://doi.org/10.5281/zenodo.23843488">DOI 10.5281/zenodo.23843488</a></p>
+    </div>
+  </article>
+
+  <!-- 02 -->
+  <article class="project wrap" id="rl-trader" aria-labelledby="rlt-h">
+    <div class="p-head reveal">
+      <div>
+        <p class="label"><b>02</b>Reinforcement learning · Research paper</p>
+        <h2 id="rlt-h">RL Trader</h2>
+        <p class="lede">A trading agent built on PPO written from scratch, and a paper archived with a DOI on how to tell an agent that learned from one that got lucky, with financial markets as a deliberately hard testbed.</p>
+      </div>
+      <ul class="actions">
+        <li><a class="btn" href="https://rl-for-crypto-and-stocks.vercel.app/#lab">Run the live lab ↗</a></li>
+        <li><a href="reports/rl-trader-paper.html">Paper</a></li>
+        <li><a href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-">Source</a></li>
+      </ul>
+    </div>
+    <div class="frame reveal" style="--ar: 980 / 614">
+      <video muted loop playsinline preload="none" width="980" height="614" poster="media/rltrader-lab.webp"
+             data-src="media/rltrader-lab.mp4" aria-label="Screen recording of the live lab: a trained agent steps through real BTC-USD prices while its equity, exposure and drawdown stream in."></video>
+      <button class="toggle" type="button" hidden>Pause</button>
+    </div>
+    <div class="p-body reveal">
+      <dl class="metrics">
+        <div><dt class="num">30</dt><dd>independent training seeds per experiment</dd></div>
+        <div><dt class="num">19 yrs</dt><dd>of real SPY data in the option-hedging study</dd></div>
+        <div><dt class="num" data-claim="tests-rl-trader">505</dt><dd>tests in CI</dd></div>
+      </dl>
+      <ul class="depth">
+        <li><strong>PPO from first principles</strong>Proximal Policy Optimization with generalized advantage estimation in PyTorch, over two custom Gymnasium environments with shared cost and accounting.</li>
+        <li><strong>Pre-registered evaluation</strong>Predictions committed before the runs, an audit against Stable-Baselines3, leak-free splits, and walk-forward retraining across four periods of history.</li>
+        <li><strong>Where it works</strong>Hedging a sold option, the agent learns to trade less as costs rise and beats a tuned textbook hedge at high costs on 19 years of real SPY data.</li>
+        <li><strong>Generalization, measured</strong>Training on a fresh simulated market each episode lifts held-out return from −44% to +187% on crypto-like paths, with every confidence interval clear of zero.</li>
+      </ul>
+      <p class="stack">PyTorch · Gymnasium · NumPy · LaTeX · Render · Vercel · <a href="https://doi.org/10.5281/zenodo.23843503">DOI 10.5281/zenodo.23843503</a></p>
+    </div>
+  </article>
+
+  <!-- 03 -->
+  <article class="project wrap" id="tradeski" aria-labelledby="ts-h">
+    <div class="p-head reveal">
+      <div>
+        <p class="label"><b>03</b>Real-time systems · Full-stack product</p>
+        <h2 id="ts-h">Tradeski</h2>
+        <p class="lede">A real-time market dashboard that streams prices, Federal Reserve data and news, with an AI analyst that answers questions about your own portfolio.</p>
+      </div>
+      <ul class="actions">
+        <li><a class="btn" href="https://www.tradeski.dev/">Open the dashboard ↗</a></li>
+        <li><a href="reports/tradeski-technical-report.html">Report</a></li>
+        <li><a href="https://github.com/Danny-397/Tradeski">Source</a></li>
+      </ul>
+    </div>
+    <div class="frame reveal">
+      <img src="media/tradeski-dashboard.webp" width="1400" height="1050" loading="lazy" decoding="async"
+           alt="The Tradeski dashboard: a live ticker strip, Federal Reserve macro series, an AAPL candlestick chart with Bollinger Bands and moving averages, and an indicator panel.">
+    </div>
+    <div class="p-body reveal">
+      <dl class="metrics">
+        <div><dt class="num">79%</dt><dd>on held-out assistant questions, written before any fix</dd></div>
+        <div><dt class="num">6</dt><dd>live data pipelines in one interface</dd></div>
+        <div><dt class="num" data-claim="tests-tradeski">343</dt><dd>tests in CI</dd></div>
+      </dl>
+      <ul class="depth">
+        <li><strong>Real-time backend</strong>A persistent WebSocket server feeds a static frontend, with caching tuned per data source and per-route rate limits to protect API budgets.</li>
+        <li><strong>Indicators from scratch</strong>RSI with Wilder smoothing, MACD, Bollinger Bands, ATR and more, hand-coded on NumPy arrays with no TA-Lib and no pandas.</li>
+        <li><strong>A grounded AI analyst</strong>Claude with nine tools and your live portfolio and macro context. Every figure in a reply is checked against the data it was shown.</li>
+        <li><strong>Options and risk</strong>Probabilities from the volatility smile, a 90-symbol options scanner, and Sharpe, beta and correlations from a year of daily returns.</li>
+      </ul>
+      <p class="stack">Python · Flask-SocketIO · Plotly.js · FRED API · Claude · Postgres · Render · Vercel</p>
+    </div>
+  </article>
+
+  <!-- 04 -->
+  <article class="project wrap" id="alphaglyph" aria-labelledby="ag-h">
+    <div class="p-head reveal">
+      <div>
+        <p class="label"><b>04</b>Quantitative finance · Statistical validation</p>
+        <h2 id="ag-h">AlphaGlyph</h2>
+        <p class="lede">A backtesting and forecasting lab that runs every strategy through the statistical tests quant funds use to separate genuine skill from luck.</p>
+      </div>
+      <ul class="actions">
+        <li><a class="btn" href="https://alphaglyph.org/backtest.html">Run a backtest ↗</a></li>
+        <li><a href="https://alphaglyph.org/tools.html">Research lab</a></li>
+        <li><a href="reports/alphaglyph-technical-report.html">Report</a></li>
+        <li><a href="https://github.com/Danny-397/Alphaglyph">Source</a></li>
+      </ul>
+    </div>
+    <div class="frame reveal" style="--ar: 920 / 516">
+      <video muted loop playsinline preload="none" width="920" height="516" poster="media/alphaglyph-replay.webp"
+             data-src="media/alphaglyph-replay.mp4" aria-label="Screen recording of a backtest replayed day by day: the equity curve grows against the S&amp;P 500 while each trade appears with a plain-English reason."></video>
+      <button class="toggle" type="button" hidden>Pause</button>
+    </div>
+    <div class="p-body reveal">
+      <dl class="metrics">
+        <div><dt class="num">106k</dt><dd>parameter transformer forecaster</dd></div>
+        <div><dt class="num">512 MB</dt><dd>server it runs in, served as ONNX</dd></div>
+        <div><dt class="num" data-claim="tests-alphaglyph">374</dt><dd>tests in CI</dd></div>
+      </dl>
+      <ul class="depth">
+        <li><strong>Skill versus luck</strong>Probabilistic and Deflated Sharpe ratios, combinatorial purged cross-validation, the probability of backtest overfitting, and Fama-French factor attribution.</li>
+        <li><strong>A data-mining lab</strong>Generates hundreds of strategies with no edge by construction, then shows naive statistics calling the luckiest significant while the Deflated Sharpe calls it noise.</li>
+        <li><strong>A calibrated forecaster</strong>A small multi-modal transformer that outputs an up-move probability, non-crossing q10–q90 return quantiles and a volatility forecast.</li>
+        <li><strong>Lean serving</strong>Trained offline and shipped as ONNX, about 40 MB of runtime instead of PyTorch's 700 MB, with a forward ledger that grades live predictions.</li>
+      </ul>
+      <p class="stack">Python · Flask · pandas · SciPy · ONNX Runtime · Chart.js · Postgres</p>
+    </div>
+  </article>
+
+  <!-- 05 -->
+  <article class="project wrap" id="rl-chess" aria-labelledby="ch-h">
+    <div class="p-head reveal">
+      <div>
+        <p class="label"><b>05</b>Reinforcement learning · Play it yourself</p>
+        <h2 id="ch-h">AlphaZero-style Chess Engine</h2>
+        <p class="lede">A chess engine that learns only by playing itself, with no opening books and no human games, built from scratch and running in your browser.</p>
+      </div>
+      <ul class="actions">
+        <li><a class="btn" href="https://rlchess.xyz/#play">Play the engine ↗</a></li>
+        <li><a href="reports/rl-chess-technical-report.html">Report</a></li>
+        <li><a href="https://github.com/Danny-397/RL-Chess-Engine">Source</a></li>
+      </ul>
+    </div>
+    <div class="frame reveal" style="--ar: 1000 / 587">
+      <video muted loop playsinline preload="none" width="1000" height="587" poster="media/rlchess-selfplay.webp"
+             data-src="media/rlchess-selfplay.mp4" aria-label="Screen recording of the engine playing itself in the browser, with candidate moves and their evaluations updating as the search runs."></video>
+      <button class="toggle" type="button" hidden>Pause</button>
+    </div>
+    <div class="p-body reveal">
+      <dl class="metrics">
+        <div><dt class="num">1,000</dt><dd>self-play games of training</dd></div>
+        <div><dt class="num">4,672</dt><dd>move logits in the policy head</dd></div>
+        <div><dt class="num" data-claim="tests-chess">59</dt><dd>tests in CI</dd></div>
+      </dl>
+      <ul class="depth">
+        <li><strong>The AlphaZero loop</strong>A dual-headed ResNet reads an 18×8×8 position tensor; PUCT Monte-Carlo tree search uses it to look ahead; self-play generates the training data.</li>
+        <li><strong>Runs in your browser</strong>The network is exported to ONNX and searched client-side with ONNX Runtime Web, with a test that checks it matches PyTorch.</li>
+        <li><strong>Controlled experiments</strong>Multi-seed studies of self-play training with a starting-network control and a confidence interval on every Elo figure.</li>
+        <li><strong>Three opponents</strong>The network alone, a hybrid search, and a classical alpha-beta engine rated about 1390 against strength-limited Stockfish.</li>
+      </ul>
+      <p class="stack">PyTorch · FastAPI · ONNX Runtime Web · chess.js · Vercel</p>
+    </div>
+  </article>
+
+  <!-- 06 -->
+  <article class="project wrap" id="neural-canvas" aria-labelledby="nc-h">
+    <div class="p-head reveal">
+      <div>
+        <p class="label"><b>06</b>Interactive art · Hack the Arts 2026</p>
+        <h2 id="nc-h">Neural Canvas</h2>
+        <p class="lede">Paint glowing light in mid-air with your bare hands: a webcam, a hand-tracking neural network and a pinch of your fingers. Nothing leaves the device.</p>
+      </div>
+      <ul class="actions">
+        <li><a class="btn" href="https://danny-397.github.io/neural-canvas/">Paint with your hands ↗</a></li>
+        <li><a href="reports/neural-canvas-technical-report.html">Report</a></li>
+        <li><a href="https://github.com/Danny-397/neural-canvas">Source</a></li>
+      </ul>
+    </div>
+    <div class="frame reveal" style="--ar: 960 / 600">
+      <video muted loop playsinline preload="none" width="960" height="600" poster="media/neuralcanvas-paint.webp"
+             data-src="media/neuralcanvas-paint.mp4" aria-label="Screen recording of the brush engine painting a glowing six-fold symmetric pattern."></video>
+      <button class="toggle" type="button" hidden>Pause</button>
+    </div>
+    <div class="p-body reveal">
+      <dl class="metrics">
+        <div><dt class="num">21</dt><dd>3D landmarks tracked per hand</dd></div>
+        <div><dt class="num">~60/s</dt><dd>frames, entirely on-device</dd></div>
+        <div><dt class="num">1</dt><dd>HTML file, no server, no build step</dd></div>
+      </dl>
+      <ul class="depth">
+        <li><strong>Hand tracking as the medium</strong>MediaPipe locates 21 points per hand about sixty times a second in the browser, through WebAssembly and the GPU.</li>
+        <li><strong>Clean strokes</strong>A one-euro filter removes landmark jitter, and strokes render with additive blending and kaleidoscope symmetry from 2 to 8 folds.</li>
+        <li><strong>A gesture-only interface</strong>Pinch to paint; other gestures erase, change color and clear. No buttons stand between the person and the drawing.</li>
+        <li><strong>Five brush models</strong>Neon glow, ribbon, spray, comet and embers, plus full-body pose painting and an attract mode for unattended displays.</li>
+      </ul>
+      <p class="stack">JavaScript · MediaPipe Tasks Vision · WebAssembly · Canvas 2D</p>
+    </div>
+  </article>
+
+  <section class="more wrap" aria-labelledby="more-h">
+    <h2 id="more-h">Beyond the code</h2>
+    <div class="more-grid">
+      <div class="reveal">
+        <h3>Technical reports</h3>
+        <p>A full write-up of every project: the design, the experiments, and how each number on this page was measured.</p>
+        <a href="reports.html">Read the reports →</a>
+      </div>
+      <div class="reveal">
+        <h3>Verification ledger</h3>
+        <p>Every headline number on this site, with its source and the command that reproduces it.</p>
+        <a href="reports/verification-ledger.html">Open the ledger →</a>
+      </div>
+      <div class="reveal">
+        <h3>Open source</h3>
+        <p>Diagnosed an <code>AsyncVectorEnv</code> crash in Gymnasium, the standard RL environment library, and submitted a fix with a regression test.</p>
+        <a href="https://github.com/Farama-Foundation/Gymnasium/pull/1657">View the pull request →</a>
       </div>
     </div>
-
-    <div>
-      <h2 class="eyebrow">Filter by field</h2>
-      <div class="filters" id="filters">
-        <button type="button" data-f="all" aria-pressed="true">Everything <span class="n">6</span></button>
-        <button type="button" data-f="ml" aria-pressed="false">Machine learning <span class="n">2</span></button>
-        <button type="button" data-f="quant" aria-pressed="false">Quantitative finance <span class="n">2</span></button>
-        <button type="button" data-f="sec" aria-pressed="false">Security <span class="n">1</span></button>
-        <button type="button" data-f="art" aria-pressed="false">Interactive art <span class="n">1</span></button>
-      </div>
-    </div>
-
-    <div>
-      <h2 class="eyebrow">Also</h2>
-      <p class="rail-note" style="border-top:0;padding-top:var(--s2)">
-        <a href="reports.html">Technical reports &rarr;</a><br>
-        <span style="color:var(--faint)">Ten documents, ~62 pages, one per project</span><br>
-        <a href="reports/verification-ledger.html">Verification ledger &rarr;</a><br>
-        <span style="color:var(--faint)">Every headline number and how to reproduce it</span>
-      </p>
-    </div>
-
-    <p class="rail-note">
-      Source for all six:<br>
-      <a href="https://github.com/Danny-397">github.com/Danny-397</a>
-    </p>
-  </nav>
-
-  <div class="records" id="records">
-
-    <article class="rec" data-field="sec" id="quantumsafe">
-      <div class="rec-head">
-        <div class="rank"><span class="num">01</span><span class="lede-note">Shipped product</span><a class="try-live" href="https://quantumsafescan.com">Try it live <span aria-hidden="true">&nearr;</span></a></div>
-        <div class="tags">
-          <span class="tag type">Developer tool</span>
-          <span class="tag">Post-quantum cryptography</span>
-          <span class="tag live">quantumsafescan.com</span>
-        </div>
-        <h3>QuantumSafe Scan</h3>
-        <p class="lede">
-          Finds the encryption inside a codebase that quantum computers are expected to break,
-          scores how exposed the project is from 0&ndash;100, and names the specific NIST-standard
-          replacement for every finding.
-        </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Usage-aware scanning reaches 100% precision on its own benchmark (naive matching: 49.1%) and 95% on a random, hand-labeled sample of real-world findings.</p>
-      </div>
-
-      <figure class="plate">
-        <div class="plate-frame plate-scroll">
-          <img src="media/quantumsafe-scan.webp" width="1400" height="961" loading="lazy" decoding="async"
-               alt="The scanner mid-use. Left: a Python snippet using RSA key generation, ECDSA, MD5 and TLS 1.0. Right: a quantum risk score of 66 out of 100 marked High risk, a severity breakdown of 4 high, 1 medium, 1 low, and a findings list mapping each line to its replacement — RSA to CRYSTALS-Kyber/Dilithium, ECC/ECDSA to Kyber/Dilithium, MD5 to SHA-3/SHA-256, TLS 1.0/1.1 to TLS 1.3.">
-          <a class="plate-cover" href="https://quantumsafescan.com/#scan">
-            <span class="plate-cta">Scan your own code &nearr;</span>
-          </a>
-        </div>
-        <figcaption>
-          <span class="chip">Screenshot &middot; a real scan</span>
-          <b>A live scan, no account needed.</b> Paste a snippet and the engine scores it, flags each
-          at-risk primitive with its line number, and names the FIPS 203/204 replacement. The same
-          engine runs against a whole repository or an uploaded <code>.zip</code>.
-         <span class="plate-hint">Scroll it sideways to read the detail.</span>
-        </figcaption>
-      </figure>
-
-
-      <dl class="figs">
-        <div><dt>Precision on labeled benchmark</dt><dd>100% <small>vs. 49.1% naive baseline</small></dd></div>
-        <div><dt>Languages parsed</dt><dd>11</dd></div>
-        <div><dt>Real-world audit</dt><dd>5,609 <small>findings, 11,275 files</small></dd></div>
-      </dl>
-
-      <p class="prose">
-        The interesting problem isn't matching the string <code>RSA</code> &mdash; it's not matching it
-        inside a comment, a docstring, or a code path nothing ever calls. A hybrid AST-and-regex engine
-        with usage awareness and reachability ranking eliminated 27 false positives the naive
-        pattern-matching baseline produced, taking precision from 49.1% to 100% on an 18-file,
-        9-language benchmark, with 100% recall on 50 seeded cases under mutation testing. Because that
-        benchmark is the one it was tuned on, precision was also measured on 100 findings drawn at random
-        from real PyPI packages and labeled by hand: 93% (95% CI 86&ndash;97%) for version 0.3.1, where four
-        of the seven misses were one rule flagging the flags that turn old TLS <em>off</em>. After that and the
-        recall fixes, a fresh sample of the current scanner gives 95% (89&ndash;98%).
-      </p>
-
-      <details class="method">
-        <summary>Method</summary>
-        <div class="inner">
-          <ul>
-            <li><strong>Attack.</strong> Shor's and Grover's algorithms implemented on the Qiskit simulator, so the HIGH risk rating on RSA, ECC and Diffie-Hellman is demonstrated rather than asserted.</li>
-            <li><strong>Detect in code.</strong> Cross-language AST + regex scanning with dependency analysis; results export to JSON, HTML, SARIF, CycloneDX CBOM and SVG badges so it drops into an existing CI pipeline.</li>
-            <li><strong>Detect on the wire.</strong> A website's quantum exposure is in its TLS handshake, not its source. TLS 1.3 removed the key exchange from the cipher-suite name and Python's <code>ssl</code> cannot read the group, so the scanner builds a ClientHello by hand: it offers post-quantum hybrids but a key share for X25519 only, so a server preferring a hybrid has to name it in a HelloRetryRequest. It also reads every signature in the certificate chain &mdash; Cloudflare's leaf is modern ECDSA, but an intermediate above it is signed with RSA, which a leaf-only check misses.</li>
-            <li><strong>Prioritise.</strong> A severity score says how much vulnerable cryptography exists, not whether you will finish migrating in time. Mosca's inequality &mdash; secrecy lifetime plus migration time, against time-to-quantum &mdash; turns it into a deadline. No default is supplied for the quantum date, because nobody knows it; the tool reports the break-even year instead, which needs no such guess.</li>
-            <li><strong>Fix.</strong> A lattice-based (LWE) key-encapsulation mechanism written from scratch &mdash; the underlying math of CRYSTALS-Kyber / ML-KEM &mdash; rather than a library call.</li>
-            <li><strong>Field results.</strong> Paramiko, the standard Python SSH library, scores 100/100 Critical with 110 findings. Across 37 PyPI packages, 32 (86%) contained at least one finding. In a study of 8 widely-used projects, 88% contained HIGH-risk usage, mean score 61.4/100.</li>
-            <li><strong>Assurance.</strong> 584 automated tests in continuous integration, plus a baseline mode that fails a build only on <em>new</em> findings &mdash; so a project with an existing backlog can ratchet it down instead of disabling the check.</li>
-          </ul>
-        </div>
-      </details>
-
-      <div class="stack">
-        <span>Python</span><span>Qiskit</span><span>Flask</span><span>SQLite / Postgres</span><span>JWT</span><span>Docker Compose</span><span>PyPI</span>
-      </div>
-      <div class="links">
-        <a class="primary" href="https://quantumsafescan.com">Open the scanner &rarr;</a>
-        <a class="secondary" href="reports/QuantumSafe-Technical-Report.pdf">Technical report</a>
-        <a class="secondary" href="reports/QuantumSafe-Whitepaper.pdf">Whitepaper</a>
-        <a class="secondary" href="https://doi.org/10.5281/zenodo.23843488">DOI</a>
-        <a class="secondary" href="https://github.com/Danny-397/Quantum-Safe-Scan">Source</a>
-      </div>
-    </article>
-
-    <article class="rec" data-field="ml" id="rl-trader">
-      <div class="rec-head">
-        <div class="rank"><span class="num">02</span><span class="lede-note">Research paper</span><a class="try-live" href="https://rl-for-crypto-and-stocks.vercel.app">Try it live <span aria-hidden="true">&nearr;</span></a></div>
-        <div class="tags">
-          <span class="tag type">Research study</span>
-          <span class="tag">Reinforcement learning</span>
-          <span class="tag live">Live dashboard + LaTeX paper</span>
-        </div>
-        <h3>RL Trader: Evaluation Rigor in Deep RL</h3>
-        <p class="lede">
-          PPO implemented from scratch and a paper, archived with a DOI, on how to tell an agent that
-          learned from one that got lucky, using financial markets as a deliberately hard testbed.
-        </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>A pre-registered evaluation across 30 seeds and four periods of history, with confidence intervals on every result. Applied to hedging a sold option, the same agent beats a tuned textbook hedge when trading costs are high.</p>
-      </div>
-
-      <figure class="plate">
-        <div class="plate-frame">
-          <video
-            muted loop playsinline preload="none"
-            width="980" height="614"
-            poster="media/rltrader-lab.webp"
-            data-src="media/rltrader-lab.mp4"
-            aria-label="The Agent Playground after a full episode on real BTC-USD data: a step cursor sweeps across the equity curve, target exposure, per-bar reward and drawdown, and the readouts above each chart update at every step."></video>
-          <button type="button" class="plate-toggle" data-play data-clip="the RL-Trader agent playground">Pause</button>
-          <a class="plate-cover" href="https://rl-for-crypto-and-stocks.vercel.app/#lab">
-            <span class="plate-cta">Run your own episode &nearr;</span>
-          </a>
-        </div>
-        <figcaption>
-          <span class="chip">Screen recording &middot; the live lab</span>
-          <b>The Agent Playground, running in the browser.</b> A trained policy steps through real
-          BTC-USD bars while equity, target exposure, per-bar reward and drawdown stream in together
-          &mdash; with transaction cost and slippage as live inputs. Every run ends with a reproducibility
-          receipt naming the experiment, the data source and the settings.
-        </figcaption>
-      </figure>
-
-      <dl class="figs">
-        <div><dt>The run I nearly published</dt><dd>+275% <small>vs. +19% &middot; superseded v1, commit d4c0ef9</small></dd></div>
-        <div><dt>Crypto, 30 seeds</dt><dd>−40% <small>vs. +10% buy-and-hold &middot; behind on 5 of 6 coins</small></dd></div>
-        <div><dt>Stocks, 30 seeds</dt><dd>−30% <small>vs. +240% buy-and-hold &middot; behind in all 300 runs</small></dd></div>
-      </dl>
-
-      <figure class="viz reveal">
-        <div class="viz-head">
-          <p class="viz-title">Every seed, plotted against the benchmark it has to beat</p>
-          <p class="viz-sub">
-            Each dot is one training seed's return <em>minus</em> buy-and-hold over the same window, so
-            the zero line means &ldquo;tied with simply holding the asset.&rdquo; The bracket is the 95%
-            confidence interval of the mean.
-          </p>
-        </div>
-        <div class="viz-wrap">
-      <svg viewBox="0 0 700 200" role="img" aria-label="Excess return over buy-and-hold for each of thirty training seeds, per market. Most crypto seeds sit below zero and their mean interval lies below it; every one of the thirty stock seeds sits far below zero.">
-        <g class="ax" text-anchor="middle">
-          <line class="grid" x1="14.0" y1="34" x2="14.0" y2="172"/>
-          <text x="14.0" y="188">-300%</text>
-          <line class="grid" x1="144.5" y1="34" x2="144.5" y2="172"/>
-          <text x="144.5" y="188">-200%</text>
-          <line class="grid" x1="275.0" y1="34" x2="275.0" y2="172"/>
-          <text x="275.0" y="188">-100%</text>
-          <line class="grid" x1="405.5" y1="34" x2="405.5" y2="172"/>
-          <text x="405.5" y="188">0</text>
-          <line class="grid" x1="535.9" y1="34" x2="535.9" y2="172"/>
-          <text x="535.9" y="188">+100%</text>
-          <line class="grid" x1="666.4" y1="34" x2="666.4" y2="172"/>
-          <text x="666.4" y="188">+200%</text>
-        </g>
-        <line class="zero" x1="405.5" y1="28" x2="405.5" y2="172" stroke-width="1.5"/>
-        <text class="lbl-em" x="405.5" y="22" text-anchor="middle">ties buy-and-hold</text>
-        <text class="lbl" x="14" y="60">Crypto · 30 seeds</text>
-        <text class="lbl-em" x="686" y="60" text-anchor="end">mean -51% · 95% CI [-62%, -38%] · p = 0.19</text>
-        <line class="ci" x1="324.9" y1="80" x2="355.9" y2="80" opacity=".45"/>
-        <line class="ci" x1="324.9" y1="74" x2="324.9" y2="86"/>
-        <line class="ci" x1="355.9" y1="74" x2="355.9" y2="86"/>
-        <circle class="dot" cx="337.6" cy="82.5" r="4"/><circle class="dot-hit" cx="337.6" cy="82.5" r="10" data-tip="seed 100: -52% vs buy-and-hold"/>
-        <circle class="dot" cx="301.8" cy="75.1" r="4"/><circle class="dot-hit" cx="301.8" cy="75.1" r="10" data-tip="seed 101: -80% vs buy-and-hold"/>
-        <circle class="dot" cx="304.8" cy="87.3" r="4"/><circle class="dot-hit" cx="304.8" cy="87.3" r="10" data-tip="seed 102: -77% vs buy-and-hold"/>
-        <circle class="dot" cx="318.0" cy="77.5" r="4"/><circle class="dot-hit" cx="318.0" cy="77.5" r="10" data-tip="seed 103: -67% vs buy-and-hold"/>
-        <circle class="dot" cx="310.2" cy="84.9" r="4"/><circle class="dot-hit" cx="310.2" cy="84.9" r="10" data-tip="seed 104: -73% vs buy-and-hold"/>
-        <circle class="dot" cx="337.3" cy="72.7" r="4"/><circle class="dot-hit" cx="337.3" cy="72.7" r="10" data-tip="seed 105: -52% vs buy-and-hold"/>
-        <circle class="dot" cx="376.1" cy="82.5" r="4"/><circle class="dot-hit" cx="376.1" cy="82.5" r="10" data-tip="seed 106: -23% vs buy-and-hold"/>
-        <circle class="dot" cx="356.0" cy="75.1" r="4"/><circle class="dot-hit" cx="356.0" cy="75.1" r="10" data-tip="seed 107: -38% vs buy-and-hold"/>
-        <circle class="dot" cx="368.1" cy="87.3" r="4"/><circle class="dot-hit" cx="368.1" cy="87.3" r="10" data-tip="seed 108: -29% vs buy-and-hold"/>
-        <circle class="dot" cx="328.6" cy="77.5" r="4"/><circle class="dot-hit" cx="328.6" cy="77.5" r="10" data-tip="seed 109: -59% vs buy-and-hold"/>
-        <circle class="dot" cx="493.9" cy="84.9" r="4"/><circle class="dot-hit" cx="493.9" cy="84.9" r="10" data-tip="seed 110: +68% vs buy-and-hold"/>
-        <circle class="dot" cx="349.3" cy="72.7" r="4"/><circle class="dot-hit" cx="349.3" cy="72.7" r="10" data-tip="seed 111: -43% vs buy-and-hold"/>
-        <circle class="dot" cx="315.3" cy="82.5" r="4"/><circle class="dot-hit" cx="315.3" cy="82.5" r="10" data-tip="seed 112: -69% vs buy-and-hold"/>
-        <circle class="dot" cx="428.5" cy="75.1" r="4"/><circle class="dot-hit" cx="428.5" cy="75.1" r="10" data-tip="seed 113: +18% vs buy-and-hold"/>
-        <circle class="dot" cx="297.9" cy="87.3" r="4"/><circle class="dot-hit" cx="297.9" cy="87.3" r="10" data-tip="seed 114: -82% vs buy-and-hold"/>
-        <circle class="dot" cx="323.8" cy="77.5" r="4"/><circle class="dot-hit" cx="323.8" cy="77.5" r="10" data-tip="seed 115: -63% vs buy-and-hold"/>
-        <circle class="dot" cx="390.3" cy="84.9" r="4"/><circle class="dot-hit" cx="390.3" cy="84.9" r="10" data-tip="seed 116: -12% vs buy-and-hold"/>
-        <circle class="dot" cx="308.9" cy="72.7" r="4"/><circle class="dot-hit" cx="308.9" cy="72.7" r="10" data-tip="seed 117: -74% vs buy-and-hold"/>
-        <circle class="dot" cx="298.7" cy="82.5" r="4"/><circle class="dot-hit" cx="298.7" cy="82.5" r="10" data-tip="seed 118: -82% vs buy-and-hold"/>
-        <circle class="dot" cx="370.6" cy="75.1" r="4"/><circle class="dot-hit" cx="370.6" cy="75.1" r="10" data-tip="seed 119: -27% vs buy-and-hold"/>
-        <circle class="dot" cx="334.0" cy="87.3" r="4"/><circle class="dot-hit" cx="334.0" cy="87.3" r="10" data-tip="seed 120: -55% vs buy-and-hold"/>
-        <circle class="dot" cx="289.9" cy="77.5" r="4"/><circle class="dot-hit" cx="289.9" cy="77.5" r="10" data-tip="seed 121: -89% vs buy-and-hold"/>
-        <circle class="dot" cx="308.3" cy="84.9" r="4"/><circle class="dot-hit" cx="308.3" cy="84.9" r="10" data-tip="seed 122: -74% vs buy-and-hold"/>
-        <circle class="dot" cx="310.6" cy="72.7" r="4"/><circle class="dot-hit" cx="310.6" cy="72.7" r="10" data-tip="seed 123: -73% vs buy-and-hold"/>
-        <circle class="dot" cx="313.1" cy="82.5" r="4"/><circle class="dot-hit" cx="313.1" cy="82.5" r="10" data-tip="seed 124: -71% vs buy-and-hold"/>
-        <circle class="dot" cx="371.6" cy="75.1" r="4"/><circle class="dot-hit" cx="371.6" cy="75.1" r="10" data-tip="seed 125: -26% vs buy-and-hold"/>
-        <circle class="dot" cx="306.6" cy="87.3" r="4"/><circle class="dot-hit" cx="306.6" cy="87.3" r="10" data-tip="seed 126: -76% vs buy-and-hold"/>
-        <circle class="dot" cx="385.0" cy="77.5" r="4"/><circle class="dot-hit" cx="385.0" cy="77.5" r="10" data-tip="seed 127: -16% vs buy-and-hold"/>
-        <circle class="dot" cx="336.8" cy="84.9" r="4"/><circle class="dot-hit" cx="336.8" cy="84.9" r="10" data-tip="seed 128: -53% vs buy-and-hold"/>
-        <circle class="dot" cx="306.0" cy="72.7" r="4"/><circle class="dot-hit" cx="306.0" cy="72.7" r="10" data-tip="seed 129: -76% vs buy-and-hold"/>
-        <circle class="mean" cx="339.3" cy="80" r="6"/>
-        <text class="lbl" x="14" y="126">Stocks · 30 seeds</text>
-        <text class="lbl-em" x="686" y="126" text-anchor="end">mean -269% · 95% CI [-274%, -264%] · p = 0.002</text>
-        <line class="ci" x1="47.4" y1="146" x2="61.3" y2="146" opacity=".45"/>
-        <line class="ci" x1="47.4" y1="140" x2="47.4" y2="152"/>
-        <line class="ci" x1="61.3" y1="140" x2="61.3" y2="152"/>
-        <circle class="dot" cx="54.5" cy="148.5" r="4"/><circle class="dot-hit" cx="54.5" cy="148.5" r="10" data-tip="seed 100: -269% vs buy-and-hold"/>
-        <circle class="dot" cx="35.3" cy="141.1" r="4"/><circle class="dot-hit" cx="35.3" cy="141.1" r="10" data-tip="seed 101: -284% vs buy-and-hold"/>
-        <circle class="dot" cx="65.6" cy="153.3" r="4"/><circle class="dot-hit" cx="65.6" cy="153.3" r="10" data-tip="seed 102: -261% vs buy-and-hold"/>
-        <circle class="dot" cx="60.9" cy="143.5" r="4"/><circle class="dot-hit" cx="60.9" cy="143.5" r="10" data-tip="seed 103: -264% vs buy-and-hold"/>
-        <circle class="dot" cx="35.5" cy="150.9" r="4"/><circle class="dot-hit" cx="35.5" cy="150.9" r="10" data-tip="seed 104: -284% vs buy-and-hold"/>
-        <circle class="dot" cx="50.8" cy="138.7" r="4"/><circle class="dot-hit" cx="50.8" cy="138.7" r="10" data-tip="seed 105: -272% vs buy-and-hold"/>
-        <circle class="dot" cx="45.1" cy="148.5" r="4"/><circle class="dot-hit" cx="45.1" cy="148.5" r="10" data-tip="seed 106: -276% vs buy-and-hold"/>
-        <circle class="dot" cx="76.1" cy="141.1" r="4"/><circle class="dot-hit" cx="76.1" cy="141.1" r="10" data-tip="seed 107: -253% vs buy-and-hold"/>
-        <circle class="dot" cx="101.0" cy="153.3" r="4"/><circle class="dot-hit" cx="101.0" cy="153.3" r="10" data-tip="seed 108: -233% vs buy-and-hold"/>
-        <circle class="dot" cx="60.1" cy="143.5" r="4"/><circle class="dot-hit" cx="60.1" cy="143.5" r="10" data-tip="seed 109: -265% vs buy-and-hold"/>
-        <circle class="dot" cx="40.6" cy="150.9" r="4"/><circle class="dot-hit" cx="40.6" cy="150.9" r="10" data-tip="seed 110: -280% vs buy-and-hold"/>
-        <circle class="dot" cx="50.0" cy="138.7" r="4"/><circle class="dot-hit" cx="50.0" cy="138.7" r="10" data-tip="seed 111: -273% vs buy-and-hold"/>
-        <circle class="dot" cx="36.6" cy="148.5" r="4"/><circle class="dot-hit" cx="36.6" cy="148.5" r="10" data-tip="seed 112: -283% vs buy-and-hold"/>
-        <circle class="dot" cx="66.6" cy="141.1" r="4"/><circle class="dot-hit" cx="66.6" cy="141.1" r="10" data-tip="seed 113: -260% vs buy-and-hold"/>
-        <circle class="dot" cx="72.5" cy="153.3" r="4"/><circle class="dot-hit" cx="72.5" cy="153.3" r="10" data-tip="seed 114: -255% vs buy-and-hold"/>
-        <circle class="dot" cx="47.3" cy="143.5" r="4"/><circle class="dot-hit" cx="47.3" cy="143.5" r="10" data-tip="seed 115: -275% vs buy-and-hold"/>
-        <circle class="dot" cx="44.8" cy="150.9" r="4"/><circle class="dot-hit" cx="44.8" cy="150.9" r="10" data-tip="seed 116: -277% vs buy-and-hold"/>
-        <circle class="dot" cx="77.9" cy="138.7" r="4"/><circle class="dot-hit" cx="77.9" cy="138.7" r="10" data-tip="seed 117: -251% vs buy-and-hold"/>
-        <circle class="dot" cx="31.3" cy="148.5" r="4"/><circle class="dot-hit" cx="31.3" cy="148.5" r="10" data-tip="seed 118: -287% vs buy-and-hold"/>
-        <circle class="dot" cx="37.9" cy="141.1" r="4"/><circle class="dot-hit" cx="37.9" cy="141.1" r="10" data-tip="seed 119: -282% vs buy-and-hold"/>
-        <circle class="dot" cx="103.6" cy="153.3" r="4"/><circle class="dot-hit" cx="103.6" cy="153.3" r="10" data-tip="seed 120: -231% vs buy-and-hold"/>
-        <circle class="dot" cx="57.4" cy="143.5" r="4"/><circle class="dot-hit" cx="57.4" cy="143.5" r="10" data-tip="seed 121: -267% vs buy-and-hold"/>
-        <circle class="dot" cx="39.8" cy="150.9" r="4"/><circle class="dot-hit" cx="39.8" cy="150.9" r="10" data-tip="seed 122: -280% vs buy-and-hold"/>
-        <circle class="dot" cx="32.3" cy="138.7" r="4"/><circle class="dot-hit" cx="32.3" cy="138.7" r="10" data-tip="seed 123: -286% vs buy-and-hold"/>
-        <circle class="dot" cx="32.2" cy="148.5" r="4"/><circle class="dot-hit" cx="32.2" cy="148.5" r="10" data-tip="seed 124: -286% vs buy-and-hold"/>
-        <circle class="dot" cx="43.1" cy="141.1" r="4"/><circle class="dot-hit" cx="43.1" cy="141.1" r="10" data-tip="seed 125: -278% vs buy-and-hold"/>
-        <circle class="dot" cx="58.3" cy="153.3" r="4"/><circle class="dot-hit" cx="58.3" cy="153.3" r="10" data-tip="seed 126: -266% vs buy-and-hold"/>
-        <circle class="dot" cx="25.8" cy="143.5" r="4"/><circle class="dot-hit" cx="25.8" cy="143.5" r="10" data-tip="seed 127: -291% vs buy-and-hold"/>
-        <circle class="dot" cx="75.7" cy="150.9" r="4"/><circle class="dot-hit" cx="75.7" cy="150.9" r="10" data-tip="seed 128: -253% vs buy-and-hold"/>
-        <circle class="dot" cx="67.6" cy="138.7" r="4"/><circle class="dot-hit" cx="67.6" cy="138.7" r="10" data-tip="seed 129: -259% vs buy-and-hold"/>
-        <circle class="mean" cx="54.2" cy="146" r="6"/>
-      </svg>
-          <div class="viz-tt" id="tt-seeds"></div>
-        </div>
-        <p class="viz-sub">
-          <b>2 of 30 crypto seeds beat holding</b>, and a single one of them, reported alone,
-          would have looked like a discovery. The mean sits below zero, though with six coins the test
-          cannot call it significant (p&nbsp;=&nbsp;0.19). <b>Every stock seed lands far left:</b>
-          that arm is not inconclusive, it is reliably worse than holding the index.
-        </p>
-        <details>
-          <summary>Table view</summary>
-      <table>
-        <thead><tr><th>Market</th><th>Worst seed</th><th>Best seed</th><th>Mean excess</th><th>95% CI</th><th>p</th></tr></thead>
-        <tbody>
-          <tr><td>Crypto</td><td>-89%</td><td>+68%</td><td>-51%</td><td>[-62%, -38%]</td><td>0.19</td></tr>
-          <tr><td>Stocks</td><td>-291%</td><td>-231%</td><td>-269%</td><td>[-274%, -264%]</td><td>0.002</td></tr>
-        </tbody>
-      </table>
-        </details>
-      </figure>
-
-      <p class="prose">
-        This is the project I'd point at first, and it is first for that reason. It is designed to
-        produce a negative result honestly, and it does. The framework implements Proximal Policy
-        Optimization with Generalized Advantage Estimation from first principles in PyTorch &mdash;
-        gradient clipping, entropy bonus, orthogonal initialization, running observation normalization
-        via Welford's method &mdash; over two custom Gymnasium environments sharing identical accounting
-        and cost mechanics.
-      </p>
-
-      <figure class="plate">
-        <div class="plate-frame plate-scroll">
-          <img src="media/rltrader-arms.webp" width="1400" height="530" loading="lazy" decoding="async"
-               alt="Two panels compared, on simulated price paths. Trained on one fixed path, tagged memorised: training return +87k% to +4.0M% across 10 seeds, held-out return minus 44% with a 95% confidence interval of minus 59% to minus 21%. A fresh path every episode, tagged generalised: training return +24% to +460%, held-out return +187% with a 95% confidence interval of +147% to +229%.">
-          <a class="plate-cover" href="https://rl-for-crypto-and-stocks.vercel.app/#result">
-            <span class="plate-cta">See the full result &nearr;</span>
-          </a>
-        </div>
-        <figcaption>
-          <span class="chip">Screenshot &middot; the finding</span>
-          <b>The whole argument in one figure.</b> On simulated crypto-like paths, both arms were trained
-          identically and scored on the same held-out paths; the only difference is whether they saw one
-          fixed path or a fresh one every episode. The overfit arm's in-sample return of
-          <code>+4.0M%</code> becomes <code>&minus;44%</code> the moment it meets data it has never seen.
-          Each dot is one seed.
-         <span class="plate-hint">Scroll it sideways to read the detail.</span>
-        </figcaption>
-      </figure>
-
-      <div class="finding">
-        <p class="eyebrow">Reported finding</p>
-        <p>
-          <strong>No seed-robust edge over buy-and-hold.</strong> One favorable run returned +275% against a
-          +19% benchmark, and that was the version I nearly wrote up as the finding &mdash; it is
-          superseded, and the project site cites the commit
-          (<code>d4c0ef9</code>) rather than quoting it as current. I then audited my own study against
-          current deep-RL practice, with every prediction committed before the runs. The audit found two
-          real flaws &mdash; my PPO trailed a reference library on two of four benchmarks, and the crypto
-          split leaked across coins in calendar time &mdash; and fixing both left the conclusion unchanged.
-          At thirty seeds the stock agent trails buy-and-hold in all 300 runs (p = 0.002); the crypto agent
-          trails on five of six coins, which six coins cannot make significant (p = 0.19). Retrained across
-          four periods of history, it trails in every period on stocks and in three of four on crypto; the
-          fourth was a crash it lost less in, and I report that registered prediction as failed. The reason
-          is plain once you look at its positions: its daily long-or-short calls are right 50.0% of the time,
-          and reversing them almost every day costs about as much as it loses.
-          Separately, on simulated market paths, an agent trained on one fixed path memorizes it
-          catastrophically, while a fresh path every episode flips held-out return from &minus;25% to +31%
-          (equity-like paths) and from &minus;44% to +187% (crypto-like) &mdash; across ten seeds, with all
-          four confidence intervals excluding zero.
-          The result reproduces Henderson et al. (2018) on the unreliability of
-          single-run RL evaluation, in a domain where the incentive to publish the lucky seed is strongest.
-        </p>
-      </div>
-
-      <details class="method">
-        <summary>Method</summary>
-        <div class="inner">
-          <ul>
-            <li><strong>Observation space.</strong> 28 engineered features spanning momentum horizons, trend indicators, oscillators, volatility-regime signals, volume microstructure and cross-asset context. Continuous action targeting a position fraction (long / short / flat).</li>
-            <li><strong>Leakage control.</strong> Chronological train/validation/test splits with feature scalers fit on training data only.</li>
-            <li><strong>Statistics.</strong> Bootstrap confidence intervals across seeds, paired permutation tests against buy-and-hold, interquartile means, Holm-adjusted p-values, and walk-forward evaluation over four periods of history. Results are reported as distributions, never single runs.</li>
-            <li><strong>Pre-registration.</strong> Two studies committed their predictions before running: an audit (a repaired PPO checked against Stable-Baselines3, a leak-free split, SAC, budgets to 1M steps, a hindsight-free stock universe) and a depth study (30 seeds, walk-forward, a full hyper-parameter sweep). Every prediction is reported as held or failed.</li>
-            <li><strong>Replication.</strong> The harder cross-sectional problem &mdash; allocating portfolio weights rather than timing one asset &mdash; reaches identical conclusions.</li>
-            <li><strong>Deployment.</strong> The trained policy is exported to NumPy archives so the inference API runs with no PyTorch dependency.</li>
-          </ul>
-        </div>
-      </details>
-
-      <div class="stack">
-        <span>PyTorch 2.x</span><span>Gymnasium</span><span>NumPy</span><span>Matplotlib</span><span>LaTeX</span><span>Vercel</span><span>Render</span>
-      </div>
-      <div class="links">
-        <a class="primary" href="https://rl-for-crypto-and-stocks.vercel.app">Open the results dashboard &rarr;</a>
-        <a class="secondary" href="https://rl-for-crypto-and-stocks.vercel.app/#lab">Interactive lab</a>
-        <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-/blob/main/RESULTS.md">Full results</a>
-        <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-/tree/main/paper">Paper</a>
-        <a class="secondary" href="https://rl-for-crypto-and-stocks.vercel.app/assets/rl-trader-summary.pdf">One-page summary</a>
-        <a class="secondary" href="https://doi.org/10.5281/zenodo.23843503">DOI</a>
-        <a class="secondary" href="https://github.com/Danny-397/RL-for-Crypto-and-stocks-">Source</a>
-      </div>
-    </article>
-
-    <article class="rec" data-field="quant" id="tradeski">
-      <div class="rec-head">
-        <div class="rank"><span class="num">03</span><span class="lede-note">Real-time infrastructure</span><a class="try-live" href="https://www.tradeski.dev/">Try it live <span aria-hidden="true">&nearr;</span></a></div>
-        <div class="tags">
-          <span class="tag type">Live system</span>
-          <span class="tag">Real-time infrastructure</span>
-          <span class="tag live">tradeski.dev</span>
-        </div>
-        <h3>Tradeski</h3>
-        <p class="lede">
-          A real-time market dashboard &mdash; streaming prices, Federal Reserve data, news sentiment and
-          an assistant that answers questions about <em>your</em> portfolio rather than the market in general.
-        </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Every indicator hand-coded on NumPy and streamed live, with an assistant that reasons about your actual holdings.</p>
-      </div>
-
-      <figure class="plate">
-        <div class="plate-frame plate-scroll">
-          <img src="media/tradeski-dashboard.webp" width="1400" height="1050" loading="lazy" decoding="async"
-               alt="The Tradeski dashboard: a top ticker strip of eleven symbols with percentage moves, a macro strip showing high-yield spread, CPI, the ten-year, the Fed rate, GDP, the yield curve and unemployment, a candlestick chart of AAPL with Bollinger Bands and moving-average overlays, and a right-hand indicator panel showing RSI, MACD, Bollinger Bands, Z-score and moving averages.">
-          <a class="plate-cover" href="https://www.tradeski.dev/">
-            <span class="plate-cta">Open the project &nearr;</span>
-          </a>
-        </div>
-        <figcaption>
-          <span class="chip">Screenshot &middot; the live dashboard</span>
-          <b>The terminal in normal operation.</b> Streaming ticker strip, seven FRED macro series,
-          candlesticks with hand-rolled overlays, and a live indicator panel &mdash; every quantitative
-          figure computed on raw NumPy arrays rather than a TA library.
-         <span class="plate-hint">Scroll it sideways to read the detail.</span>
-        </figcaption>
-      </figure>
-
-
-      <dl class="figs">
-        <div><dt>Symbols tracked live</dt><dd>11 <small>ticker + correlation matrix</small></dd></div>
-        <div><dt>Assistant eval, held-out</dt><dd>79% <small>19 of 24, questions written before any fix</small></dd></div>
-        <div><dt>Tests in CI</dt><dd>343 <small>across 28 files</small></dd></div>
-      </dl>
-
-      <p class="prose">
-        The engineering interest here is everything around the charts. Every quantitative indicator
-        &mdash; SMA, EMA, RSI with Wilder smoothing, MACD, Bollinger Bands, ATR, stochastic, Z-score,
-        volatility, linear regression &mdash; is hand-coded on raw NumPy arrays: no TA-Lib, no pandas.
-        A persistent WebSocket backend feeds a fully static frontend, with a caching layer tuned per
-        data source (prices 5 minutes, news 30, FRED and correlations an hour) and per-route rate
-        limiting to keep third-party API budgets intact.
-      </p>
-
-      <details class="method">
-        <summary>Method</summary>
-        <div class="inner">
-          <ul>
-            <li><strong>Risk metrics.</strong> Sharpe ratio, beta against the S&amp;P 500 and annualized volatility computed from a year of daily returns weighted by current market value, plus a 90-day pairwise return-correlation heatmap across all tracked symbols.</li>
-            <li><strong>Sentiment.</strong> VADER extended with roughly 30 finance-specific terms &mdash; <code>beats &rarr; +2.0</code>, <code>bankruptcy &rarr; &minus;3.0</code> &mdash; because general-purpose sentiment models misread earnings language.</li>
-            <li><strong>Assistant.</strong> Claude Haiku 5.5 with nine Tradeski tools and web search, grounded in the user's portfolio and macro context. Every figure in a reply is checked against the data it was shown. A 32-question eval with deterministic grading scores 89% on the main set and 79% on held-out questions; its first run found a prompt line that had kept signed-out visitors from ever reaching the what-if tool.</li>
-            <li><strong>Security.</strong> PBKDF2 password hashing, signed bearer tokens, and per-user row scoping isolating portfolios, alerts and watchlists.</li>
-            <li><strong>Screener.</strong> A 29-symbol universe &mdash; 27 stocks across five sectors plus SPY and QQQ &mdash; fetched concurrently through an 8-worker thread pool.</li>
-          </ul>
-        </div>
-      </details>
-
-      <div class="stack">
-        <span>Python 3.12</span><span>Flask-SocketIO</span><span>gevent</span><span>Plotly.js</span><span>FRED API</span><span>NewsAPI</span><span>Claude Haiku 5.5</span><span>Postgres</span>
-      </div>
-      <div class="links">
-        <a class="primary" href="https://www.tradeski.dev/">Open the project &rarr;</a>
-        <a class="secondary" href="https://www.tradeski.dev/app">Open the dashboard</a>
-        <a class="secondary" href="reports/Tradeski-Technical-Report.pdf">Technical report</a>
-        <a class="secondary" href="https://github.com/Danny-397/Tradeski">Source</a>
-      </div>
-    </article>
-
-    <article class="rec" data-field="quant" id="alphaglyph">
-      <div class="rec-head">
-        <div class="rank"><span class="num">04</span><span class="lede-note">Statistical rigor</span><a class="try-live" href="https://alphaglyph.org/backtest.html">Try it live <span aria-hidden="true">&nearr;</span></a></div>
-        <div class="tags">
-          <span class="tag type">Live system</span>
-          <span class="tag">Statistical validation</span>
-          <span class="tag">Probabilistic forecasting</span>
-          <span class="tag live">alphaglyph.org</span>
-        </div>
-        <h3>AlphaGlyph</h3>
-        <p class="lede">
-          A backtesting and forecasting laboratory built on the assumption that its own results are wrong
-          until they survive the statistical tests institutional quant funds use to separate skill from luck
-          &mdash; including the forecast it makes about tomorrow.
-        </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Every strategy is scored with the tests quant funds use to separate skill from luck: Deflated Sharpe, the probability of backtest overfitting, and purged cross-validation.</p>
-      </div>
-
-      <figure class="plate">
-        <div class="plate-frame">
-          <video
-            muted loop playsinline preload="none"
-            width="920" height="516"
-            poster="media/alphaglyph-replay.webp"
-            data-src="media/alphaglyph-replay.mp4"
-            aria-label="The Watch It Trade replay: the strategy equity curve grows day by day against the SPY benchmark while each executed trade streams into a log beneath it with a plain-English reason and its realised profit or loss."></video>
-          <button type="button" class="plate-toggle" data-play data-clip="the AlphaGlyph replay">Pause</button>
-          <a class="plate-cover" href="https://alphaglyph.org/backtest.html">
-            <span class="plate-cta">Run your own backtest &nearr;</span>
-          </a>
-        </div>
-        <figcaption>
-          <span class="chip">Screen recording &middot; a real backtest</span>
-          <b>&ldquo;Watch it trade&rdquo; &mdash; the backtest replayed day by day.</b> The equity curve grows
-          against the SPY benchmark while each trade streams in with a plain-English reason
-          (&ldquo;bought because the stock was trading near its 52-week low&rdquo;) and its realised P&amp;L.
-          Nothing about the run is hidden behind a single summary number.
-        </figcaption>
-      </figure>
-
-      <dl class="figs">
-        <div><dt>Forecaster test AUC</dt><dd>&asymp;0.51 <small>a coin flip</small></dd></div>
-        <div><dt>In-sample Sharpe surviving OOS</dt><dd>~52% <small>median</small></dd></div>
-        <div><dt>Tests in CI</dt><dd>374</dd></div>
-      </dl>
-
-      <figure class="viz reveal">
-        <div class="viz-head">
-          <p class="viz-title">Probability that the best backtest in the search is fooling you</p>
-          <p class="viz-sub">
-            Combinatorially-symmetric cross-validation over a 42-variant trend and mean-reversion grid on
-            SPY. Above the 50% mark, the in-sample winner is more likely than not to land in the bottom
-            half out-of-sample.
-          </p>
-        </div>
-        <div class="meter-track" role="img" aria-label="Probability of backtest overfitting: 72 percent, above the 50 percent coin-flip mark.">
-          <div class="meter-fill" style="width:72%"></div>
-          <div class="meter-mid" style="left:50%"></div>
-        </div>
-        <div class="meter-scale">
-          <span>0%</span><span>50% &middot; coin flip</span><span>100%</span>
-        </div>
-        <p class="viz-sub">
-          <b>72%</b> on the run of 2026-08-01. An earlier run of the identical procedure returned
-          <b>63%</b> &mdash; same code, same grid, same ticker, a different window. The drift is the point:
-          a single PBO quoted as a constant is the exact error the metric exists to catch.
-        </p>
-      </figure>
-
-      <p class="prose">
-        Anyone can produce a backtest with a good-looking equity curve. This one runs day-by-day
-        simulations with walk-forward cross-validation, rolling Kelly position sizing with no look-ahead,
-        transaction costs, regime tagging and an SPY benchmark &mdash; then subjects the output to
-        Probabilistic and Deflated Sharpe ratios, Fama-French factor decomposition, cost-sensitivity
-        sweeps, and an append-only forward ledger that grades live predictions after the fact so past
-        calls can't be quietly revised.
-      </p>
-
-      <p class="prose">
-        The other half of the system points forward. A 106k-parameter multi-modal transformer &mdash;
-        deliberately tiny, because daily market data is small data drowning in noise &mdash; reads 60 days
-        of 13 features and emits three things: the probability of an up-move, a q10&ndash;q90 distribution of
-        the return built so the quantiles can never cross, and a volatility forecast. A Predictor view
-        blends that price channel with post-earnings drift and news sentiment, weights each by its own
-        confidence, and <em>lowers</em> the combined confidence when the channels disagree. That is the part
-        I'd defend: the useful output of a forecaster isn't a number, it's a calibrated distribution and an
-        honest confidence attached to it.
-      </p>
-
-      <div class="finding">
-        <p class="eyebrow">Reported finding</p>
-        <p>
-          Run over a 42-variant trend and mean-reversion grid on SPY using Combinatorial Purged
-          Cross-Validation, the platform reports a <strong>72% probability of backtest overfitting</strong>
-          &mdash; the in-sample winner lands in the bottom half out-of-sample more often than not &mdash;
-          and a median of only ~52% of in-sample Sharpe surviving out of sample. An earlier run of the
-          identical procedure returned 63% and ~38%: same code, same grid, same ticker, different window.
-          That instability is itself the finding, and the report says so rather than quoting whichever
-          number flatters the system. The ML forecaster's test
-          AUC of &asymp;0.51 on next-week direction is, correctly and publicly, a coin flip. The one clean
-          positive: a dip-buying strategy on AAPL/MSFT in ranging markets, January 2021 to January 2024,
-          returning +21.6% against SPY's +5.6%. One more year of data shrinks that edge to +3.6 points,
-          and the report says so.
-        </p>
-      </div>
-
-      <details class="method">
-        <summary>Method</summary>
-        <div class="inner">
-          <ul>
-            <li><strong>The Data-Mining Lab.</strong> Generates hundreds of random long/flat strategies that have no edge <em>by construction</em>, keeps the luckiest, and shows the naive statistics calling it significant while the Deflated Sharpe correctly calls it noise. The gap between those two numbers is the argument the whole system is built on.</li>
-            <li><strong>Architecture.</strong> The browser holds all UI state and the backend is a pure compute layer; the ML model is trained offline and shipped as a portable ONNX artifact &mdash; ~40&nbsp;MB of ONNX Runtime instead of PyTorch's 700&nbsp;MB, which is what lets it serve inside a 512&nbsp;MB free tier. 15 API endpoints, five of them forward-looking rather than backtest-looking.</li>
-            <li><strong>Forecast honesty.</strong> Calibration scores the model only on data after its validation cutoff &mdash; a claim of &ldquo;60% up&rdquo; is worthless unless the market rises about 60% of the time it is said. Test AUC comes back at &asymp;0.51 and the page says so. The forward ledger then logs every live prediction at the moment it is made and grades it once the horizon elapses, append-only, so the hit rate cannot be refitted in hindsight.</li>
-            <li><strong>What the shipped model can't do.</strong> The committed checkpoint was trained with the macro and news blocks zero-filled, so it currently predicts from price alone; the multi-modal plumbing is real and tested, and a retrain activates the other two channels with no code change. The metadata file shows it &mdash; those five features carry a standard deviation of exactly zero.</li>
-            <li><strong>Indicators from first principles.</strong> SMA, EMA, RSI, MACD, ADX and Bollinger Bands implemented directly rather than pulled from a TA library, across six strategies plus a no-code custom rule builder and a regime-detecting adaptive mode.</li>
-            <li><strong>Data resilience.</strong> A three-stage cascade &mdash; Tiingo, then yfinance, then Stooq &mdash; so a single upstream outage doesn't take the system down.</li>
-            <li><strong>Pipeline.</strong> GitHub Actions running 374 pytest cases, flake8 linting and smoke tests on every push.</li>
-          </ul>
-        </div>
-      </details>
-
-      <div class="stack">
-        <span>Python 3.11</span><span>Flask 3</span><span>pandas</span><span>SciPy (SLSQP)</span><span>ONNX Runtime</span><span>Chart.js</span><span>Postgres</span>
-      </div>
-      <div class="links">
-        <a class="primary" href="https://alphaglyph.org/backtest.html">Run a backtest &rarr;</a>
-        <a class="secondary" href="https://alphaglyph.org/tools.html">Predictor &amp; research lab</a>
-        <a class="secondary" href="https://alphaglyph.org">Project site</a>
-        <a class="secondary" href="https://github.com/Danny-397/Alphaglyph/blob/main/docs/technical-report.md">Technical report</a>
-        <a class="secondary" href="https://github.com/Danny-397/Alphaglyph">Source</a>
-      </div>
-    </article>
-
-    <article class="rec" data-field="ml" id="rl-chess">
-      <div class="rec-head">
-        <div class="rank"><span class="num">05</span><span class="lede-note">Play it yourself</span><a class="try-live" href="https://rlchess.xyz/#play">Try it live <span aria-hidden="true">&nearr;</span></a></div>
-        <div class="tags">
-          <span class="tag type">Research study</span>
-          <span class="tag">Reinforcement learning</span>
-          <span class="tag live">rlchess.xyz</span>
-        </div>
-        <h3>AlphaZero-style Chess Engine</h3>
-        <p class="lede">
-          An AlphaZero-style engine that learns by playing itself &mdash; a policy/value network, tree
-          search and a self-play loop, written from scratch, with no openings or human games. You can
-          play it in your browser.
-        </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>The full AlphaZero pipeline, network, tree search and self-play, built from scratch and running in your browser, plus controlled multi-seed experiments on how self-play training behaves.</p>
-      </div>
-
-      <figure class="plate">
-        <div class="plate-frame">
-          <video
-            muted loop playsinline preload="none"
-            width="1000" height="587"
-            poster="media/rlchess-selfplay.webp"
-            data-src="media/rlchess-selfplay.mp4"
-            aria-label="The engine playing itself in the browser: pieces move on the board while the panel on the left lists the engine's top three candidate moves with their evaluations and the move list fills in below."></video>
-          <button type="button" class="plate-toggle" data-play data-clip="the chess engine self-play clip">Pause</button>
-          <a class="plate-cover" href="https://rlchess.xyz/#play">
-            <span class="plate-cta">Play the engine &nearr;</span>
-          </a>
-        </div>
-        <figcaption>
-          <span class="chip">Screen recording &middot; self-play in the browser</span>
-          <b>The engine playing itself, client-side.</b> Candidate moves and their evaluations appear on
-          the left as the search runs; the move list and captured material fill in as the game goes. The
-          same page lets you take White and play it yourself.
-        </figcaption>
-      </figure>
-
-      <dl class="figs">
-        <div><dt>Self-play games trained</dt><dd>1,000 <small>~9.8h on 2&times;T4</small></dd></div>
-        <div><dt>Change vs starting network (95% CI &minus;125 to &minus;60)</dt><dd>&minus;93 Elo <small>3 seeds</small></dd></div>
-        <div><dt>Policy head</dt><dd>4,672 <small>move logits</small></dd></div>
-      </dl>
-
-      <p class="prose">
-        A dual-headed ResNet reads an <code>18&times;8&times;8</code> position tensor and emits both a move
-        policy and a position value in <code>[&minus;1, 1]</code>; PUCT Monte-Carlo tree search balances the
-        running value estimate against the network's priors; self-play generates the
-        (position, search policy, outcome) tuples it then trains on. The browser opponent runs the
-        exported network client-side through ONNX Runtime Web.
-      </p>
-
-      <div class="finding">
-        <p class="eyebrow">Reported finding</p>
-        <p>
-          From iteration 3, every baseline self-play game ends in threefold repetition: with every outcome
-          a draw, the value head learns that every position is even. My first write-up claimed a material
-          blend in the search broke the cycle (&minus;21 &rarr; +28 Elo). It did not hold: the arms had been
-          evaluated with different searches and nothing was compared with the starting network, so I
-          withdrew it. Rerun with three seeds per arm, each measured against its own start, training inside
-          the cycle made the network <em>worse</em>: &minus;93 Elo against random (95% CI &minus;125 to &minus;60).
-          The material blend only held level, and scoring drawn games by material taught the value head
-          a little without changing play (&minus;93 again). Reading the search code then turned up a bug that
-          hid repetitions of earlier positions from the search. With it fixed and self-play contempt added,
-          repetitions fell from 82% of games to 16% and checkmates tripled, yet the network still declined by
-          the same amount (&minus;91, 95% CI &minus;123 to &minus;60). The cycle was real; it was not the cause.
-        </p>
-      </div>
-
-      <details class="method">
-        <summary>Method</summary>
-        <div class="inner">
-          <ul>
-            <li>Modular by component so each piece is testable in isolation: <code>chess_game.py</code> (rules and encoding), <code>model.py</code> (network), <code>mcts.py</code> (search), <code>self_play.py</code> / <code>training.py</code> (the learning loop), <code>evaluation.py</code> (strength measurement).</li>
-            <li>Trained with cross-entropy loss against the MCTS visit distribution and mean-squared error against the final game outcome.</li>
-            <li>Three ways in: a browser UI, a console client, and a FastAPI HTTP API.</li>
-            <li>59-test pytest suite on GitHub Actions, including an ONNX-vs-PyTorch parity check on the exported network.</li>
-          </ul>
-        </div>
-      </details>
-
-      <div class="stack">
-        <span>PyTorch</span><span>Python 3.10+</span><span>FastAPI</span><span>ONNX Runtime Web</span><span>chess.js</span><span>Vercel</span>
-      </div>
-      <div class="links">
-        <a class="primary" href="https://rlchess.xyz/#play">Play the engine &rarr;</a>
-        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine/blob/main/docs/technical-report.md">Technical report</a>
-        <a class="secondary" href="https://rlchess.xyz/#findings">How the investigation went</a>
-        <a class="secondary" href="https://github.com/Danny-397/RL-Chess-Engine">Source</a>
-      </div>
-    </article>
-
-    <article class="rec" data-field="art" id="neural-canvas">
-      <div class="rec-head">
-        <div class="rank"><span class="num">06</span><span class="lede-note">Hackathon piece</span><a class="try-live" href="https://danny-397.github.io/neural-canvas/">Try it live <span aria-hidden="true">&nearr;</span></a></div>
-        <div class="tags">
-          <span class="tag type">Artwork</span>
-          <span class="tag">Hack the Arts 2026</span>
-          <span class="tag live">Runs in your browser</span>
-        </div>
-        <h3>Neural Canvas</h3>
-        <p class="lede">
-          Paint glowing light in mid-air with your bare hands. No controller, no mouse, no stylus &mdash;
-          a webcam, a neural network, and a pinch of your fingers.
-        </p>
-        <p class="takeaway"><span class="takeaway-label">Takeaway</span>Hand tracking as the medium: 21 3D landmarks per hand at ~60 frames a second, entirely on-device, in one HTML file.</p>
-      </div>
-
-      <figure class="plate">
-        <div class="plate-frame">
-          <video
-            muted loop playsinline preload="none"
-            width="960" height="600"
-            poster="media/neuralcanvas-paint.webp"
-            data-src="media/neuralcanvas-paint.mp4"
-            aria-label="The painting engine drawing a glowing violet mandala: a single stroke path is mirrored into six-fold kaleidoscope symmetry with additive blending and shadow-blur glow, slowly fading as new strokes are laid down."></video>
-          <button type="button" class="plate-toggle" data-play data-clip="the Neural Canvas demo">Pause</button>
-          <a class="plate-cover" href="https://danny-397.github.io/neural-canvas/">
-            <span class="plate-cta">Paint with your hands &nearr;</span>
-          </a>
-        </div>
-        <figcaption>
-          <span class="chip">Screen recording &middot; the app's idle demo</span>
-          <b>The brush engine, in the app's own idle mode.</b> With no hand in frame the canvas drives
-          itself, which shows the rendering honestly: one stroke path mirrored into six-fold symmetry,
-          additive blending, shadow-blur glow and a slow fade. With a webcam, that path is your fingertip.
-        </figcaption>
-      </figure>
-
-      <dl class="figs">
-        <div><dt>Hand landmarks tracked</dt><dd>21 <small>per hand, in 3D</small></dd></div>
-        <div><dt>Inference rate</dt><dd>~60/s <small>fully on-device</small></dd></div>
-        <div><dt>Build step</dt><dd>None <small>one HTML file, no server</small></dd></div>
-      </dl>
-
-      <p class="prose">
-        Built for Hack the Arts 2026, whose theme was art that wouldn't exist without technology &mdash;
-        so the hand tracking isn't a control scheme bolted onto a paint program, it's the medium.
-        MediaPipe Tasks Vision locates 21 3D points per hand about sixty times a second entirely in the
-        browser; a one-euro filter smooths the jitter out of raw landmark data so strokes stay clean;
-        Canvas 2D renders them with additive blending and shadow-blur glow. Nothing leaves the device.
-      </p>
-
-      <details class="method">
-        <summary>Method</summary>
-        <div class="inner">
-          <ul>
-            <li><strong>Gesture vocabulary.</strong> Pinch to paint; other hand positions erase, change color and clear the canvas &mdash; no UI chrome between the person and the drawing.</li>
-            <li><strong>Brushes.</strong> Neon glow, ribbon, spray, comet and embers, each a different stroke-accumulation model.</li>
-            <li><strong>Symmetry.</strong> Kaleidoscope mirroring at 2, 4, 6 and 8 folds, applied as a transform on the stroke path.</li>
-            <li><strong>Extras.</strong> Full-body pose painting, an attract mode for unattended displays, and save/record output.</li>
-            <li><strong>Constraint.</strong> Pure HTML, CSS and JavaScript in a single file &mdash; no framework, no build, no backend. MediaPipe runs via WebAssembly and GPU.</li>
-          </ul>
-        </div>
-      </details>
-
-      <div class="stack">
-        <span>JavaScript</span><span>MediaPipe Tasks Vision</span><span>WebAssembly</span><span>Canvas 2D</span><span>One-euro filter</span>
-      </div>
-      <div class="links">
-        <a class="primary" href="https://danny-397.github.io/neural-canvas/">Paint with your hands &rarr;</a>
-        <a class="secondary" href="reports/Neural-Canvas-Technical-Report.pdf">Technical report</a>
-        <a class="secondary" href="https://github.com/Danny-397/neural-canvas">Source</a>
-      </div>
-    </article>
-
-  </div>
+  </section>
 </main>
 
-<footer class="colophon">
-  <div class="wrap colophon-grid">
-    <div>
-      <p class="eyebrow">Contact</p>
-      <p>
-        <a href="mailto:dlichtenberger91@gmail.com">dlichtenberger91@gmail.com</a><br>
-        <a href="https://github.com/Danny-397">github.com/Danny-397</a>
-      </p>
-    </div>
-    <div>
-      <p class="eyebrow">On the numbers</p>
-      <p>
-        Every figure on this page is taken from the corresponding repository's own
-        documentation and test suite, and each one links back to how it was measured.
-      </p>
-    </div>
-    <div>
-      <p class="eyebrow">On the screens</p>
-      <p>
-        Every image and recording is captured from the deployed application itself, in
-        September 2026 &mdash; no mockups, no staged data. Where a service is not currently
-        serving, the record says so.
-      </p>
-    </div>
-    <div>
-      <p class="eyebrow">Colophon</p>
-      <p>
-        Set in Iowan Old Style and Cascadia Mono. Drawn in a single HTML file with no
-        framework and no build step &mdash; same constraint as the artwork.
-      </p>
-    </div>
+<footer>
+  <div class="wrap">
+    <p>Dan Lichtenberger · New York</p>
+    <p class="links">
+      <a href="mailto:dlichtenberger91@gmail.com">dlichtenberger91@gmail.com</a>
+      <a href="https://github.com/Danny-397">GitHub</a>
+    </p>
   </div>
 </footer>
 
 <script>
 (function () {
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---------- field filter ---------- */
-  var bar = document.getElementById('filters');
-  var recs = Array.prototype.slice.call(document.querySelectorAll('.rec'));
-
-  /* Records used to be a rule-separated list, where the first visible one had to
-     lose its top rule. They are self-contained cards now, so there is nothing to
-     restripe -- and zeroing padding here would collapse the first card. */
-  function restripe() {}
-
-  function applyFilter(f) {
-    Array.prototype.forEach.call(bar.querySelectorAll('button'), function (b) {
-      b.setAttribute('aria-pressed', String(b.getAttribute('data-f') === f));
-    });
-    recs.forEach(function (r) {
-      r.hidden = !(f === 'all' || r.getAttribute('data-field') === f);
-    });
-    restripe();
-  }
-
-  bar.addEventListener('click', function (e) {
-    var btn = e.target.closest('button[data-f]');
-    if (!btn) return;
-    applyFilter(btn.getAttribute('data-f'));
-  });
-
-  /* a table-of-contents click must never land on a filtered-out record */
-  document.getElementById('toc').addEventListener('click', function (e) {
-    var a = e.target.closest('a[href^="#"]');
-    if (!a) return;
-    var target = document.querySelector(a.getAttribute('href'));
-    if (target && target.hidden) applyFilter('all');
-  });
-
-  /* ---------- lazy, viewport-driven demo playback ---------- */
-  var vids = Array.prototype.slice.call(document.querySelectorAll('video[data-src]'));
-
-  function load(v) {
-    if (!v.getAttribute('src')) v.setAttribute('src', v.getAttribute('data-src'));
-  }
-
-  /* The visible word stays short, but four buttons all reading "Pause" are
-     indistinguishable to a screen reader tabbing through the page. Name the
-     clip in aria-label, and keep that label in step with the state. */
-  function setPlayState(btn, word) {
-    btn.textContent = word;
-    var clip = btn.getAttribute('data-clip');
-    if (clip) btn.setAttribute('aria-label', word + ' ' + clip);
-  }
-
-  vids.forEach(function (v) {
-    var btn = v.parentElement.querySelector('[data-play]');
-    if (!btn) return;
-    setPlayState(btn, reduce ? 'Play' : 'Pause');
-    btn.addEventListener('click', function () {
-      if (v.paused) {
-        load(v);
-        var p = v.play();
-        if (p && p.catch) p.catch(function () {});
-        setPlayState(btn, 'Pause');
-        v.removeAttribute('data-user-paused');
-      } else {
-        v.pause();
-        setPlayState(btn, 'Play');
-        v.setAttribute('data-user-paused', '1');
-      }
-    });
-  });
-
-  if ('IntersectionObserver' in window && !reduce) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        var v = en.target;
-        if (en.isIntersecting) {
-          load(v);
-          if (!v.hasAttribute('data-user-paused')) {
-            var p = v.play();
-            if (p && p.catch) p.catch(function () {});
-          }
-        } else {
-          v.pause();
-        }
-      });
-    }, { rootMargin: '150px 0px', threshold: 0.2 });
-    vids.forEach(function (v) { io.observe(v); });
-  }
-
-  /* ---------- sticky utility bar + current-section marker ---------- */
-  var util = document.getElementById('util');
-  var mast = document.querySelector('.masthead');
-  var tocLinks = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
-
-  function onScroll() {
-    var past = window.scrollY > mast.offsetHeight - 40;
-    util.classList.toggle('on', past);
-    util.setAttribute('aria-hidden', String(!past));
-    util.inert = !past;   // hidden bar's links must not take keyboard focus
-
-    var here = null;
-    recs.forEach(function (r) {
-      if (r.hidden) return;
-      if (r.getBoundingClientRect().top <= 140) here = r.id;
-    });
-    tocLinks.forEach(function (a) {
-      a.classList.toggle('here', a.getAttribute('href') === '#' + here);
-    });
-  }
-  var ticking = false;
-  window.addEventListener('scroll', function () {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(function () { onScroll(); ticking = false; });
-  }, { passive: true });
-  onScroll();
-
-  /* ---------- masthead: five seeds, one median ---------- */
-  var cv = document.getElementById('plot');
-  if (!cv || !cv.getContext) return;
-  var ctx = cv.getContext('2d');
-  var N = 260, SEEDS = 5;
-  var paths = [], median = [];
-
-  function rng(seed) {
-    return function () {
-      seed = (seed * 1664525 + 1013904223) % 4294967296;
-      return seed / 4294967296;
-    };
-  }
-
-  function build() {
-    paths = []; median = [];
-    for (var s = 0; s < SEEDS; s++) {
-      var r = rng(97 + s * 7919), v = 0, pts = [];
-      for (var i = 0; i < N; i++) {
-        v += (r() - 0.5) * 0.62 + (r() - 0.5) * 0.28;
-        v *= 0.985;                       /* mean reversion, so paths fan then settle */
-        pts.push(v);
-      }
-      paths.push(pts);
-    }
-    for (var i2 = 0; i2 < N; i2++) {
-      var col = paths.map(function (p) { return p[i2]; }).sort(function (a, b) { return a - b; });
-      median.push(col[2]);
-    }
-  }
-
-  var W = 0, H = 0;
-  function resize() {
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = cv.clientWidth; H = cv.clientHeight;
-    cv.width = Math.max(1, Math.round(W * dpr));
-    cv.height = Math.max(1, Math.round(H * dpr));
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-
-  function ink() {
-    return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#1F4B99';
-  }
-
-  function draw(progress) {
-    ctx.clearRect(0, 0, W, H);
-    if (!W || !H) return;
-    var mid = H * 0.60, amp = Math.min(H * 0.22, 96), c = ink();
-    var upto = Math.max(2, Math.floor(N * progress));
-
-    function xy(i, v) { return [ (i / (N - 1)) * W, mid - v * amp ]; }
-
-    /* the five individual runs, faint */
-    ctx.lineWidth = 1;
-    ctx.globalAlpha = 0.30;
-    ctx.strokeStyle = c;
-    paths.forEach(function (p) {
-      ctx.beginPath();
-      for (var i = 0; i < upto; i++) {
-        var q = xy(i, p[i]);
-        i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]);
-      }
-      ctx.stroke();
-    });
-
-    /* the honest summary, drawn over them */
-    ctx.globalAlpha = 0.85;
-    ctx.lineWidth = 1.6;
-    ctx.beginPath();
-    for (var j = 0; j < upto; j++) {
-      var m = xy(j, median[j]);
-      j ? ctx.lineTo(m[0], m[1]) : ctx.moveTo(m[0], m[1]);
-    }
-    ctx.stroke();
-
-    /* zero line */
-    ctx.globalAlpha = 0.18;
-    ctx.lineWidth = 1;
-    ctx.setLineDash([2, 5]);
-    ctx.beginPath();
-    ctx.moveTo(0, mid);
-    ctx.lineTo(W * progress, mid);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.globalAlpha = 1;
-  }
-
-  var start = null;
-  function frame(t) {
-    if (start === null) start = t;
-    var p = Math.min(1, (t - start) / 1500);
-    draw(p * p * (3 - 2 * p));
-    if (p < 1) requestAnimationFrame(frame);
-  }
-
-  function run() {
-    resize();
-    build();
-    if (reduce) { draw(1); return; }
-    start = null;
-    requestAnimationFrame(frame);
-  }
-
-  run();
-
-  var t0;
-  window.addEventListener('resize', function () {
-    clearTimeout(t0);
-    t0 = setTimeout(function () { resize(); draw(1); }, 160);
-  });
-
-  /* redraw when the viewer flips theme, so the pen colour follows */
-  new MutationObserver(function () { draw(1); })
-    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-})();
-</script>
-
-<script>
-/* ---------- theme, motion, and the two inline charts ---------- */
-(function () {
-  var root = document.documentElement;
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ---------- theme toggle ----------
-     The CSS has carried data-theme overrides for a while but nothing ever set
-     the attribute, so the viewer was stuck with whatever the OS reported. */
-  function stored() {
-    try { return localStorage.getItem('theme'); } catch (e) { return null; }
-  }
-  function systemDark() {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  }
-  function currentlyDark() {
-    var t = root.getAttribute('data-theme');
-    return t ? t === 'dark' : systemDark();
-  }
-  var saved = stored();
-  if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
-
-  function flip() {
-    var next = currentlyDark() ? 'light' : 'dark';
-    root.setAttribute('data-theme', next);
-    try { localStorage.setItem('theme', next); } catch (e) { /* private mode */ }
-  }
-  Array.prototype.forEach.call(document.querySelectorAll('.themebtn'), function (b) {
-    b.addEventListener('click', flip);
-  });
-
-  /* ---------- scroll progress ---------- */
-  var bar = document.getElementById('progress');
-  function progress() {
-    if (!bar) return;
-    var h = document.documentElement.scrollHeight - window.innerHeight;
-    bar.style.transform = 'scaleX(' + (h > 0 ? Math.min(1, window.scrollY / h) : 0) + ')';
-  }
-  var queued = false;
-  window.addEventListener('scroll', function () {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(function () { progress(); queued = false; });
-  }, { passive: true });
-  progress();
-
-  /* ---------- reveal on scroll ---------- */
-  var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
-  if (reduce || !('IntersectionObserver' in window)) {
-    reveals.forEach(function (el) { el.classList.add('in'); });
+  /* Fade sections in once as they reach the screen. */
+  var items = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window && !reduce) {
+    var ro = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); ro.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -8% 0px" });
+    items.forEach(function (el) { ro.observe(el); });
   } else {
-    var ro = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        en.target.classList.add('in');
-        ro.unobserve(en.target);
-      });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
-    reveals.forEach(function (el) { ro.observe(el); });
+    items.forEach(function (el) { el.classList.add("in"); });
   }
 
-  /* ---------- chart hover: enhances the labels, never the only way to read a value
-     (every figure is also in the table view under each chart) ---------- */
-  Array.prototype.forEach.call(document.querySelectorAll('.viz-wrap'), function (wrap) {
-    var tip = wrap.querySelector('.viz-tt');
-    if (!tip) return;
-    function show(e) {
-      var t = e.target.getAttribute('data-tip');
-      if (!t) return;
-      tip.textContent = t;
-      tip.style.opacity = '1';
-      var box = wrap.getBoundingClientRect();
-      var dot = e.target.getBoundingClientRect();
-      tip.style.left = Math.round(dot.left - box.left + dot.width / 2 - tip.offsetWidth / 2) + 'px';
-      tip.style.top = Math.round(dot.top - box.top - tip.offsetHeight - 4) + 'px';
+  /* Recordings load only when reached, play while on screen, and can be paused.
+     With reduced motion they wait for a click. */
+  document.querySelectorAll(".frame video").forEach(function (v) {
+    var btn = v.parentElement.querySelector(".toggle");
+    var userPaused = reduce;
+    function load() { if (!v.getAttribute("src")) v.setAttribute("src", v.getAttribute("data-src")); }
+    function sync() { btn.textContent = v.paused ? "Play" : "Pause"; }
+    function play() { load(); var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    btn.hidden = false; sync();
+    v.addEventListener("play", sync); v.addEventListener("pause", sync);
+    btn.addEventListener("click", function () {
+      if (v.paused) { userPaused = false; play(); } else { userPaused = true; v.pause(); }
+    });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (e.isIntersecting && !userPaused) play();
+          else if (!e.isIntersecting && !v.paused) v.pause();
+        });
+      }, { threshold: 0.35 }).observe(v);
     }
-    function hide() { tip.style.opacity = '0'; }
-    wrap.addEventListener('mouseover', show);
-    wrap.addEventListener('mouseout', hide);
-    wrap.addEventListener('focusin', show);
-    wrap.addEventListener('focusout', hide);
   });
-
-  /* No count-up on the ledger figures. They are factual claims, and an animation
-     that counts 584 -> 1,316 means the page displays a wrong number for a second --
-     which is the exact failure mode the rest of this site argues against. */
 })();
 </script>
 </body>

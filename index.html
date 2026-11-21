@@ -80,7 +80,7 @@
   /* ---------------------------------------------------------------- top bar */
   .top { border-bottom: 1px solid var(--rule); }
   .top .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 24px; }
-  .top .name { font: 600 16px/1 var(--sans); color: var(--text); letter-spacing: -.01em; }
+  .top .name { font: 500 21px/1 var(--serif); color: var(--text); letter-spacing: -.01em; white-space: nowrap; }
   .top nav { display: flex; gap: clamp(16px, 3vw, 32px); }
   .top nav a { font-size: 15px; color: var(--muted); }
   .top nav a:hover { color: var(--text); }
@@ -88,7 +88,6 @@
   /* ---------------------------------------------------------------- hero */
   .hero { --pc: var(--c); padding-top: clamp(48px, 8vw, 96px); padding-bottom: clamp(56px, 8vw, 88px); }
   .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
-  .hero .label { margin: 0 0 24px; }
   .hero h1 { margin: 0; font: 500 clamp(38px, 4.3vw, 58px)/1.06 var(--serif); letter-spacing: -.022em; }
   .rot { display: block; height: 1.12em; overflow: hidden; }
   .rot-in { display: inline-block; font-style: italic; color: var(--pc); transition: color .5s var(--ease); white-space: nowrap; }
@@ -149,6 +148,7 @@
     .show-cap { padding: 32px 16px 14px; }
     .cap-name { font-size: 19px; }
   }
+  @media (max-width: 359px) { .top nav a.opt2 { display: none; } }
   @media (prefers-reduced-motion: reduce) {
     .slide { transition: none; transform: none; }
     .rot-in.swap { animation: none; }
@@ -245,6 +245,8 @@
   @media (max-width: 640px) {
     body { font-size: 16px; }
     .top nav a.opt { display: none; }
+    .top .name { font-size: 18px; }
+    .top nav { gap: 16px; }
     .stats { grid-template-columns: 1fr 1fr; gap: 28px 20px; }
     .metrics { grid-template-columns: 1fr; }
     .metrics dt { font-size: 30px; }
@@ -265,7 +267,7 @@
     <a class="name" href="./">Dan Lichtenberger</a>
     <nav aria-label="Site">
       <a href="#work">Work</a>
-      <a href="reports.html">Reports</a>
+      <a class="opt2" href="reports.html">Reports</a>
       <a class="opt" href="https://github.com/Danny-397">GitHub</a>
       <a href="mailto:dlichtenberger91@gmail.com">Contact</a>
     </nav>
@@ -276,7 +278,6 @@
   <section class="hero wrap" style="--c: #3F55C4; --cd: #93A5F4">
     <div class="hero-grid">
       <div class="hero-text">
-        <p class="label">Dan Lichtenberger · New York</p>
         <h1 aria-label="I build and ship, from scratch, software in security, machine learning, finance and art.">
           <span aria-hidden="true">I build and ship, <br>from scratch,</span>
           <span class="rot" aria-hidden="true"><span class="rot-in">cryptography.</span></span>
@@ -558,7 +559,7 @@
 
 <footer>
   <div class="wrap">
-    <p>Dan Lichtenberger · New York</p>
+    <p>Dan Lichtenberger</p>
     <p class="links">
       <a href="mailto:dlichtenberger91@gmail.com">dlichtenberger91@gmail.com</a>
       <a href="https://github.com/Danny-397">GitHub</a>

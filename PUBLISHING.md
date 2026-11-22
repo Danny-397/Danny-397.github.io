@@ -54,7 +54,7 @@ colophon ("On the screens"), so it has to stay true.
 | `rltrader-arms.webp` | The memorised-vs-generalised figure | Element screenshot of `#rs-arms` |
 | `quantumsafe-scan.webp` | A real snippet scan | Click `#demo-sample`, screenshot the result panel |
 | `alphaglyph-replay.mp4` | "Watch it trade" day-by-day replay | Run a backtest, press Play on the replay, record |
-| `rlchess-selfplay.mp4` | The engine playing itself | Play tab → `#watchBtn`, record |
+| `pieces/*.svg` | Chess piece art for the live boards (showcase slide + Chess Engine section) | Copied from `RL-Chess-Engine/web/static/pieces/` (Cburnett set); the boards are built by the script at the end of `index.html`, no recording |
 | `tradeski-dashboard.webp` | The terminal with the backend up | From `Tradeski/docs/screenshots/dashboard.png` |
 | `neuralcanvas-paint.mp4` | The brush engine in idle mode | See the camera note below |
 

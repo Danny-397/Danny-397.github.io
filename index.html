@@ -202,6 +202,46 @@
   }
   .frame .toggle:hover { background: rgba(14,18,24,.9); }
 
+  /* Chess: a live board playing an opening, in place of a screen recording.
+     Same walnut, maple and brass as rlchess.xyz. The script at the end of
+     the page builds the squares and pieces inside [data-chess-board]. */
+  .chess-stage, .slide-chess { background: #1d140e; }
+  .chess-stage { --ar: 16 / 9; display: grid; place-items: center; }
+  .chess-stage .cb-frame { height: 84%; }
+  .slide.slide-chess { display: flex; justify-content: center; align-items: flex-start; gap: clamp(20px, 3vw, 36px); padding-top: 18px; }
+  .slide-chess .cb-frame { height: calc(100% - 82px); flex: none; }
+  .cb-side { height: calc(100% - 124px); width: 150px; display: flex; flex-direction: column; }  /* ends above the caption fade */
+  .cb-label { margin: 0 0 10px; font: 500 11.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #C9A368; }
+  .cb-list { flex: 1; min-height: 0; margin: 0; padding: 0; list-style: none; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: flex-end; font: 500 13px/1 var(--mono); color: #EFE3CB; }
+  .cb-list li { display: grid; grid-template-columns: 30px 1fr 1fr; padding: 7px 0; border-top: 1px solid rgba(236,216,180,.1); }
+  .cb-list .n { color: #9D8A6B; }
+  .cb-frame { position: relative; aspect-ratio: 1; padding: clamp(7px, 1.4vw, 16px); border-radius: 4px; background: #2b1b10;
+    box-shadow: inset 0 1px 0 rgba(255,235,200,.08), inset 0 0 0 1px rgba(0,0,0,.5), 0 30px 60px -30px rgba(0,0,0,.9); }
+  .cb-board { position: relative; width: 100%; height: 100%; display: grid; grid-template: repeat(8, 1fr) / repeat(8, 1fr);
+    outline: 1px solid rgba(201,163,104,.5); outline-offset: clamp(3px, .5vw, 6px); }
+  .cb-sq { transition: box-shadow .35s var(--ease); }
+  .cb-sq.l { background: #E7CD9C; }
+  .cb-sq.d { background: #9B6842; }
+  .cb-sq.hl { box-shadow: inset 0 0 0 999px rgba(201,163,104,.5); }
+  .cb-pieces { position: absolute; inset: 0; transition: opacity .6s var(--ease); }
+  .cb-pieces.fade { opacity: 0; }
+  .cb-p { position: absolute; left: 0; top: 0; width: 12.5%; height: 12.5%; display: grid; place-items: center;
+    transition: transform .62s cubic-bezier(.45,.05,.2,1), opacity .35s var(--ease); }
+  .cb-p img { width: 86%; height: 86%; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0,0,0,.38)); }
+  .cb-p.mv { z-index: 1; }
+  .cb-p.gone { opacity: 0; }
+  .cb-move { position: absolute; left: 18px; bottom: 16px; margin: 0; font: 500 12px/1 var(--mono); letter-spacing: .06em;
+    text-transform: uppercase; color: #C9A368; }
+  .cb-san { margin-left: 10px; font-weight: 600; letter-spacing: .02em; text-transform: none; color: #EFE3CB; font-size: 14px; }
+  @media (max-width: 640px) {
+    .slide.slide-chess { padding-top: 12px; }
+    .slide-chess .cb-frame { height: calc(100% - 64px); }
+    .cb-side { display: none; }
+    .chess-stage { --ar: 1 / 1; }
+    .chess-stage .cb-frame { height: 78%; margin-bottom: 8%; }
+  }
+
   .p-body { display: grid; grid-template-columns: 4fr 8fr; gap: 48px; margin-top: clamp(32px, 4vw, 48px); }
   .metrics { margin: 0; padding: 0; display: grid; gap: 22px; align-content: start; }
   .metrics div { border-top: 1px solid var(--rule); padding-top: 14px; }
@@ -302,7 +342,7 @@
           <img class="slide" src="media/rltrader-lab.webp" alt="" loading="eager" decoding="async">
           <img class="slide" src="media/tradeski-dashboard.webp" alt="" loading="eager" decoding="async">
           <img class="slide" src="media/alphaglyph-replay.webp" alt="" loading="eager" decoding="async">
-          <img class="slide" src="media/rlchess-selfplay.webp" alt="" loading="eager" decoding="async">
+          <div class="slide slide-chess"><div data-chess-board></div><div class="cb-side" aria-hidden="true"><p class="cb-label">Italian Game</p><ol class="cb-list"></ol></div></div>
           <img class="slide" src="media/neuralcanvas-paint.webp" alt="" loading="eager" decoding="async">
           <span class="show-cap"><span class="cap-name">QuantumSafe Scan</span><span class="cap-hook">Finds the cryptography quantum computers will break</span></span>
         </a>
@@ -490,9 +530,9 @@
         <li><a href="https://github.com/Danny-397/RL-Chess-Engine">Source</a></li>
       </ul>
     </div>
-    <div class="frame reveal" style="--ar: 1000 / 587">
-      <video muted loop playsinline preload="none" width="1000" height="587" poster="media/rlchess-selfplay.webp"
-             data-src="media/rlchess-selfplay.mp4" aria-label="Screen recording of the engine playing itself in the browser, with candidate moves and their evaluations updating as the search runs."></video>
+    <div class="frame chess-stage reveal">
+      <div data-chess-board data-ticker role="img" aria-label="A wooden chess board playing through an Italian Game opening, one move at a time."></div>
+      <p class="cb-move" aria-hidden="true">Italian Game<b class="cb-san">&nbsp;</b></p>
       <button class="toggle" type="button" hidden>Pause</button>
     </div>
     <div class="p-body reveal">
@@ -654,6 +694,113 @@
       }, { threshold: 0.35 }).observe(v);
     }
   });
+})();
+</script>
+<!-- Live chess boards (the showcase slide and the Chess Engine section). A
+     precomputed opening, checked legal with python-chess, so no chess library
+     is needed: pieces slide, captures fade, the last move is highlighted. Each
+     board plays only while on screen (and, in the showcase, while its slide is
+     showing); reduced motion gets the final position, still. Piece art: the
+     Cburnett set, as on rlchess.xyz. -->
+<script>
+(function () {
+  var LINE = [["e2","e4",null,null,"1. e4"],["e7","e5",null,null,"1... e5"],["g1","f3",null,null,"2. Nf3"],["b8","c6",null,null,"2... Nc6"],["f1","c4",null,null,"3. Bc4"],["f8","c5",null,null,"3... Bc5"],["c2","c3",null,null,"4. c3"],["g8","f6",null,null,"4... Nf6"],["d2","d4",null,null,"5. d4"],["e5","d4","d4",null,"5... exd4"],["c3","d4","d4",null,"6. cxd4"],["c5","b4",null,null,"6... Bb4+"],["b1","c3",null,null,"7. Nc3"],["f6","e4","e4",null,"7... Nxe4"],["e1","g1",null,["h1","f1"],"8. O-O"],["b4","c3","c3",null,"8... Bxc3"],["d4","d5",null,null,"9. d5"],["c3","f6",null,null,"9... Bf6"],["f1","e1",null,null,"10. Re1"],["c6","e7",null,null,"10... Ne7"],["e1","e4","e4",null,"11. Rxe4"],["d7","d6",null,null,"11... d6"],["c1","g5",null,null,"12. Bg5"],["f6","g5","g5",null,"12... Bxg5"],["f3","g5","g5",null,"13. Nxg5"],["e8","g8",null,["h8","f8"],"13... O-O"],["g5","h7","h7",null,"14. Nxh7"]];
+  var FILES = "abcdefgh", BACK = "rnbqkbnr";
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function board(host, ticker, list) {
+    host.classList.add("cb-frame");
+    var grid = document.createElement("div"); grid.className = "cb-board"; host.appendChild(grid);
+    var sq = {}, r, f;
+    for (r = 8; r >= 1; r--) for (f = 0; f < 8; f++) {
+      var d = document.createElement("div"); d.className = "cb-sq " + ((f + r) % 2 ? "d" : "l");
+      sq[FILES[f] + r] = d; grid.appendChild(d);
+    }
+    var layer = document.createElement("div"); layer.className = "cb-pieces"; grid.appendChild(layer);
+    var at = {}, last = [], i = 0, timer = null, onScreen = false, active = true, paused = false;
+
+    function put(el, s) { el.style.transform = "translate(" + FILES.indexOf(s[0]) * 100 + "%," + (8 - s[1]) * 100 + "%)"; }
+    function mark(list) {
+      last.forEach(function (s) { sq[s].classList.remove("hl"); });
+      last = list; last.forEach(function (s) { sq[s].classList.add("hl"); });
+    }
+    function reset() {
+      layer.textContent = ""; at = {}; mark([]);
+      for (var f = 0; f < 8; f++) [["w", 1, BACK[f]], ["w", 2, "p"], ["b", 7, "p"], ["b", 8, BACK[f]]].forEach(function (p) {
+        var el = document.createElement("div"), img = document.createElement("img"), s = FILES[f] + p[1];
+        el.className = "cb-p"; img.src = "media/pieces/" + p[0] + p[2] + ".svg"; img.alt = ""; img.draggable = false;
+        el.appendChild(img); put(el, s); layer.appendChild(el); at[s] = el;
+      });
+      if (ticker) ticker.innerHTML = "&nbsp;";
+      if (list) list.textContent = "";
+    }
+    // Move list: one row per move number, white then black, newest at the bottom.
+    function note(san) {
+      var black = san.indexOf("...") > 0, parts = san.split(black ? "... " : ". "), row;
+      if (!black) {
+        row = document.createElement("li");
+        row.innerHTML = '<span class="n">' + parts[0] + '.</span><span></span><span></span>';
+        list.appendChild(row);
+        while (list.children.length > 9) list.removeChild(list.firstChild);
+      }
+      row = list.lastChild; if (row) row.children[black ? 2 : 1].textContent = parts[1];
+    }
+    function slide(from, to) {
+      var el = at[from]; delete at[from]; at[to] = el;
+      el.classList.add("mv"); put(el, to);
+      setTimeout(function () { el.classList.remove("mv"); }, 700);
+    }
+    function step(m) {
+      if (m[2]) { var c = at[m[2]]; delete at[m[2]]; c.classList.add("gone"); setTimeout(function () { c.remove(); }, 450); }
+      slide(m[0], m[1]);
+      if (m[3]) slide(m[3][0], m[3][1]);
+      mark([m[0], m[1]]);
+      if (ticker) ticker.textContent = m[4];
+      if (list) note(m[4]);
+    }
+    reset();
+    if (reduce) { LINE.forEach(step); return { setActive: function () {}, setPaused: function () {} }; }
+
+    function running() { return onScreen && active && !paused && !document.hidden; }
+    function schedule(ms) { clearTimeout(timer); timer = setTimeout(tick, ms); }
+    function tick() {
+      timer = null;
+      if (!running()) return;
+      if (i < LINE.length) { step(LINE[i++]); schedule(i < LINE.length ? 1150 : 4200); return; }
+      layer.classList.add("fade");                 // hold the final position, fade, start over
+      timer = setTimeout(function () { reset(); i = 0; layer.classList.remove("fade"); schedule(1100); }, 650);
+    }
+    function wake() { if (running() && !timer) schedule(700); }
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) { onScreen = es[0].isIntersecting; wake(); }, { threshold: 0.3 }).observe(host);
+    } else { onScreen = true; wake(); }
+    document.addEventListener("visibilitychange", wake);
+    return {
+      setActive: function (a) { active = a; wake(); },
+      setPaused: function (p) { paused = p; wake(); }
+    };
+  }
+
+  // Showcase slide: plays only while it is the slide on show.
+  var slideEl = document.querySelector(".slide-chess");
+  if (slideEl) {
+    var hb = board(slideEl.querySelector("[data-chess-board]"), null, slideEl.querySelector(".cb-list"));
+    var sync = function () { hb.setActive(slideEl.classList.contains("on")); };
+    sync(); new MutationObserver(sync).observe(slideEl, { attributes: true, attributeFilter: ["class"] });
+  }
+
+  // Chess Engine section: with a Pause / Play button, like the recordings.
+  var stage = document.querySelector(".chess-stage");
+  if (stage) {
+    var pb = board(stage.querySelector("[data-chess-board]"), stage.querySelector(".cb-san"));
+    var btn = stage.querySelector(".toggle"), isPaused = false;
+    if (!reduce) {
+      btn.hidden = false;
+      btn.addEventListener("click", function () {
+        isPaused = !isPaused; pb.setPaused(isPaused); btn.textContent = isPaused ? "Play" : "Pause";
+      });
+    }
+  }
 })();
 </script>
 </body>

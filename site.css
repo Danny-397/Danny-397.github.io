@@ -209,3 +209,15 @@ footer.colophon a { color: var(--accent-ink); }
   :root:not([data-theme="light"]) .themebtn .i-moon { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .themebtn:hover { transform: none; } }
+
+/* ---------- touch screens: finger-sized targets (about 44px) ----------
+   Desktop is unchanged. Nothing reflows: the header links, the theme button
+   and the report links keep their look and get a larger invisible hit area
+   via ::after. */
+@media (pointer: coarse) {
+  .bar .name, .bar nav a, .themebtn, .links a, .doc h2 a { position: relative; }
+  .bar .name::after, .bar nav a::after, .links a::after, .doc h2 a::after {
+    content: ""; position: absolute; inset: -12px -6px;
+  }
+  .themebtn::after { content: ""; position: absolute; inset: -8px; border-radius: 50%; }
+}

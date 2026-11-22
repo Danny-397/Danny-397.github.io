@@ -249,3 +249,6 @@ h2:hover .anchor, h3:hover .anchor, .anchor:focus { opacity: 1; }
 .prose-doc :not(pre) > code {
   overflow-wrap: anywhere;
 }
+
+/* Phones: table headers at 12px, not 0.68rem. */
+@media (max-width: 640px) { .prose-doc thead th { font-size: 12px; } }

@@ -254,6 +254,17 @@
     .more-grid { grid-template-columns: 1fr; gap: 24px; }
     .frame { border-radius: 10px; }
   }
+  /* Touch screens: finger-sized targets (about 44px). Desktop is unchanged.
+     The nav links and video toggles grow; text links keep their look and get
+     a larger invisible hit area via ::after, so nothing reflows. */
+  @media (pointer: coarse) {
+    .top nav a { display: inline-flex; align-items: center; min-height: 44px; }
+    .frame .toggle { min-height: 40px; padding: 0 16px; }
+    .top .name, .hero-cta a:not(.btn), .actions a, .more-grid a, footer a { position: relative; }
+    .top .name::after, .hero-cta a:not(.btn)::after, .actions a::after, .more-grid a::after, footer a::after {
+      content: ""; position: absolute; inset: -12px -6px;
+    }
+  }
 </style>
 <script>document.documentElement.className += " js";</script>
 <script src="analytics.js" defer></script>
